@@ -15,16 +15,16 @@ import (
 )
 
 var (
-	httpIncomingRequestsDurationSeconds = promauto.NewHistogramVec(
+	httpIncomingRequestDurationSeconds = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name: "http_incoming_requests_duration_seconds",
+			Name: "http_incoming_request_duration_seconds",
 			Help: "Duration of incoming HTTP requests by path, status code and method.",
 		},
 		[]string{"path", "code", "method"},
 	)
-	httpOutgoingRequestsDurationSeconds = promauto.NewHistogramVec(
+	httpOutgoingRequestDurationSeconds = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name: "http_outgoing_requests_duration_seconds",
+			Name: "http_outgoing_request_duration_seconds",
 			Help: "Duration of outgoing HTTP requests by service and status code.",
 		},
 		[]string{"service", "code"},
@@ -55,7 +55,7 @@ func newTelegramWebhookHandler(dm datamall.APIClient) http.HandlerFunc {
 func main() {
 	client := &http.Client{
 		Transport: promhttp.InstrumentRoundTripperDuration(
-			httpOutgoingRequestsDurationSeconds.MustCurryWith(prometheus.Labels{"service": "datamall"}),
+			httpOutgoingRequestDurationSeconds.MustCurryWith(prometheus.Labels{"service": "datamall"}),
 			http.DefaultTransport,
 		),
 	}
@@ -64,7 +64,7 @@ func main() {
 	http.Handle(
 		"/telegram/updates",
 		promhttp.InstrumentHandlerDuration(
-			httpIncomingRequestsDurationSeconds.MustCurryWith(prometheus.Labels{"path": "/telegram/updates"}),
+			httpIncomingRequestDurationSeconds.MustCurryWith(prometheus.Labels{"path": "/telegram/updates"}),
 			newTelegramWebhookHandler(dm),
 		),
 	)
