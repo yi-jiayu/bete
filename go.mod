@@ -1,4 +1,4 @@
-module github.com/yi-jiayu/bus-eta-bot/v5
+module github.com/yi-jiayu/bete
 
 go 1.14
 
