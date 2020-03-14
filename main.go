@@ -74,5 +74,5 @@ func main() {
 		port = "8080"
 	}
 	addr := fmt.Sprintf(":%s", port)
-	http.ListenAndServe(addr, nil)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
