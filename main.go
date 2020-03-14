@@ -11,7 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/yi-jiayu/datamall/v2"
+	"github.com/yi-jiayu/datamall/v3"
 )
 
 var (
