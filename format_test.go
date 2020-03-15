@@ -71,21 +71,23 @@ func Test_sortByService(t *testing.T) {
 }
 
 func TestFormatArrivalsByService(t *testing.T) {
-	t.Run("without filter", func(t *testing.T) {
-		arrivals := ArrivalInfo{
-			Stop: BusStop{
-				ID:          "96049",
-				Description: "UPP CHANGI STN/SUTD",
-				RoadName:    "Upp Changi Rd East",
+	cases := []struct {
+		name     string
+		arrivals ArrivalInfo
+		expected string
+	}{
+		{
+			name: "show bus stop details when available",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID:          "96049",
+					Description: "UPP CHANGI STN/SUTD",
+					RoadName:    "Upp Changi Rd East",
+				},
+				Time:     refTime,
+				Services: buildDataMallBusArrival().Services,
 			},
-			Time:     refTime,
-			Services: buildDataMallBusArrival().Services,
-		}
-		formatted, err := FormatArrivalsByService(arrivals)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Equal(t, `<strong>UPP CHANGI STN/SUTD (96049)</strong>
+			expected: `<strong>UPP CHANGI STN/SUTD (96049)</strong>
 Upp Changi Rd East
 <pre>
 | Svc  | Nxt | 2nd | 3rd |
@@ -93,24 +95,39 @@ Upp Changi Rd East
 | 5    |  -1 |  10 |  36 |
 | 24   |   1 |   3 |   6 |
 </pre>
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`, formatted)
-	})
-	t.Run("with filter", func(t *testing.T) {
-		arrivals := ArrivalInfo{
-			Stop: BusStop{
-				ID:          "96049",
-				Description: "UPP CHANGI STN/SUTD",
-				RoadName:    "Upp Changi Rd East",
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
+		},
+		{
+			name: "show only bus stop id when details not available",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID: "96049",
+				},
+				Time:     refTime,
+				Services: buildDataMallBusArrival().Services,
 			},
-			Time:     refTime,
-			Services: buildDataMallBusArrival().Services,
-			Filter:   []string{"2", "24"},
-		}
-		formatted, err := FormatArrivalsByService(arrivals)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Equal(t, `<strong>UPP CHANGI STN/SUTD (96049)</strong>
+			expected: `<strong>96049</strong>
+<pre>
+| Svc  | Nxt | 2nd | 3rd |
+|------|-----|-----|-----|
+| 5    |  -1 |  10 |  36 |
+| 24   |   1 |   3 |   6 |
+</pre>
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
+		},
+		{
+			name: "filters services and shows filtered services when filter provided",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID:          "96049",
+					Description: "UPP CHANGI STN/SUTD",
+					RoadName:    "Upp Changi Rd East",
+				},
+				Time:     refTime,
+				Services: buildDataMallBusArrival().Services,
+				Filter:   []string{"2", "24"},
+			},
+			expected: `<strong>UPP CHANGI STN/SUTD (96049)</strong>
 Upp Changi Rd East
 <pre>
 | Svc  | Nxt | 2nd | 3rd |
@@ -118,8 +135,16 @@ Upp Changi Rd East
 | 24   |   1 |   3 |   6 |
 </pre>
 Filtered by services: 2, 24
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`, formatted)
-	})
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			actual, err := FormatArrivalsByService(c.arrivals)
+			assert.NoError(t, err)
+			assert.Equal(t, c.expected, actual)
+		})
+	}
 }
 
 func Test_filterByService(t *testing.T) {

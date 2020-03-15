@@ -1,6 +1,7 @@
-<strong>{{ .Stop.Description }} ({{ .Stop.ID }})</strong>
-{{ .Stop.RoadName }}
-<pre>
+{{ if .Stop.Description }}<strong>{{ .Stop.Description }} ({{ .Stop.ID }})</strong>
+{{ else }}<strong>{{ .Stop.ID }}</strong>
+{{ end }}{{ with .Stop.RoadName }}{{ . }}
+{{ end }}<pre>
 | Svc  | Nxt | 2nd | 3rd |
 |------|-----|-----|-----|
 {{- range (.Services | filterByService .Filter | sortByService) }}
@@ -10,5 +11,5 @@
 | {{ printf "%-4v" .ServiceNo }} | {{ printf "%3v" $fst }} | {{ printf "%3v" $snd }} | {{ printf "%3v" $thd }} |
 {{- end }}
 </pre>
-{{ if .Filter }}Filtered by services: {{ join .Filter ", " }}
+{{ with .Filter }}Filtered by services: {{ join . ", " }}
 {{ end }}<em>Last updated on {{ .Time | inSGT }}</em>
