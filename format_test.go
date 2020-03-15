@@ -148,30 +148,56 @@ Filtered by services: 2, 24
 }
 
 func Test_filterByService(t *testing.T) {
-	t.Run("noop when filter is empty", func(t *testing.T) {
-		services := []datamall.Service{
-			{ServiceNo: "2"},
-			{ServiceNo: "5"},
-			{ServiceNo: "24"},
-		}
-		filtered := filterByService(nil, services)
-		assert.Equal(t, []datamall.Service{
-			{ServiceNo: "2"},
-			{ServiceNo: "5"},
-			{ServiceNo: "24"},
-		}, filtered)
-	})
-	t.Run("returns only services in filter", func(t *testing.T) {
-		services := []datamall.Service{
-			{ServiceNo: "2"},
-			{ServiceNo: "5"},
-			{ServiceNo: "24"},
-		}
-		filter := []string{"5", "24"}
-		filtered := filterByService(filter, services)
-		assert.Equal(t, []datamall.Service{
-			{ServiceNo: "5"},
-			{ServiceNo: "24"},
-		}, filtered)
-	})
+	cases := []struct {
+		name     string
+		services []datamall.Service
+		filter   []string
+		expected []datamall.Service
+	}{
+		{
+			name: "noop when filter is empty",
+			services: []datamall.Service{
+				{ServiceNo: "2"},
+				{ServiceNo: "5"},
+				{ServiceNo: "24"},
+			},
+			filter: nil,
+			expected: []datamall.Service{
+				{ServiceNo: "2"},
+				{ServiceNo: "5"},
+				{ServiceNo: "24"},
+			},
+		},
+		{
+			name: "returns only services in filter",
+			services: []datamall.Service{
+				{ServiceNo: "2"},
+				{ServiceNo: "5"},
+				{ServiceNo: "24"},
+			},
+			filter: []string{"5", "24"},
+			expected: []datamall.Service{
+				{ServiceNo: "5"},
+				{ServiceNo: "24"},
+			},
+		},
+		{
+			name: "filter should be case-insensitive",
+			services: []datamall.Service{
+				{ServiceNo: "2A"},
+				{ServiceNo: "5e"},
+			},
+			filter: []string{"2a", "5E"},
+			expected: []datamall.Service{
+				{ServiceNo: "2A"},
+				{ServiceNo: "5e"},
+			},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			filtered := filterByService(c.filter, c.services)
+			assert.Equal(t, c.expected, filtered)
+		})
+	}
 }

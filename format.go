@@ -72,7 +72,7 @@ func filterByService(filter []string, services []datamall.Service) []datamall.Se
 	var filtered []datamall.Service
 	for _, s := range services {
 		for _, f := range filter {
-			if s.ServiceNo == f {
+			if strings.EqualFold(s.ServiceNo, f) {
 				filtered = append(filtered, s)
 			}
 		}
