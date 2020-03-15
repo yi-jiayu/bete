@@ -25,7 +25,7 @@ var funcMap = map[string]interface{}{
 var (
 	arrivalsByServiceTemplate = template.Must(template.New("arrivals_by_service.tmpl").
 		Funcs(funcMap).
-		ParseFiles("templates/arrivals_by_service.tmpl"))
+		Parse(arrivalsByServiceTemplateString))
 )
 
 var sgt = time.FixedZone("SGT", 8*3600)
