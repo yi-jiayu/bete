@@ -2,11 +2,11 @@ package bete
 
 import (
 	"bytes"
+	"html/template"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/yi-jiayu/datamall/v3"

@@ -98,6 +98,25 @@ Upp Changi Rd East
 <em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
+			name: "escapes dangerous HTML",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID: "<em>Hello</em>",
+				},
+				Time:     refTime,
+				Services: buildDataMallBusArrival().Services,
+				Filter:   []string{"2", "5", "<strong>24</strong>"},
+			},
+			expected: `<strong>&lt;em&gt;Hello&lt;/em&gt;</strong>
+<pre>
+| Svc  | Nxt | 2nd | 3rd |
+|------|-----|-----|-----|
+| 5    |  -1 |  10 |  36 |
+</pre>
+Filtered by services: 2, 5, &lt;strong&gt;24&lt;/strong&gt;
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
+		},
+		{
 			name: "show only bus stop id when details not available",
 			arrivals: ArrivalInfo{
 				Stop: BusStop{
