@@ -21,5 +21,14 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: docker build -t docker.pkg.github.com/yi-jiayu/bete/bete:<< pipeline.git.revision >>
+      - run: docker build -t docker.pkg.github.com/yi-jiayu/bete/bete:<< pipeline.git.revision >> .
+
+workflows:
+  version: 2
+  package:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
 
