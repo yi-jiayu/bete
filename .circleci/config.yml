@@ -14,14 +14,14 @@ jobs:
 
     steps:
       - checkout
-
-      # specify any bash command here prefixed with `run: `
       - run: go test -v -cover -coverprofile=coverage.out -covermode=count ./...
   build:
     machine: true
     steps:
       - checkout
+      - run: echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --username yi-jiayu --password-stdin
       - run: docker build -t docker.pkg.github.com/yi-jiayu/bete/bete:<< pipeline.git.revision >> .
+      - run: docker push docker.pkg.github.com/yi-jiayu/bete/bete:<< pipeline.git.revision >>
 
 workflows:
   version: 2
@@ -31,4 +31,3 @@ workflows:
       - build:
           requires:
             - test
-
