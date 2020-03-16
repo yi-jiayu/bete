@@ -20,8 +20,8 @@ jobs:
     steps:
       - checkout
       - run: echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --username yi-jiayu --password-stdin
-      - run: docker build -t docker.pkg.github.com/yi-jiayu/bete/bete:<< pipeline.git.revision >> .
-      - run: docker push docker.pkg.github.com/yi-jiayu/bete/bete:<< pipeline.git.revision >>
+      - run: docker build -t docker.pkg.github.com/yi-jiayu/bete/bete:$(git describe --always) .
+      - run: docker push docker.pkg.github.com/yi-jiayu/bete/bete:$(git describe --always)
 
 workflows:
   version: 2
