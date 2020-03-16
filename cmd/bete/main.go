@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -36,7 +35,7 @@ var (
 	)
 )
 
-func newTelegramWebhookHandler(dm datamall.APIClient) http.HandlerFunc {
+func newTelegramWebhookHandler(b bete.Bete) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var update ted.Update
 		err := json.NewDecoder(r.Body).Decode(&update)
@@ -48,6 +47,7 @@ func newTelegramWebhookHandler(dm datamall.APIClient) http.HandlerFunc {
 			return
 		}
 		message := update.Message
+		chatID := message.Chat.ID
 		var query string
 		if command, args := message.CommandAndArgs(); command == "eta" {
 			query = args
@@ -58,48 +58,57 @@ func newTelegramWebhookHandler(dm datamall.APIClient) http.HandlerFunc {
 		if len(parts) == 0 {
 			return
 		}
-		stop := parts[0]
-		t := time.Now()
-		arrivals, err := dm.GetBusArrival(stop, "")
+		stop, filter := parts[0], parts[1:]
+		err = b.SendETAMessage(chatID, stop, filter)
 		if err != nil {
-			log.Printf("error getting bus arrivals: %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		text, err := bete.FormatArrivalsByService(bete.ArrivalInfo{
-			Stop:     bete.BusStop{ID: stop},
-			Time:     t,
-			Services: arrivals.Services,
-			Filter:   parts[1:],
-		})
-		w.Header().Set("Content-Type", "application/json")
-		reply := map[string]interface{}{
-			"method":     "sendMessage",
-			"chat_id":    message.Chat.ID,
-			"text":       text,
-			"parse_mode": "HTML",
-		}
-		err = json.NewEncoder(w).Encode(reply)
-		if err != nil {
-			log.Printf("error writing bus arrivals to response: %v", err)
+			log.Printf("error sending eta message: %v", err)
 		}
 	}
 }
 
 func main() {
-	client := &http.Client{
+	accountKey := os.Getenv("DATAMALL_ACCOUNT_KEY")
+	if accountKey == "" {
+		log.Fatal("DATAMALL_ACCOUNT_KEY environment variable not set")
+	}
+	dm := datamall.NewClient(accountKey, &http.Client{
 		Transport: promhttp.InstrumentRoundTripperDuration(
 			httpOutgoingRequestDurationSeconds.MustCurryWith(prometheus.Labels{"service": "datamall"}),
 			http.DefaultTransport,
 		),
+	})
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		log.Fatal("DATABASE_URL environment variable not set")
 	}
-	accountKey := os.Getenv("DATAMALL_ACCOUNT_KEY")
-	dm := datamall.NewClient(accountKey, client)
+	repo, err := bete.NewPostgresBusStopRepository(databaseURL)
+	if err != nil {
+		log.Fatalf("error creating postgres bus stop repository: %v", err)
+	}
+	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
+	if botToken == "" {
+		log.Fatal("TELEGRAM_BOT_TOKEN environment variable not set")
+	}
+	bot := ted.Bot{
+		Token: botToken,
+		HTTPClient: &http.Client{
+			Transport: promhttp.InstrumentRoundTripperDuration(
+				httpOutgoingRequestDurationSeconds.MustCurryWith(prometheus.Labels{"service": "telegram"}),
+				http.DefaultTransport,
+			),
+		},
+	}
+	b := bete.Bete{
+		Clock:    bete.RealClock{},
+		BusStops: repo,
+		DataMall: dm,
+		Telegram: bot,
+	}
 	http.Handle(
 		"/telegram/updates",
 		promhttp.InstrumentHandlerDuration(
 			httpIncomingRequestDurationSeconds.MustCurryWith(prometheus.Labels{"path": "/telegram/updates"}),
-			newTelegramWebhookHandler(dm),
+			newTelegramWebhookHandler(b),
 		),
 	)
 	http.Handle("/metrics", promhttp.Handler())

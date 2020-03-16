@@ -53,3 +53,11 @@ func buildDataMallBusArrival() datamall.BusArrival {
 		},
 	}
 }
+
+func buildBusStop() BusStop {
+	return BusStop{
+		ID:          "96049",
+		Description: "UPP CHANGI STN/SUTD",
+		RoadName:    "Upp Changi Rd East",
+	}
+}
