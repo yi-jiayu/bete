@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"github.com/yi-jiayu/ted"
 )
 
@@ -67,6 +66,5 @@ func TestBete_HandleCallbackQuery_Refresh(t *testing.T) {
 			}.Encode(),
 		},
 	}
-	err := b.HandleUpdate(update)
-	assert.NoError(t, err)
+	b.HandleUpdate(update)
 }

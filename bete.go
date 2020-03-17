@@ -35,14 +35,13 @@ type Bete struct {
 	Telegram Telegram
 }
 
-func (b Bete) HandleUpdate(u ted.Update) error {
+func (b Bete) HandleUpdate(u ted.Update) {
 	switch {
 	case u.Message != nil:
-		return b.HandleMessage(u.Message)
+		b.HandleMessage(u.Message)
 	case u.CallbackQuery != nil:
-		return b.HandleCallbackQuery(u.CallbackQuery)
+		b.HandleCallbackQuery(u.CallbackQuery)
 	}
-	return nil
 }
 
 func (b Bete) SendETAMessage(chatID int, stopID string, filter []string) error {

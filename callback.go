@@ -7,15 +7,16 @@ import (
 	"github.com/yi-jiayu/ted"
 )
 
-func (b Bete) HandleCallbackQuery(q *ted.CallbackQuery) error {
+func (b Bete) HandleCallbackQuery(q *ted.CallbackQuery) {
 	var data CallbackData
 	err := json.Unmarshal([]byte(q.Data), &data)
 	if err != nil {
-		return err
+		return
 	}
 	text, err := b.etaMessageText(data.StopID, data.Filter)
 	if err != nil {
-		return err
+		log.Printf("error generating eta message text: %v", err)
+		return
 	}
 	editMessageText := ted.EditMessageTextRequest{
 		ChatID:      q.Message.Chat.ID,
@@ -36,5 +37,4 @@ func (b Bete) HandleCallbackQuery(q *ted.CallbackQuery) error {
 	if err != nil {
 		log.Printf("error making answerCallbackQuery request: %v", err)
 	}
-	return nil
 }

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"github.com/yi-jiayu/ted"
 )
 
@@ -51,6 +50,5 @@ func TestBete_HandleMessage_Text(t *testing.T) {
 			Text: "96049 5 24",
 		},
 	}
-	err := b.HandleUpdate(update)
-	assert.NoError(t, err)
+	b.HandleUpdate(update)
 }

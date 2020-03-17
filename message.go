@@ -1,20 +1,24 @@
 package bete
 
 import (
+	"log"
 	"strings"
 
 	"github.com/yi-jiayu/ted"
 )
 
-func (b Bete) HandleMessage(m *ted.Message) error {
-	return b.HandleTextMessage(m)
+func (b Bete) HandleMessage(m *ted.Message) {
+	b.HandleTextMessage(m)
 }
 
-func (b Bete) HandleTextMessage(m *ted.Message) error {
+func (b Bete) HandleTextMessage(m *ted.Message) {
 	parts := strings.Fields(m.Text)
 	if len(parts) == 0 {
-		return nil
+		return
 	}
 	stop, filter := parts[0], parts[1:]
-	return b.SendETAMessage(m.Chat.ID, stop, filter)
+	err := b.SendETAMessage(m.Chat.ID, stop, filter)
+	if err != nil {
+		log.Printf("error sending eta message: %v", err)
+	}
 }
