@@ -60,6 +60,10 @@ func Test_etaMessageReplyMarkup(t *testing.T) {
 					Text:         "Refresh",
 					CallbackData: "{\"t\":\"refresh\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
 				},
+				{
+					Text:         "Resend",
+					CallbackData: "{\"t\":\"resend\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
+				},
 			},
 		},
 	}

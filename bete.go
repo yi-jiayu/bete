@@ -91,6 +91,14 @@ func etaMessageReplyMarkup(stopID string, filter []string) ted.InlineKeyboardMar
 						Filter: filter,
 					}.Encode(),
 				},
+				{
+					Text: "Resend",
+					CallbackData: CallbackData{
+						Type:   "resend",
+						StopID: stopID,
+						Filter: filter,
+					}.Encode(),
+				},
 			},
 		},
 	}
