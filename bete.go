@@ -29,10 +29,11 @@ type Telegram interface {
 }
 
 type Bete struct {
-	Clock    Clock
-	BusStops BusStopRepository
-	DataMall DataMall
-	Telegram Telegram
+	Clock      Clock
+	BusStops   BusStopRepository
+	Favourites FavouriteRepository
+	DataMall   DataMall
+	Telegram   Telegram
 }
 
 func (b Bete) HandleUpdate(ctx context.Context, u ted.Update) {

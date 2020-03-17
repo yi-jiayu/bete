@@ -13,7 +13,13 @@ func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
 }
 
 func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
-	parts := strings.Fields(m.Text)
+	var query string
+	if favourite := b.Favourites.FindByUserAndText(m.From.ID, m.Text); favourite != "" {
+		query = favourite
+	} else {
+		query = m.Text
+	}
+	parts := strings.Fields(query)
 	if len(parts) == 0 {
 		return
 	}

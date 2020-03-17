@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -81,9 +82,9 @@ func main() {
 	if databaseURL == "" {
 		log.Fatal("DATABASE_URL environment variable not set")
 	}
-	repo, err := bete.NewPostgresBusStopRepository(databaseURL)
+	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
-		log.Fatalf("error creating postgres bus stop repository: %v", err)
+		log.Fatalf("error opening postgres database: %v", err)
 	}
 	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
 	if botToken == "" {
@@ -99,10 +100,11 @@ func main() {
 		},
 	}
 	b := bete.Bete{
-		Clock:    bete.RealClock{},
-		BusStops: repo,
-		DataMall: dm,
-		Telegram: bot,
+		Clock:      bete.RealClock{},
+		BusStops:   bete.PostgresBusStopRepository{DB: db},
+		Favourites: bete.PostgresFavouriteRepository{DB: db},
+		DataMall:   dm,
+		Telegram:   bot,
 	}
 	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 	http.Handle(

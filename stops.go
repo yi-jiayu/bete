@@ -24,20 +24,12 @@ type BusStopRepository interface {
 }
 
 type PostgresBusStopRepository struct {
-	db *sql.DB
-}
-
-func NewPostgresBusStopRepository(url string) (PostgresBusStopRepository, error) {
-	db, err := sql.Open("postgres", url)
-	if err != nil {
-		return PostgresBusStopRepository{}, errors.Wrap(err, "error opening postgres database")
-	}
-	return PostgresBusStopRepository{db: db}, nil
+	DB *sql.DB
 }
 
 func (r PostgresBusStopRepository) Find(id string) (BusStop, error) {
 	var stop BusStop
-	err := r.db.QueryRow("select id, description, road from stops where id = $1", id).Scan(&stop.ID, &stop.Description, &stop.RoadName)
+	err := r.DB.QueryRow("select id, description, road from stops where id = $1", id).Scan(&stop.ID, &stop.Description, &stop.RoadName)
 	if err == sql.ErrNoRows {
 		return stop, Error("not found")
 	} else if err != nil {

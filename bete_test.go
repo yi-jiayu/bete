@@ -9,7 +9,7 @@ import (
 	"github.com/yi-jiayu/ted"
 )
 
-//go:generate bin/mockgen -source bete.go -destination bete_mocks_test.go -package bete
+//go:generate bin/mockgen -destination mocks_test.go -package bete -self_package github.com/yi-jiayu/bete . Clock,DataMall,Telegram,BusStopRepository,FavouriteRepository
 
 func must(i interface{}, err error) interface{} {
 	if err != nil {
