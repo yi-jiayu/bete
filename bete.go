@@ -1,6 +1,7 @@
 package bete
 
 import (
+	"encoding/json"
 	"log"
 	"time"
 
@@ -34,15 +35,26 @@ type Bete struct {
 	Telegram Telegram
 }
 
+func (b Bete) HandleUpdate(u ted.Update) error {
+	switch {
+	case u.Message != nil:
+		return b.HandleMessage(u.Message)
+	case u.CallbackQuery != nil:
+		return b.HandleCallbackQuery(u.CallbackQuery)
+	}
+	return nil
+}
+
 func (b Bete) SendETAMessage(chatID int, stopID string, filter []string) error {
 	text, err := b.etaMessageText(stopID, filter)
 	if err != nil {
 		return err
 	}
 	req := ted.SendMessageRequest{
-		ChatID:    chatID,
-		Text:      text,
-		ParseMode: "HTML",
+		ChatID:      chatID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(stopID, filter),
 	}
 	_, err = b.Telegram.Do(req)
 	if err != nil {
@@ -69,4 +81,41 @@ func (b Bete) etaMessageText(stopID string, filter []string) (string, error) {
 		Services: arrivals.Services,
 		Filter:   filter,
 	})
+}
+
+type CallbackData struct {
+	Type   string   `json:"t"`
+	StopID string   `json:"b,omitempty"`
+	Filter []string `json:"s,omitempty"`
+	Format string   `json:"f,omitempty"`
+}
+
+func (c CallbackData) Encode() string {
+	JSON, err := json.Marshal(c)
+	if err != nil {
+		panic(err)
+	}
+	return string(JSON)
+}
+
+func etaMessageReplyMarkup(stopID string, filter []string) ted.InlineKeyboardMarkup {
+	return ted.InlineKeyboardMarkup{
+		InlineKeyboard: [][]ted.InlineKeyboardButton{
+			{
+				{
+					Text: "Refresh",
+					CallbackData: CallbackData{
+						Type:   "refresh",
+						StopID: stopID,
+						Filter: filter,
+					}.Encode(),
+				},
+			},
+		},
+	}
+}
+
+func etaMessageReplyMarkupP(stopID string, filter []string) *ted.InlineKeyboardMarkup {
+	markup := etaMessageReplyMarkup(stopID, filter)
+	return &markup
 }

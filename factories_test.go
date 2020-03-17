@@ -1,12 +1,27 @@
 package bete
 
 import (
+	"encoding/base64"
+	"math/rand"
 	"time"
 
 	"github.com/yi-jiayu/datamall/v3"
 )
 
 var refTime = time.Unix(1584244383, 0)
+
+func randomID() int {
+	return rand.Int()
+}
+
+func randomStringID() string {
+	p := make([]byte, 6)
+	_, err := rand.Read(p)
+	if err != nil {
+		return "abcdef"
+	}
+	return base64.StdEncoding.EncodeToString(p)
+}
 
 func buildDataMallBusArrival() datamall.BusArrival {
 	return datamall.BusArrival{

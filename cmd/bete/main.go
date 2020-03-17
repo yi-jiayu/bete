@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -43,25 +42,9 @@ func newTelegramWebhookHandler(b bete.Bete) http.HandlerFunc {
 			log.Printf("error decoding update: %v", err)
 			return
 		}
-		if update.Message == nil || update.Message.Text == "" {
-			return
-		}
-		message := update.Message
-		chatID := message.Chat.ID
-		var query string
-		if command, args := message.CommandAndArgs(); command == "eta" {
-			query = args
-		} else {
-			query = message.Text
-		}
-		parts := strings.Fields(query)
-		if len(parts) == 0 {
-			return
-		}
-		stop, filter := parts[0], parts[1:]
-		err = b.SendETAMessage(chatID, stop, filter)
+		err = b.HandleUpdate(update)
 		if err != nil {
-			log.Printf("error sending eta message: %v", err)
+			log.Printf("error handling update: %v", err)
 		}
 	}
 }

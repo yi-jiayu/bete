@@ -68,7 +68,7 @@ func TestBete_SendETAMessage(t *testing.T) {
 
 	stop := buildBusStop()
 	arrivals := buildDataMallBusArrival()
-	chatID := 123
+	chatID := randomID()
 	text := must(FormatArrivalsByService(ArrivalInfo{
 		Stop:     stop,
 		Time:     refTime,
@@ -76,9 +76,10 @@ func TestBete_SendETAMessage(t *testing.T) {
 		Filter:   nil,
 	})).(string)
 	req := ted.SendMessageRequest{
-		ChatID:    chatID,
-		Text:      text,
-		ParseMode: "HTML",
+		ChatID:      chatID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(stop.ID, nil),
 	}
 
 	clock.EXPECT().Now().Return(refTime)
@@ -88,4 +89,19 @@ func TestBete_SendETAMessage(t *testing.T) {
 
 	err := b.SendETAMessage(chatID, stop.ID, nil)
 	assert.NoError(t, err)
+}
+
+func Test_etaMessageReplyMarkup(t *testing.T) {
+	expected := ted.InlineKeyboardMarkup{
+		InlineKeyboard: [][]ted.InlineKeyboardButton{
+			{
+				{
+					Text:         "Refresh",
+					CallbackData: "{\"t\":\"refresh\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
+				},
+			},
+		},
+	}
+	actual := etaMessageReplyMarkup("96049", []string{"5", "24"})
+	assert.Equal(t, expected, actual)
 }

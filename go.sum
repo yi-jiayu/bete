@@ -83,6 +83,8 @@ github.com/yi-jiayu/datamall/v3 v3.1.0 h1:jRxvumFTuPngBYEaopduZQLkg/jaiX0kbGrx02
 github.com/yi-jiayu/datamall/v3 v3.1.0/go.mod h1:jT2m4Iwr+Js4J/wcuCT7d4Su94U8rm+0scpygqDJJiI=
 github.com/yi-jiayu/ted v0.0.0-20200315154109-23238d1ed67d h1:2R9HU/4Oa/KM1ntxDVLmO93jdwPdfjTKzYBjgTLrJBQ=
 github.com/yi-jiayu/ted v0.0.0-20200315154109-23238d1ed67d/go.mod h1:sQJ9I0muTEOa2hHCrIt1AeKRlQLQZyamj8vUdDDppWI=
+github.com/yi-jiayu/ted v0.0.0-20200317074027-9f0164c0d656 h1:2lRfiYCXbZ5zQTkIswP3fWzCThfENJR77J6t0DBScl4=
+github.com/yi-jiayu/ted v0.0.0-20200317074027-9f0164c0d656/go.mod h1:XN9J9OOiT+A+c+usXAv9xQL9f1mKsvZcJRovhE92CQU=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/net v0.0.0-20181114220301-adae6a3d119a/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
