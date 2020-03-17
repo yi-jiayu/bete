@@ -194,6 +194,8 @@ github.com/yi-jiayu/ted v0.0.0-20200315154109-23238d1ed67d h1:2R9HU/4Oa/KM1ntxDV
 github.com/yi-jiayu/ted v0.0.0-20200315154109-23238d1ed67d/go.mod h1:sQJ9I0muTEOa2hHCrIt1AeKRlQLQZyamj8vUdDDppWI=
 github.com/yi-jiayu/ted v0.0.0-20200317074027-9f0164c0d656 h1:2lRfiYCXbZ5zQTkIswP3fWzCThfENJR77J6t0DBScl4=
 github.com/yi-jiayu/ted v0.0.0-20200317074027-9f0164c0d656/go.mod h1:XN9J9OOiT+A+c+usXAv9xQL9f1mKsvZcJRovhE92CQU=
+github.com/yi-jiayu/ted v0.0.0-20200317132353-025baaf9e05c h1:sBndeIUldrXcLtDXPyXqN1kqJV0lFzLcK0EW/aiCRL8=
+github.com/yi-jiayu/ted v0.0.0-20200317132353-025baaf9e05c/go.mod h1:XN9J9OOiT+A+c+usXAv9xQL9f1mKsvZcJRovhE92CQU=
 github.com/yudai/gojsondiff v1.0.0/go.mod h1:AY32+k2cwILAkW1fbgxQ5mUmMiZFgLIV+FBNExI05xg=
 github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82/go.mod h1:lgjkn3NuSvDfVJdfcVVdX+jpBxNmX4rDAzaS45IcYoM=
 github.com/yudai/pp v2.0.1+incompatible/go.mod h1:PuxR/8QJ7cyCkFp/aUDS+JY727OFEZkTdatxwunjIkc=

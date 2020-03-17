@@ -31,7 +31,7 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		Text:            "ETAs updated!",
 	}
 	_, err = b.Telegram.Do(editMessageText)
-	if err != nil {
+	if err != nil && !ted.IsMessageNotModified(err) {
 		captureError(ctx, errors.WithStack(err))
 	}
 	_, err = b.Telegram.Do(answerCallbackQuery)
