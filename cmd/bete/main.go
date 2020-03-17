@@ -21,6 +21,11 @@ import (
 )
 
 var (
+	commit      = "tip"
+	environment = os.Getenv("ENVIRONMENT")
+)
+
+var (
 	httpIncomingRequestDurationSeconds = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name: "http_incoming_request_duration_seconds",
@@ -49,8 +54,17 @@ func newTelegramWebhookHandler(b bete.Bete) http.HandlerFunc {
 	}
 }
 
+func init() {
+	if environment == "" {
+		environment = "development"
+	}
+}
+
 func main() {
-	if err := sentry.Init(sentry.ClientOptions{}); err != nil {
+	if err := sentry.Init(sentry.ClientOptions{
+		Release:     commit,
+		Environment: environment,
+	}); err != nil {
 		log.Printf("Sentry initialization failed: %v\n", err)
 	}
 	accountKey := os.Getenv("DATAMALL_ACCOUNT_KEY")
