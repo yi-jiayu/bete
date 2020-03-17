@@ -1,6 +1,7 @@
 package bete
 
 import (
+	"context"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -66,5 +67,5 @@ func TestBete_HandleCallbackQuery_Refresh(t *testing.T) {
 			}.Encode(),
 		},
 	}
-	b.HandleUpdate(update)
+	b.HandleUpdate(context.Background(), update)
 }

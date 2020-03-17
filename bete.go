@@ -1,6 +1,7 @@
 package bete
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"time"
@@ -35,12 +36,12 @@ type Bete struct {
 	Telegram Telegram
 }
 
-func (b Bete) HandleUpdate(u ted.Update) {
+func (b Bete) HandleUpdate(ctx context.Context, u ted.Update) {
 	switch {
 	case u.Message != nil:
-		b.HandleMessage(u.Message)
+		b.HandleMessage(ctx, u.Message)
 	case u.CallbackQuery != nil:
-		b.HandleCallbackQuery(u.CallbackQuery)
+		b.HandleCallbackQuery(ctx, u.CallbackQuery)
 	}
 }
 

@@ -42,7 +42,7 @@ func newTelegramWebhookHandler(b bete.Bete) http.HandlerFunc {
 			log.Printf("error decoding update: %v", err)
 			return
 		}
-		b.HandleUpdate(update)
+		b.HandleUpdate(r.Context(), update)
 	}
 }
 

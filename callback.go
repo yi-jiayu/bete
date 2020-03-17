@@ -1,13 +1,14 @@
 package bete
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 
 	"github.com/yi-jiayu/ted"
 )
 
-func (b Bete) HandleCallbackQuery(q *ted.CallbackQuery) {
+func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	var data CallbackData
 	err := json.Unmarshal([]byte(q.Data), &data)
 	if err != nil {

@@ -1,17 +1,18 @@
 package bete
 
 import (
+	"context"
 	"log"
 	"strings"
 
 	"github.com/yi-jiayu/ted"
 )
 
-func (b Bete) HandleMessage(m *ted.Message) {
-	b.HandleTextMessage(m)
+func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
+	b.HandleTextMessage(ctx, m)
 }
 
-func (b Bete) HandleTextMessage(m *ted.Message) {
+func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 	parts := strings.Fields(m.Text)
 	if len(parts) == 0 {
 		return

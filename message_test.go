@@ -1,6 +1,7 @@
 package bete
 
 import (
+	"context"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -50,5 +51,5 @@ func TestBete_HandleMessage_Text(t *testing.T) {
 			Text: "96049 5 24",
 		},
 	}
-	b.HandleUpdate(update)
+	b.HandleUpdate(context.Background(), update)
 }
