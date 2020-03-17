@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/getsentry/sentry-go"
+	sentryhttp "github.com/getsentry/sentry-go/http"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -47,6 +50,9 @@ func newTelegramWebhookHandler(b bete.Bete) http.HandlerFunc {
 }
 
 func main() {
+	if err := sentry.Init(sentry.ClientOptions{}); err != nil {
+		log.Printf("Sentry initialization failed: %v\n", err)
+	}
 	accountKey := os.Getenv("DATAMALL_ACCOUNT_KEY")
 	if accountKey == "" {
 		log.Fatal("DATAMALL_ACCOUNT_KEY environment variable not set")
@@ -84,11 +90,14 @@ func main() {
 		DataMall: dm,
 		Telegram: bot,
 	}
+	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 	http.Handle(
 		"/telegram/updates",
-		promhttp.InstrumentHandlerDuration(
-			httpIncomingRequestDurationSeconds.MustCurryWith(prometheus.Labels{"path": "/telegram/updates"}),
-			newTelegramWebhookHandler(b),
+		sentryHandler.Handle(
+			promhttp.InstrumentHandlerDuration(
+				httpIncomingRequestDurationSeconds.MustCurryWith(prometheus.Labels{"path": "/telegram/updates"}),
+				newTelegramWebhookHandler(b),
+			),
 		),
 	)
 	http.Handle("/metrics", promhttp.Handler())

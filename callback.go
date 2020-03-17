@@ -3,8 +3,8 @@ package bete
 import (
 	"context"
 	"encoding/json"
-	"log"
 
+	"github.com/pkg/errors"
 	"github.com/yi-jiayu/ted"
 )
 
@@ -14,9 +14,9 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	if err != nil {
 		return
 	}
-	text, err := b.etaMessageText(data.StopID, data.Filter)
+	text, err := b.etaMessageText(ctx, data.StopID, data.Filter)
 	if err != nil {
-		log.Printf("error generating eta message text: %v", err)
+		captureError(ctx, err)
 		return
 	}
 	editMessageText := ted.EditMessageTextRequest{
@@ -32,10 +32,10 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	}
 	_, err = b.Telegram.Do(editMessageText)
 	if err != nil {
-		log.Printf("error making editMessageText request: %v", err)
+		captureError(ctx, errors.WithStack(err))
 	}
 	_, err = b.Telegram.Do(answerCallbackQuery)
 	if err != nil {
-		log.Printf("error making answerCallbackQuery request: %v", err)
+		captureError(ctx, errors.WithStack(err))
 	}
 }

@@ -1,6 +1,7 @@
 package bete
 
 import (
+	"context"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -37,7 +38,7 @@ func TestBete_etaMessageText(t *testing.T) {
 	busStopRepository.EXPECT().Find(gomock.Any()).Return(stop, nil)
 	dm.EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 
-	actual, err := b.etaMessageText(stop.ID, nil)
+	actual, err := b.etaMessageText(context.Background(), stop.ID, nil)
 	assert.NoError(t, err)
 	expected, err := FormatArrivalsByService(ArrivalInfo{
 		Stop:     stop,
@@ -49,46 +50,6 @@ func TestBete_etaMessageText(t *testing.T) {
 		panic(err)
 	}
 	assert.Equal(t, expected, actual)
-}
-
-func TestBete_SendETAMessage(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	clock := NewMockClock(ctrl)
-	busStopRepository := NewMockBusStopRepository(ctrl)
-	dm := NewMockDataMall(ctrl)
-	telegram := NewMockTelegram(ctrl)
-	b := Bete{
-		Clock:    clock,
-		BusStops: busStopRepository,
-		DataMall: dm,
-		Telegram: telegram,
-	}
-
-	stop := buildBusStop()
-	arrivals := buildDataMallBusArrival()
-	chatID := randomID()
-	text := must(FormatArrivalsByService(ArrivalInfo{
-		Stop:     stop,
-		Time:     refTime,
-		Services: arrivals.Services,
-		Filter:   nil,
-	})).(string)
-	req := ted.SendMessageRequest{
-		ChatID:      chatID,
-		Text:        text,
-		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkup(stop.ID, nil),
-	}
-
-	clock.EXPECT().Now().Return(refTime)
-	busStopRepository.EXPECT().Find(gomock.Any()).Return(stop, nil)
-	dm.EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
-	telegram.EXPECT().Do(req).Return(ted.Response{}, nil)
-
-	err := b.SendETAMessage(chatID, stop.ID, nil)
-	assert.NoError(t, err)
 }
 
 func Test_etaMessageReplyMarkup(t *testing.T) {

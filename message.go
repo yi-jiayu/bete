@@ -2,9 +2,9 @@ package bete
 
 import (
 	"context"
-	"log"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/yi-jiayu/ted"
 )
 
@@ -18,8 +18,20 @@ func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 		return
 	}
 	stop, filter := parts[0], parts[1:]
-	err := b.SendETAMessage(m.Chat.ID, stop, filter)
+	text, err := b.etaMessageText(ctx, stop, filter)
 	if err != nil {
-		log.Printf("error sending eta message: %v", err)
+		captureError(ctx, err)
+		return
+	}
+	req := ted.SendMessageRequest{
+		ChatID:      m.Chat.ID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(stop, filter),
+	}
+	_, err = b.Telegram.Do(req)
+	if err != nil {
+		captureError(ctx, errors.WithStack(err))
+		return
 	}
 }

@@ -3,7 +3,6 @@ package bete
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"time"
 
 	"github.com/pkg/errors"
@@ -45,25 +44,7 @@ func (b Bete) HandleUpdate(ctx context.Context, u ted.Update) {
 	}
 }
 
-func (b Bete) SendETAMessage(chatID int, stopID string, filter []string) error {
-	text, err := b.etaMessageText(stopID, filter)
-	if err != nil {
-		return err
-	}
-	req := ted.SendMessageRequest{
-		ChatID:      chatID,
-		Text:        text,
-		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkup(stopID, filter),
-	}
-	_, err = b.Telegram.Do(req)
-	if err != nil {
-		return errors.Wrap(err, "error sending telegram message")
-	}
-	return nil
-}
-
-func (b Bete) etaMessageText(stopID string, filter []string) (string, error) {
+func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string) (string, error) {
 	t := b.Clock.Now()
 	arrivals, err := b.DataMall.GetBusArrival(stopID, "")
 	if err != nil {
@@ -72,7 +53,7 @@ func (b Bete) etaMessageText(stopID string, filter []string) (string, error) {
 	var stop BusStop
 	stop, err = b.BusStops.Find(stopID)
 	if err != nil {
-		log.Printf("error getting bus stop: %v", err)
+		captureError(ctx, err)
 		stop = BusStop{ID: stopID}
 	}
 	return FormatArrivalsByService(ArrivalInfo{
