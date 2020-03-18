@@ -15,7 +15,7 @@ func TestBete_HandleCallbackQuery_Refresh(t *testing.T) {
 	stop := buildBusStop()
 	filter := []string{"5", "24"}
 	arrivals := buildDataMallBusArrival()
-	chatID := randomID()
+	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
 	text := must(FormatArrivalsByService(ArrivalInfo{
@@ -66,7 +66,7 @@ func TestBete_HandleCallbackQuery_Resend(t *testing.T) {
 	stop := buildBusStop()
 	filter := []string{"5", "24"}
 	arrivals := buildDataMallBusArrival()
-	chatID := randomID()
+	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
 	text := must(FormatArrivalsByService(ArrivalInfo{
@@ -113,12 +113,12 @@ func TestBete_HandleCallbackQuery_AddFavourite(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	chatID := randomID()
+	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
 	sendMessage := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        "Send me the ETA query you wish to save as a favourite.",
+		Text:        AddFavouritePromptForQuery,
 		ReplyMarkup: ted.ForceReply{},
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{

@@ -2,6 +2,8 @@ package bete
 
 import (
 	"context"
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -9,8 +11,16 @@ import (
 )
 
 func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
+	if m.Text == "" {
+		// Ignore non-text messages.
+		return
+	}
 	if cmd, args := m.CommandAndArgs(); cmd != "" {
 		b.HandleCommand(ctx, m, cmd, args)
+		return
+	}
+	if m.ReplyToMessage != nil {
+		b.HandleReply(ctx, m)
 		return
 	}
 	b.HandleTextMessage(ctx, m)
@@ -72,5 +82,45 @@ func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
 	if err != nil {
 		captureError(ctx, errors.WithStack(err))
 		return
+	}
+}
+
+func (b Bete) HandleReply(ctx context.Context, m *ted.Message) {
+	query := m.Text
+	if invalid, _ := regexp.MatchString("[^0-9A-Za-z ]", query); invalid {
+		reportError := ted.SendMessageRequest{
+			ChatID:      m.Chat.ID,
+			Text:        AddFavouriteReportQueryInvalid,
+			ReplyMarkup: ted.ForceReply{},
+		}
+		askAgain := ted.SendMessageRequest{
+			ChatID:      m.Chat.ID,
+			Text:        AddFavouritePromptForQuery,
+			ReplyMarkup: ted.ForceReply{},
+		}
+		var err error
+		_, err = b.Telegram.Do(reportError)
+		if err != nil {
+			captureError(ctx, errors.WithStack(err))
+			return
+		}
+		_, err = b.Telegram.Do(askAgain)
+		if err != nil {
+			captureError(ctx, errors.WithStack(err))
+			return
+		}
+		return
+	}
+	if m.ReplyToMessage.Text == AddFavouritePromptForQuery {
+		req := ted.SendMessageRequest{
+			ChatID:      m.Chat.ID,
+			Text:        fmt.Sprintf(AddFavouritePromptForName, m.Text),
+			ReplyMarkup: ted.ForceReply{},
+		}
+		_, err := b.Telegram.Do(req)
+		if err != nil {
+			captureError(ctx, errors.WithStack(err))
+			return
+		}
 	}
 }

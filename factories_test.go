@@ -14,6 +14,10 @@ func randomID() int {
 	return rand.Int()
 }
 
+func randomInt64ID() int64 {
+	return rand.Int63()
+}
+
 func randomStringID() string {
 	p := make([]byte, 6)
 	_, err := rand.Read(p)

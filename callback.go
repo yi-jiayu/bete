@@ -80,7 +80,7 @@ func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 func (b Bete) askForFavouriteQuery(ctx context.Context, q *ted.CallbackQuery) {
 	sendMessage := ted.SendMessageRequest{
 		ChatID:      q.Message.Chat.ID,
-		Text:        "Send me the ETA query you wish to save as a favourite.",
+		Text:        AddFavouritePromptForQuery,
 		ReplyMarkup: ted.ForceReply{},
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
