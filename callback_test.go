@@ -108,3 +108,37 @@ func TestBete_HandleCallbackQuery_Resend(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_HandleCallbackQuery_AddFavourite(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	chatID := randomID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	sendMessage := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        "Send me the ETA query you wish to save as a favourite.",
+		ReplyMarkup: ted.ForceReply{},
+	}
+	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(sendMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID: callbackQueryID,
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: "add_favourite",
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
