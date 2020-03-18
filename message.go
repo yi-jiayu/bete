@@ -54,10 +54,19 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args strin
 }
 
 func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
-	req := ted.SendMessageRequest{
-		ChatID:      m.Chat.ID,
-		Text:        "What would you like to do?",
-		ReplyMarkup: favouritesReplyMarkup(),
+	var req ted.Request
+	if m.Chat.Type != "private" {
+		req = ted.SendMessageRequest{
+			ChatID:           m.Chat.ID,
+			Text:             "Sorry, you can only manage your favourites in a private chat.",
+			ReplyToMessageID: m.ID,
+		}
+	} else {
+		req = ted.SendMessageRequest{
+			ChatID:      m.Chat.ID,
+			Text:        "What would you like to do?",
+			ReplyMarkup: favouritesReplyMarkup(),
+		}
 	}
 	_, err := b.Telegram.Do(req)
 	if err != nil {

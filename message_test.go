@@ -101,7 +101,40 @@ func TestBete_HandleCommand_Favourite(t *testing.T) {
 	update := ted.Update{
 		Message: &ted.Message{
 			From: &ted.User{ID: userID},
-			Chat: ted.Chat{ID: chatID},
+			Chat: ted.Chat{ID: chatID, Type: "private"},
+			Text: "/favourites",
+			Entities: []ted.MessageEntity{
+				{
+					Type:   "bot_command",
+					Offset: 0,
+					Length: 11,
+				},
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_HandleCommand_Favourite_NonPrivateChat(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomID()
+	messageID := randomID()
+	req := ted.SendMessageRequest{
+		ChatID:           chatID,
+		Text:             "Sorry, you can only manage your favourites in a private chat.",
+		ReplyToMessageID: messageID,
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			ID:   messageID,
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID, Type: "group"},
 			Text: "/favourites",
 			Entities: []ted.MessageEntity{
 				{
