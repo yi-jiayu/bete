@@ -6,7 +6,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/yi-jiayu/ted"
 )
 
 //go:generate bin/mockgen -destination mocks_test.go -package bete -self_package github.com/yi-jiayu/bete . Clock,DataMall,Telegram,BusStopRepository,FavouriteRepository
@@ -18,25 +17,28 @@ func must(i interface{}, err error) interface{} {
 	return i
 }
 
-func TestBete_etaMessageText(t *testing.T) {
+func newMockBete(t *testing.T) (Bete, func()) {
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	clock := NewMockClock(ctrl)
-	busStopRepository := NewMockBusStopRepository(ctrl)
-	dm := NewMockDataMall(ctrl)
 	b := Bete{
-		Clock:    clock,
-		BusStops: busStopRepository,
-		DataMall: dm,
+		Clock:      NewMockClock(ctrl),
+		BusStops:   NewMockBusStopRepository(ctrl),
+		Favourites: NewMockFavouriteRepository(ctrl),
+		DataMall:   NewMockDataMall(ctrl),
+		Telegram:   NewMockTelegram(ctrl),
 	}
+	return b, ctrl.Finish
+}
+
+func TestBete_etaMessageText(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
 
 	stop := buildBusStop()
 	arrivals := buildDataMallBusArrival()
 
-	clock.EXPECT().Now().Return(refTime)
-	busStopRepository.EXPECT().Find(gomock.Any()).Return(stop, nil)
-	dm.EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 
 	actual, err := b.etaMessageText(context.Background(), stop.ID, nil)
 	assert.NoError(t, err)
@@ -49,24 +51,5 @@ func TestBete_etaMessageText(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	assert.Equal(t, expected, actual)
-}
-
-func Test_etaMessageReplyMarkup(t *testing.T) {
-	expected := ted.InlineKeyboardMarkup{
-		InlineKeyboard: [][]ted.InlineKeyboardButton{
-			{
-				{
-					Text:         "Refresh",
-					CallbackData: "{\"t\":\"refresh\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
-				},
-				{
-					Text:         "Resend",
-					CallbackData: "{\"t\":\"resend\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
-				},
-			},
-		},
-	}
-	actual := etaMessageReplyMarkup("96049", []string{"5", "24"})
 	assert.Equal(t, expected, actual)
 }

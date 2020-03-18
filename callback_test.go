@@ -9,19 +9,8 @@ import (
 )
 
 func TestBete_HandleCallbackQuery_Refresh(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	clock := NewMockClock(ctrl)
-	busStopRepository := NewMockBusStopRepository(ctrl)
-	dm := NewMockDataMall(ctrl)
-	telegram := NewMockTelegram(ctrl)
-	b := Bete{
-		Clock:    clock,
-		BusStops: busStopRepository,
-		DataMall: dm,
-		Telegram: telegram,
-	}
+	b, finish := newMockBete(t)
+	defer finish()
 
 	stop := buildBusStop()
 	filter := []string{"5", "24"}
@@ -47,11 +36,11 @@ func TestBete_HandleCallbackQuery_Refresh(t *testing.T) {
 		Text:            "ETAs updated!",
 	}
 
-	clock.EXPECT().Now().Return(refTime)
-	busStopRepository.EXPECT().Find(gomock.Any()).Return(stop, nil)
-	dm.EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
-	telegram.EXPECT().Do(editMessageText).Return(ted.Response{}, nil)
-	telegram.EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
+	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(editMessageText).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
 
 	update := ted.Update{
 		CallbackQuery: &ted.CallbackQuery{
@@ -71,19 +60,8 @@ func TestBete_HandleCallbackQuery_Refresh(t *testing.T) {
 }
 
 func TestBete_HandleCallbackQuery_Resend(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	clock := NewMockClock(ctrl)
-	busStopRepository := NewMockBusStopRepository(ctrl)
-	dm := NewMockDataMall(ctrl)
-	telegram := NewMockTelegram(ctrl)
-	b := Bete{
-		Clock:    clock,
-		BusStops: busStopRepository,
-		DataMall: dm,
-		Telegram: telegram,
-	}
+	b, finish := newMockBete(t)
+	defer finish()
 
 	stop := buildBusStop()
 	filter := []string{"5", "24"}
@@ -108,11 +86,11 @@ func TestBete_HandleCallbackQuery_Resend(t *testing.T) {
 		Text:            "ETAs sent!",
 	}
 
-	clock.EXPECT().Now().Return(refTime)
-	busStopRepository.EXPECT().Find(gomock.Any()).Return(stop, nil)
-	dm.EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
-	telegram.EXPECT().Do(sendMessage).Return(ted.Response{}, nil)
-	telegram.EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
+	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(sendMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
 
 	update := ted.Update{
 		CallbackQuery: &ted.CallbackQuery{

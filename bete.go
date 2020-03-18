@@ -79,33 +79,3 @@ func (c CallbackData) Encode() string {
 	}
 	return string(JSON)
 }
-
-func etaMessageReplyMarkup(stopID string, filter []string) ted.InlineKeyboardMarkup {
-	return ted.InlineKeyboardMarkup{
-		InlineKeyboard: [][]ted.InlineKeyboardButton{
-			{
-				{
-					Text: "Refresh",
-					CallbackData: CallbackData{
-						Type:   "refresh",
-						StopID: stopID,
-						Filter: filter,
-					}.Encode(),
-				},
-				{
-					Text: "Resend",
-					CallbackData: CallbackData{
-						Type:   "resend",
-						StopID: stopID,
-						Filter: filter,
-					}.Encode(),
-				},
-			},
-		},
-	}
-}
-
-func etaMessageReplyMarkupP(stopID string, filter []string) *ted.InlineKeyboardMarkup {
-	markup := etaMessageReplyMarkup(stopID, filter)
-	return &markup
-}
