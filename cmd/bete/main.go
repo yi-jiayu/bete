@@ -117,11 +117,15 @@ func main() {
 		),
 	)
 	http.Handle("/metrics", promhttp.Handler())
+	var host string
+	if environment == "development" {
+		host = "localhost"
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
-	addr := fmt.Sprintf(":%s", port)
+	addr := fmt.Sprintf("%s:%s", host, port)
 	log.Printf("listening on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
