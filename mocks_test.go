@@ -186,16 +186,45 @@ func (m *MockFavouriteRepository) EXPECT() *MockFavouriteRepositoryMockRecorder 
 	return m.recorder
 }
 
-// FindByUserAndText mocks base method
-func (m *MockFavouriteRepository) FindByUserAndText(arg0 int, arg1 string) string {
+// Find mocks base method
+func (m *MockFavouriteRepository) Find(arg0 int, arg1 string) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByUserAndText", arg0, arg1)
+	ret := m.ctrl.Call(m, "Find", arg0, arg1)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// FindByUserAndText indicates an expected call of FindByUserAndText
-func (mr *MockFavouriteRepositoryMockRecorder) FindByUserAndText(arg0, arg1 interface{}) *gomock.Call {
+// Find indicates an expected call of Find
+func (mr *MockFavouriteRepositoryMockRecorder) Find(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByUserAndText", reflect.TypeOf((*MockFavouriteRepository)(nil).FindByUserAndText), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockFavouriteRepository)(nil).Find), arg0, arg1)
+}
+
+// List mocks base method
+func (m *MockFavouriteRepository) List(arg0 int) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", arg0)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List
+func (mr *MockFavouriteRepositoryMockRecorder) List(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockFavouriteRepository)(nil).List), arg0)
+}
+
+// Put mocks base method
+func (m *MockFavouriteRepository) Put(arg0 int, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Put", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Put indicates an expected call of Put
+func (mr *MockFavouriteRepositoryMockRecorder) Put(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockFavouriteRepository)(nil).Put), arg0, arg1, arg2)
 }

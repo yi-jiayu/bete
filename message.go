@@ -28,7 +28,7 @@ func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
 
 func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 	var query string
-	if favourite := b.Favourites.FindByUserAndText(m.From.ID, m.Text); favourite != "" {
+	if favourite := b.Favourites.Find(m.From.ID, m.Text); favourite != "" {
 		query = favourite
 	} else {
 		query = m.Text
@@ -75,7 +75,7 @@ func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
 		req = ted.SendMessageRequest{
 			ChatID:      m.Chat.ID,
 			Text:        "What would you like to do?",
-			ReplyMarkup: favouritesReplyMarkup(),
+			ReplyMarkup: manageFavouritesReplyMarkup(),
 		}
 	}
 	_, err := b.Telegram.Do(req)
@@ -85,7 +85,27 @@ func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
 	}
 }
 
+func getFavouriteQuery(text string) string {
+	var query string
+	n, err := fmt.Sscanf(text, AddFavouritePromptForName, &query)
+	if err != nil {
+		return ""
+	}
+	if n != 1 {
+		return ""
+	}
+	return query
+}
+
 func (b Bete) HandleReply(ctx context.Context, m *ted.Message) {
+	if m.ReplyToMessage.Text == AddFavouritePromptForQuery {
+		b.addFavouritePromptForName(ctx, m)
+	} else if query := getFavouriteQuery(m.ReplyToMessage.Text); query != "" {
+		b.addFavouriteFinish(ctx, m, query)
+	}
+}
+
+func (b Bete) addFavouritePromptForName(ctx context.Context, m *ted.Message) {
 	query := m.Text
 	if invalid, _ := regexp.MatchString("[^0-9A-Za-z ]", query); invalid {
 		reportError := ted.SendMessageRequest{
@@ -111,16 +131,39 @@ func (b Bete) HandleReply(ctx context.Context, m *ted.Message) {
 		}
 		return
 	}
-	if m.ReplyToMessage.Text == AddFavouritePromptForQuery {
-		req := ted.SendMessageRequest{
-			ChatID:      m.Chat.ID,
-			Text:        fmt.Sprintf(AddFavouritePromptForName, m.Text),
-			ReplyMarkup: ted.ForceReply{},
-		}
-		_, err := b.Telegram.Do(req)
-		if err != nil {
-			captureError(ctx, errors.WithStack(err))
-			return
-		}
+	req := ted.SendMessageRequest{
+		ChatID:      m.Chat.ID,
+		Text:        fmt.Sprintf(AddFavouritePromptForName, m.Text),
+		ReplyMarkup: ted.ForceReply{},
+	}
+	_, err := b.Telegram.Do(req)
+	if err != nil {
+		captureError(ctx, errors.WithStack(err))
+		return
+	}
+}
+
+func (b Bete) addFavouriteFinish(ctx context.Context, m *ted.Message, query string) {
+	name := m.Text
+	userID := m.From.ID
+	err := b.Favourites.Put(userID, name, query)
+	if err != nil {
+		captureError(ctx, err)
+		return
+	}
+	favourites, err := b.Favourites.List(userID)
+	if err != nil {
+		captureError(ctx, err)
+		return
+	}
+	req := ted.SendMessageRequest{
+		ChatID:      m.Chat.ID,
+		Text:        "New favourite added!",
+		ReplyMarkup: showFavouritesReplyMarkup(favourites),
+	}
+	_, err = b.Telegram.Do(req)
+	if err != nil {
+		captureError(ctx, err)
+		return
 	}
 }

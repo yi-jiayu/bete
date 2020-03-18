@@ -34,7 +34,7 @@ func etaMessageReplyMarkupP(stopID string, filter []string) *ted.InlineKeyboardM
 	return &markup
 }
 
-func favouritesReplyMarkup() ted.InlineKeyboardMarkup {
+func manageFavouritesReplyMarkup() ted.InlineKeyboardMarkup {
 	return ted.InlineKeyboardMarkup{
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
@@ -70,5 +70,16 @@ func favouritesReplyMarkup() ted.InlineKeyboardMarkup {
 				},
 			},
 		},
+	}
+}
+
+func showFavouritesReplyMarkup(favourites []string) ted.ReplyKeyboardMarkup {
+	var keyboard [][]interface{}
+	for _, f := range favourites {
+		keyboard = append(keyboard, []interface{}{f})
+	}
+	return ted.ReplyKeyboardMarkup{
+		Keyboard:       keyboard,
+		ResizeKeyboard: true,
 	}
 }

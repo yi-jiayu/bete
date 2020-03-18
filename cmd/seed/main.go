@@ -72,9 +72,10 @@ func createFavourites() error {
 	log.Println("creating table favourites")
 	_, err := db.Exec(`create table if not exists favourites
 (
-    user_id integer not null,
-    name    text    not null,
-    query   text    not null
+    user_id integer,
+    name    text,
+    query   text not null,
+    primary key (user_id, name)
 )`)
 	if err != nil {
 		return fmt.Errorf("error creating table favourites: %w", err)

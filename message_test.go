@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"github.com/yi-jiayu/ted"
 )
 
@@ -32,7 +33,7 @@ func TestBete_HandleTextMessage(t *testing.T) {
 
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
 	b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
-	b.Favourites.(*MockFavouriteRepository).EXPECT().FindByUserAndText(gomock.Any(), gomock.Any()).Return("")
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Find(gomock.Any(), gomock.Any()).Return("")
 	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
 
@@ -71,7 +72,7 @@ func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
 	b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
-	b.Favourites.(*MockFavouriteRepository).EXPECT().FindByUserAndText(userID, messageText).Return("96049 5 24")
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Find(userID, messageText).Return("96049 5 24")
 	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
 
@@ -85,7 +86,7 @@ func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_HandleReply_AddFavouriteQuery(t *testing.T) {
+func TestBete_HandleReply_AddFavourite_PromptForName(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
@@ -113,7 +114,39 @@ func TestBete_HandleReply_AddFavouriteQuery(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_HandleReply_AddFavouriteQuery_InvalidQuery(t *testing.T) {
+func TestBete_HandleReply_AddFavourite_Finish(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	query := "96049 5 24"
+	favourites := []string{"Home", "SUTD"}
+	name := "SUTD"
+	req := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        "New favourite added!",
+		ReplyMarkup: showFavouritesReplyMarkup(favourites),
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Put(userID, name, query).Return(nil)
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(favourites, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			ReplyToMessage: &ted.Message{
+				Text: fmt.Sprintf(AddFavouritePromptForName, query),
+			},
+			Text: name,
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_HandleReply_AddFavourite_HandleInvalidQuery(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
@@ -156,7 +189,7 @@ func TestBete_HandleCommand_Favourite(t *testing.T) {
 	req := ted.SendMessageRequest{
 		ChatID:      chatID,
 		Text:        "What would you like to do?",
-		ReplyMarkup: favouritesReplyMarkup(),
+		ReplyMarkup: manageFavouritesReplyMarkup(),
 	}
 
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
@@ -209,4 +242,10 @@ func TestBete_HandleCommand_Favourite_NonPrivateChat(t *testing.T) {
 		},
 	}
 	b.HandleUpdate(context.Background(), update)
+}
+
+func Test_getFavouriteQuery(t *testing.T) {
+	text := fmt.Sprintf(AddFavouritePromptForName, "96049 5 24")
+	assert.Equal(t, "96049 5 24", getFavouriteQuery(text))
+	assert.Equal(t, "", getFavouriteQuery("invalid"))
 }

@@ -61,6 +61,19 @@ func Test_favouritesReplyMarkup(t *testing.T) {
 			},
 		},
 	}
-	actual := favouritesReplyMarkup()
+	actual := manageFavouritesReplyMarkup()
+	assert.Equal(t, expected, actual)
+}
+
+func Test_showFavouritesReplyMarkup(t *testing.T) {
+	expected := ted.ReplyKeyboardMarkup{
+		Keyboard: [][]interface{}{
+			{"Home"},
+			{"Work"},
+			{"MRT"},
+		},
+		ResizeKeyboard: true,
+	}
+	actual := showFavouritesReplyMarkup([]string{"Home", "Work", "MRT"})
 	assert.Equal(t, expected, actual)
 }
