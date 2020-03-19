@@ -33,6 +33,11 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
+    - name: Initialise database
+      run: go run cmd/seed/main.go
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/bete?sslmode=disable
+
     - name: Run tests
       run: go test -v ./...
       env:
