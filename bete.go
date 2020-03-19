@@ -3,8 +3,10 @@ package bete
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/pkg/errors"
 	"github.com/yi-jiayu/datamall/v3"
 	"github.com/yi-jiayu/ted"
@@ -36,6 +38,16 @@ type Bete struct {
 	Favourites FavouriteRepository
 	DataMall   DataMall
 	Telegram   Telegram
+}
+
+func sentrySetUser(ctx context.Context, id int) {
+	if hub := sentry.GetHubFromContext(ctx); hub != nil {
+		hub.ConfigureScope(func(scope *sentry.Scope) {
+			scope.SetUser(sentry.User{
+				ID: strconv.Itoa(id),
+			})
+		})
+	}
 }
 
 func (b Bete) HandleUpdate(ctx context.Context, u ted.Update) {

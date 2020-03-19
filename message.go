@@ -15,6 +15,8 @@ const MaxQueryLength = 32
 var validQueryRegexp = regexp.MustCompile(`\d{5}(?:\s|$)`)
 
 func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
+	sentrySetUser(ctx, m.From.ID)
+
 	if m.Text == "" {
 		// Ignore non-text messages.
 		return

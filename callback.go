@@ -9,6 +9,8 @@ import (
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
+	sentrySetUser(ctx, q.From.ID)
+
 	var data CallbackData
 	err := json.Unmarshal([]byte(q.Data), &data)
 	if err != nil {
