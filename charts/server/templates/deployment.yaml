@@ -33,10 +33,13 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{- range $k, $v := .Values.env }}
-            - name: {{ quote $k }}
-              value: {{ quote $v }}
-          {{- end }}
+            - name: ENVIRONMENT
+              value: {{ .Values.environment | quote }}
+          {{ with .Values.envFromConfigMap }}
+          envFrom:
+            - configMapRef:
+                name: {{ . }}
+          {{ end }}
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}
