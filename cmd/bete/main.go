@@ -102,8 +102,8 @@ func main() {
 	b := bete.Bete{
 		Version:    commit,
 		Clock:      bete.RealClock{},
-		BusStops:   bete.PostgresBusStopRepository{DB: db},
-		Favourites: bete.PostgresFavouriteRepository{DB: db},
+		BusStops:   bete.SQLBusStopRepository{DB: db},
+		Favourites: bete.SQLFavouriteRepository{DB: db},
 		DataMall:   dm,
 		Telegram:   bot,
 	}
