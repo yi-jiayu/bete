@@ -40,16 +40,31 @@ jobs:
     docker:
       - image: "cimg/base:stable"
     steps:
+      - checkout
       - helm/install-helm-client:
           version: "v3.0.0"
       - run:
           name: Create kubeconfig file
           command: echo $KUBECONFIG_FILE_BASE64 | base64 --decode > $KUBECONFIG
-      - checkout
-      - run: bin/deploy.sh $(git rev-parse --verify --short HEAD) staging deploy/values.yaml
+      - run: echo "export commit=$(git rev-parse --verify --short HEAD)" >> $BASH_ENV
+      - run:
+          name: Helm upgrade
+          command: |
+            helm upgrade --install \
+              bete deploy/charts/server \
+              -n bete \
+              -f deploy/values.yaml \
+              --set image.tag="$commit" \
+              --set environment="$ENVIRONMENT"
+      - run:
+          name: Create deploy in Sentry
+          command: |
+            curl -sL https://sentry.io/get-cli/ | bash
+            sentry-cli releases deploys "$commit" new -e "$ENVIRONMENT"
     environment:
       SENTRY_ORG: jiayu-yi
       KUBECONFIG: kubeconfig.yaml
+      ENVIRONMENT: staging
 
 workflows:
   version: 2

@@ -6,9 +6,8 @@ set -o nounset
 
 commit=${1:-}
 environment=${2:-}
-values=${3:-}
 
-if [[ -z "$commit" || -z "$environment" || -z "$values" ]]; then
+if [[ -z "$commit" || -z "$environment" ]]; then
   echo "usage: deploy.sh <commit> <environment> <values>"
   exit 1
 fi
@@ -24,9 +23,9 @@ if [[ -z "${SENTRY_ORG:-}" ]]; then
 fi
 
 helm upgrade --install \
-  bete charts/server \
+  bete deploy/charts/server \
   -n bete \
-  -f "$values" \
+  -f deploy/values.yaml \
   --set image.tag="$commit" \
   --set environment="$environment"
 
