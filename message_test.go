@@ -67,6 +67,31 @@ func TestBete_HandleTextMessage_InvalidQuery(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+// Display an error for queries longer than 32 bytes (an arbitrary limit, but chosen to stay within the 64-character limit for callback query data).
+func TestBete_HandleTextMessage_LongQuery(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	query := "81111 155 134 135 135A 137 154 155 24 28 43 43e 70 70A 70M 76"
+	chatID := randomInt64ID()
+	reply := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   ETAQueryTooLong,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Find(gomock.Any(), gomock.Any()).Return("")
+	b.Telegram.(*MockTelegram).EXPECT().Do(reply)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: randomID()},
+			Chat: ted.Chat{ID: chatID},
+			Text: query,
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()

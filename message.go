@@ -10,6 +10,8 @@ import (
 	"github.com/yi-jiayu/ted"
 )
 
+const MaxQueryLength = 32
+
 var validQueryRegexp = regexp.MustCompile(`\d{5}(?:\s|$)`)
 
 func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
@@ -34,6 +36,16 @@ func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 		query = favourite
 	} else {
 		query = m.Text
+		if len(query) > MaxQueryLength {
+			_, err := b.Telegram.Do(ted.SendMessageRequest{
+				ChatID: m.Chat.ID,
+				Text:   ETAQueryTooLong,
+			})
+			if err != nil {
+				captureError(ctx, err)
+			}
+			return
+		}
 	}
 	if valid := validQueryRegexp.MatchString(query); !valid {
 		return
