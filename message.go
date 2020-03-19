@@ -10,6 +10,8 @@ import (
 	"github.com/yi-jiayu/ted"
 )
 
+var validQueryRegexp = regexp.MustCompile(`\d{5}(?:\s|$)`)
+
 func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
 	if m.Text == "" {
 		// Ignore non-text messages.
@@ -32,6 +34,9 @@ func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 		query = favourite
 	} else {
 		query = m.Text
+	}
+	if valid := validQueryRegexp.MatchString(query); !valid {
+		return
 	}
 	parts := strings.Fields(query)
 	if len(parts) == 0 {

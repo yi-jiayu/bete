@@ -47,6 +47,26 @@ func TestBete_HandleTextMessage(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+// Do not respond when an incoming text message does not start with a 5-digit bus stop code (after favourites check).
+func TestBete_HandleTextMessage_InvalidQuery(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	text := "Hello, World"
+	chatID := randomInt64ID()
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Find(gomock.Any(), gomock.Any()).Return("")
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: randomID()},
+			Chat: ted.Chat{ID: chatID},
+			Text: text,
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
