@@ -24,7 +24,12 @@ jobs:
               sleep 1
             done
             echo Failed waiting for Postgres && exit 1
-      - run: go test -v -cover -coverprofile=coverage.out -covermode=count ./...
+      - run:
+          name: Initialise database
+          command: go run cmd/seed/main.go
+      - run:
+          name: Run tests
+          command: go test -v -cover -coverprofile=coverage.out -covermode=count ./...
   build:
     machine: true
     steps:
