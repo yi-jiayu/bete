@@ -1,0 +1,33 @@
+image:
+  repository: docker.pkg.github.com/yi-jiayu/bete/bete
+
+imagePullSecrets:
+  - name: docker.pkg.github.com
+
+prometheus:
+  enabled: true
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+  hosts:
+    - host: bete.orario.infra.jiayu.io
+      paths:
+        - /telegram/updates
+
+  tls:
+    - secretName: bete-tls
+      hosts:
+        - bete.orario.infra.jiayu.io
+
+envFromConfigMap: bete-staging
+
+livenessProbe:
+  enabled: true
+  path: /metrics
+
+readinessProbe:
+  enabled: true
+  path: /metrics
