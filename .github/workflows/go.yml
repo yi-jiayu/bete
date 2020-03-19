@@ -11,8 +11,19 @@ jobs:
   build:
     name: Test
     runs-on: ubuntu-latest
-    steps:
 
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bete
+        ports:
+        - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
     - name: Set up Go 1.14
       uses: actions/setup-go@v1
       with:
@@ -24,3 +35,5 @@ jobs:
 
     - name: Run tests
       run: go test -v ./...
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/bete?sslmode=disable
