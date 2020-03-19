@@ -180,6 +180,43 @@ func TestBete_HandleReply_AddFavourite_HandleInvalidQuery(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+func TestBete_HandleCommand_About(t *testing.T) {
+	variants := []string{"/about", "/version"}
+	for _, variant := range variants {
+		t.Run(variant, func(t *testing.T) {
+			b, finish := newMockBete(t)
+			defer finish()
+
+			version := randomStringID()
+			userID := randomID()
+			chatID := randomInt64ID()
+			req := ted.SendMessageRequest{
+				ChatID: chatID,
+				Text:   "Bus Eta Bot " + version,
+			}
+
+			b.Version = version
+			b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+			update := ted.Update{
+				Message: &ted.Message{
+					From: &ted.User{ID: userID},
+					Chat: ted.Chat{ID: chatID, Type: "private"},
+					Text: variant,
+					Entities: []ted.MessageEntity{
+						{
+							Type:   "bot_command",
+							Offset: 0,
+							Length: len(variant),
+						},
+					},
+				},
+			}
+			b.HandleUpdate(context.Background(), update)
+		})
+	}
+}
+
 func TestBete_HandleCommand_Favourite(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()

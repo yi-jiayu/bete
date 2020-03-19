@@ -29,6 +29,8 @@ type Telegram interface {
 }
 
 type Bete struct {
+	Version string
+
 	Clock      Clock
 	BusStops   BusStopRepository
 	Favourites FavouriteRepository

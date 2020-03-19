@@ -100,6 +100,7 @@ func main() {
 		},
 	}
 	b := bete.Bete{
+		Version:    commit,
 		Clock:      bete.RealClock{},
 		BusStops:   bete.PostgresBusStopRepository{DB: db},
 		Favourites: bete.PostgresFavouriteRepository{DB: db},

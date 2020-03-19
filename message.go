@@ -60,7 +60,25 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args strin
 	switch cmd {
 	case "favourites":
 		b.handleFavouritesCommand(ctx, m)
+	case "about":
+		fallthrough
+	case "version":
+		b.handleAboutCommand(ctx, m)
 	}
+}
+
+func (b Bete) handleAboutCommand(ctx context.Context, m *ted.Message) {
+	req := ted.SendMessageRequest{
+		ChatID:           m.Chat.ID,
+		Text:             "Bus Eta Bot " + b.Version,
+		ReplyToMessageID: m.ID,
+	}
+	_, err := b.Telegram.Do(req)
+	if err != nil {
+		captureError(ctx, err)
+		return
+	}
+	return
 }
 
 func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
