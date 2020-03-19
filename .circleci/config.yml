@@ -1,7 +1,6 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2.1
+orbs:
+  helm: circleci/helm@0.2.3
 jobs:
   test:
     docker:
@@ -19,7 +18,7 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: echo "export commit=$(git describe --always)" >> $BASH_ENV
+      - run: echo "export commit=$(git rev-parse --verify --short HEAD)" >> $BASH_ENV
       - run:
           name: Docker login
           command: echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --username yi-jiayu --password-stdin
@@ -37,12 +36,29 @@ jobs:
             sentry-cli releases set-commits --auto $commit
     environment:
       SENTRY_ORG: jiayu-yi
+  deploy:
+    docker:
+      - image: "cimg/base:stable"
+    steps:
+      - helm/install-helm-client:
+          version: "v3.0.0"
+      - run:
+          name: Create kubeconfig file
+          command: base64 --decode <<< $KUBECONFIG_FILE_BASE64 > $KUBECONFIG
+      - checkout
+      - run: bin/deploy.sh $(git rev-parse --verify --short HEAD) staging
+    environment:
+      SENTRY_ORG: jiayu-yi
+      KUBECONFIG: kubeconfig.yaml
 
 workflows:
   version: 2
-  package:
+  deploy:
     jobs:
       - test
       - build:
           requires:
             - test
+      - deploy:
+          requires:
+            - build
