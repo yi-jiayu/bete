@@ -9,6 +9,7 @@ jobs:
         environment:
           POSTGRES_USER: bete
           POSTGRES_DB: bete
+          POSTGRES_HOST_AUTH_METHOD: "trust"
     environment:
       DATABASE_URL: postgres://bete@localhost:5432/bete?sslmode=disable
     steps:
