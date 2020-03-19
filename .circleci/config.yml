@@ -20,9 +20,23 @@ jobs:
     steps:
       - checkout
       - run: echo "export commit=$(git describe --always)" >> $BASH_ENV
-      - run: echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --username yi-jiayu --password-stdin
-      - run: docker build -t docker.pkg.github.com/yi-jiayu/bete/bete:$commit --build-arg commit=$commit .
-      - run: docker push docker.pkg.github.com/yi-jiayu/bete/bete:$commit
+      - run:
+          name: Docker login
+          command: echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --username yi-jiayu --password-stdin
+      - run:
+          name: Docker build
+          command: docker build -t docker.pkg.github.com/yi-jiayu/bete/bete:$commit --build-arg commit=$commit .
+      - run:
+          name: Docker push
+          command: docker push docker.pkg.github.com/yi-jiayu/bete/bete:$commit
+      - run:
+          name: Create release in Sentry
+          command: |
+            curl -sL https://sentry.io/get-cli/ | bash
+            sentry-cli releases new -p bete $commit
+            sentry-cli releases set-commits --auto $commit
+    environment:
+      SENTRY_ORG: jiayu-yi
 
 workflows:
   version: 2
