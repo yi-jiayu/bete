@@ -2,6 +2,7 @@ package bete
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -50,7 +51,7 @@ func TestBete_HandleCallbackQuery_Refresh(t *testing.T) {
 				Chat: ted.Chat{ID: chatID},
 			},
 			Data: CallbackData{
-				Type:   "refresh",
+				Type:   callbackRefresh,
 				StopID: stop.ID,
 				Filter: filter,
 			}.Encode(),
@@ -100,7 +101,7 @@ func TestBete_HandleCallbackQuery_Resend(t *testing.T) {
 				Chat: ted.Chat{ID: chatID},
 			},
 			Data: CallbackData{
-				Type:   "resend",
+				Type:   callbackResend,
 				StopID: stop.ID,
 				Filter: filter,
 			}.Encode(),
@@ -136,7 +137,98 @@ func TestBete_HandleCallbackQuery_AddFavourite(t *testing.T) {
 				Chat: ted.Chat{ID: chatID},
 			},
 			Data: CallbackData{
-				Type: "add_favourite",
+				Type: callbackAddFavourite,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_saveFavouriteCallback_WithName(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	name := "Opp Tropicana Condo"
+	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
+	favourites := []string{"Home", name}
+	showFavourites := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        fmt.Sprintf("Added the query %q to your favourites as %q!", query.Canonical(), name),
+		ReplyMarkup: showFavouritesReplyMarkup(favourites),
+	}
+	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+	removeButtons := ted.EditMessageReplyMarkupRequest{
+		ChatID:    chatID,
+		MessageID: messageID,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Put(userID, name, query.Canonical())
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(favourites, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(showFavourites).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(removeButtons).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type:  callbackSaveFavourite,
+				Query: &query,
+				Name:  name,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_saveFavouriteCallback_WithoutName(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
+	promptForName := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        fmt.Sprintf(AddFavouritePromptForName, query.Canonical()),
+		ReplyMarkup: ted.ForceReply{},
+	}
+	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+	removeButtons := ted.EditMessageReplyMarkupRequest{
+		ChatID:    chatID,
+		MessageID: messageID,
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(promptForName).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(removeButtons).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type:  callbackSaveFavourite,
+				Query: &query,
 			}.Encode(),
 		},
 	}

@@ -2,7 +2,6 @@ package bete
 
 import (
 	"context"
-	"encoding/json"
 	"strconv"
 	"time"
 
@@ -77,19 +76,4 @@ func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string
 		Services: arrivals.Services,
 		Filter:   filter,
 	})
-}
-
-type CallbackData struct {
-	Type   string   `json:"t"`
-	StopID string   `json:"b,omitempty"`
-	Filter []string `json:"s,omitempty"`
-	Format string   `json:"f,omitempty"`
-}
-
-func (c CallbackData) Encode() string {
-	JSON, err := json.Marshal(c)
-	if err != nil {
-		panic(err)
-	}
-	return string(JSON)
 }

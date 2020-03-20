@@ -3,16 +3,11 @@ package bete
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/yi-jiayu/ted"
 )
-
-const MaxQueryLength = 32
-
-var validQueryRegexp = regexp.MustCompile(`\d{5}(?:\s|$)`)
 
 func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
 	sentrySetUser(ctx, m.From.ID)
@@ -136,15 +131,15 @@ func getFavouriteQuery(text string) string {
 
 func (b Bete) HandleReply(ctx context.Context, m *ted.Message) {
 	if m.ReplyToMessage.Text == AddFavouritePromptForQuery {
-		b.addFavouritePromptForName(ctx, m)
+		b.addFavouriteSuggestName(ctx, m)
 	} else if query := getFavouriteQuery(m.ReplyToMessage.Text); query != "" {
 		b.addFavouriteFinish(ctx, m, query)
 	}
 }
 
-func (b Bete) addFavouritePromptForName(ctx context.Context, m *ted.Message) {
-	query := m.Text
-	if invalid, _ := regexp.MatchString("[^0-9A-Za-z ]", query); invalid {
+func (b Bete) addFavouriteSuggestName(ctx context.Context, m *ted.Message) {
+	query, err := ParseQuery(m.Text)
+	if err != nil {
 		reportError := ted.SendMessageRequest{
 			ChatID:      m.Chat.ID,
 			Text:        AddFavouriteReportQueryInvalid,
@@ -168,15 +163,23 @@ func (b Bete) addFavouritePromptForName(ctx context.Context, m *ted.Message) {
 		}
 		return
 	}
+	var description string
+	stop, err := b.BusStops.Find(query.Stop)
+	switch {
+	case err == ErrNotFound:
+	case err != nil:
+		captureError(ctx, err)
+	default:
+		description = stop.Description
+	}
 	req := ted.SendMessageRequest{
 		ChatID:      m.Chat.ID,
-		Text:        fmt.Sprintf(AddFavouritePromptForName, m.Text),
-		ReplyMarkup: ted.ForceReply{},
+		Text:        fmt.Sprintf(AddFavouriteSuggestName, query.Canonical()),
+		ReplyMarkup: addFavouriteSuggestNameMarkup(query, description),
 	}
-	_, err := b.Telegram.Do(req)
+	_, err = b.Telegram.Do(req)
 	if err != nil {
 		captureError(ctx, errors.WithStack(err))
-		return
 	}
 }
 

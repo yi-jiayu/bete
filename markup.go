@@ -9,17 +9,17 @@ func etaMessageReplyMarkup(stopID string, filter []string) ted.InlineKeyboardMar
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
 				{
-					Text: "Refresh",
+					Text: callbackRefresh,
 					CallbackData: CallbackData{
-						Type:   "refresh",
+						Type:   callbackRefresh,
 						StopID: stopID,
 						Filter: filter,
 					}.Encode(),
 				},
 				{
-					Text: "Resend",
+					Text: callbackResend,
 					CallbackData: CallbackData{
-						Type:   "resend",
+						Type:   callbackResend,
 						StopID: stopID,
 						Filter: filter,
 					}.Encode(),
@@ -41,7 +41,7 @@ func manageFavouritesReplyMarkup() ted.InlineKeyboardMarkup {
 				{
 					Text: "Add a new favourite",
 					CallbackData: CallbackData{
-						Type: "add_favourite",
+						Type: callbackAddFavourite,
 					}.Encode(),
 				},
 			},
@@ -81,5 +81,45 @@ func showFavouritesReplyMarkup(favourites []string) ted.ReplyKeyboardMarkup {
 	return ted.ReplyKeyboardMarkup{
 		Keyboard:       keyboard,
 		ResizeKeyboard: true,
+	}
+}
+
+func addFavouriteSuggestNameMarkup(query Query, description string) ted.InlineKeyboardMarkup {
+	var rows [][]ted.InlineKeyboardButton
+	if description != "" {
+		rows = append(rows, []ted.InlineKeyboardButton{
+			{
+				Text: description,
+				CallbackData: CallbackData{
+					Type:  callbackSaveFavourite,
+					Query: &query,
+					Name:  description,
+				}.Encode(),
+			},
+		})
+	}
+	rows = append(rows,
+		[]ted.InlineKeyboardButton{
+			{
+				Text: query.Canonical(),
+				CallbackData: CallbackData{
+					Type:  callbackSaveFavourite,
+					Query: &query,
+					Name:  query.Canonical(),
+				}.Encode(),
+			},
+		},
+		[]ted.InlineKeyboardButton{
+			{
+				Text: "Set a custom name",
+				CallbackData: CallbackData{
+					Type:  callbackSaveFavourite,
+					Query: &query,
+				}.Encode(),
+			},
+		},
+	)
+	return ted.InlineKeyboardMarkup{
+		InlineKeyboard: rows,
 	}
 }

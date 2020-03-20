@@ -3,9 +3,17 @@ package bete
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/yi-jiayu/ted"
+)
+
+const (
+	callbackRefresh       = "refresh"
+	callbackResend        = "resend"
+	callbackAddFavourite  = "af"
+	callbackSaveFavourite = "sf"
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -17,12 +25,14 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		return
 	}
 	switch data.Type {
-	case "refresh":
+	case callbackRefresh:
 		b.updateETAs(ctx, q, data.StopID, data.Filter)
-	case "resend":
+	case callbackResend:
 		b.resendETAs(ctx, q, data.StopID, data.Filter)
-	case "add_favourite":
+	case callbackAddFavourite:
 		b.askForFavouriteQuery(ctx, q)
+	case callbackSaveFavourite:
+		b.saveFavouriteCallback(ctx, q, data)
 	}
 }
 
@@ -96,5 +106,57 @@ func (b Bete) askForFavouriteQuery(ctx context.Context, q *ted.CallbackQuery) {
 	_, err = b.Telegram.Do(answerCallbackQuery)
 	if err != nil {
 		captureError(ctx, errors.WithStack(err))
+	}
+}
+
+func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
+	query := data.Query
+	if name := data.Name; name != "" {
+		userID := q.From.ID
+		err := b.Favourites.Put(userID, name, query.Canonical())
+		if err != nil {
+			captureError(ctx, err)
+			return
+		}
+		favourites, err := b.Favourites.List(userID)
+		if err != nil {
+			captureError(ctx, err)
+			return
+		}
+		showFavourites := ted.SendMessageRequest{
+			ChatID:      q.Message.Chat.ID,
+			Text:        fmt.Sprintf("Added the query %q to your favourites as %q!", query.Canonical(), data.Name),
+			ReplyMarkup: showFavouritesReplyMarkup(favourites),
+		}
+		_, err = b.Telegram.Do(showFavourites)
+		if err != nil {
+			captureError(ctx, err)
+		}
+	} else {
+		promptForName := ted.SendMessageRequest{
+			ChatID:      q.Message.Chat.ID,
+			Text:        fmt.Sprintf(AddFavouritePromptForName, query.Canonical()),
+			ReplyMarkup: ted.ForceReply{},
+		}
+		_, err := b.Telegram.Do(promptForName)
+		if err != nil {
+			captureError(ctx, err)
+		}
+	}
+	var err error
+	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
+	}
+	removeButtons := ted.EditMessageReplyMarkupRequest{
+		ChatID:    q.Message.Chat.ID,
+		MessageID: q.Message.ID,
+	}
+	_, err = b.Telegram.Do(answerCallbackQuery)
+	if err != nil {
+		captureError(ctx, err)
+	}
+	_, err = b.Telegram.Do(removeButtons)
+	if err != nil {
+		captureError(ctx, err)
 	}
 }

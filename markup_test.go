@@ -12,11 +12,11 @@ func Test_etaMessageReplyMarkup(t *testing.T) {
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
 				{
-					Text:         "Refresh",
+					Text:         callbackRefresh,
 					CallbackData: "{\"t\":\"refresh\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
 				},
 				{
-					Text:         "Resend",
+					Text:         callbackResend,
 					CallbackData: "{\"t\":\"resend\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
 				},
 			},
@@ -32,13 +32,13 @@ func Test_etaMessageReplyMarkupP(t *testing.T) {
 	assert.Equal(t, markup, *markupP)
 }
 
-func Test_favouritesReplyMarkup(t *testing.T) {
+func Test_manageFavouritesReplyMarkup(t *testing.T) {
 	expected := ted.InlineKeyboardMarkup{
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
 				{
 					Text:         "Add a new favourite",
-					CallbackData: "{\"t\":\"add_favourite\"}",
+					CallbackData: CallbackData{Type: callbackAddFavourite}.Encode(),
 				},
 			},
 			{
@@ -76,4 +76,53 @@ func Test_showFavouritesReplyMarkup(t *testing.T) {
 	}
 	actual := showFavouritesReplyMarkup([]string{"Home", "Work", "MRT"})
 	assert.Equal(t, expected, actual)
+}
+
+func Test_addFavouriteSuggestNameMarkup(t *testing.T) {
+	t.Run("with bus stop description", func(t *testing.T) {
+		expected := ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text:         "Opp Tropicana Condo",
+						CallbackData: `{"t":"sf","n":"Opp Tropicana Condo","q":"96049 5 24"}`,
+					},
+				},
+				{
+					{
+						Text:         "96049 5 24",
+						CallbackData: `{"t":"sf","n":"96049 5 24","q":"96049 5 24"}`,
+					},
+				},
+				{
+					{
+						Text:         "Set a custom name",
+						CallbackData: "{\"t\":\"sf\",\"q\":\"96049 5 24\"}",
+					},
+				},
+			},
+		}
+		actual := addFavouriteSuggestNameMarkup(Query{Stop: "96049", Filter: []string{"5", "24"}}, "Opp Tropicana Condo")
+		assert.Equal(t, actual, expected)
+	})
+	t.Run("without bus stop description", func(t *testing.T) {
+		expected := ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text:         "96049 5 24",
+						CallbackData: `{"t":"sf","n":"96049 5 24","q":"96049 5 24"}`,
+					},
+				},
+				{
+					{
+						Text:         "Set a custom name",
+						CallbackData: "{\"t\":\"sf\",\"q\":\"96049 5 24\"}",
+					},
+				},
+			},
+		}
+		actual := addFavouriteSuggestNameMarkup(Query{Stop: "96049", Filter: []string{"5", "24"}}, "")
+		assert.Equal(t, actual, expected)
+	})
 }

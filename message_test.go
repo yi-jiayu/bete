@@ -131,19 +131,21 @@ func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_HandleReply_AddFavourite_PromptForName(t *testing.T) {
+func TestBete_addFavouriteSuggestName(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
 	userID := randomID()
 	chatID := randomInt64ID()
-	messageText := "96049 5 24"
+	stop := buildBusStop()
+	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
 	req := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        fmt.Sprintf(AddFavouritePromptForName, messageText),
-		ReplyMarkup: ted.ForceReply{},
+		Text:        fmt.Sprintf(AddFavouriteSuggestName, query.Canonical()),
+		ReplyMarkup: addFavouriteSuggestNameMarkup(query, stop.Description),
 	}
 
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
 
 	update := ted.Update{
@@ -153,7 +155,37 @@ func TestBete_HandleReply_AddFavourite_PromptForName(t *testing.T) {
 			ReplyToMessage: &ted.Message{
 				Text: AddFavouritePromptForQuery,
 			},
-			Text: messageText,
+			Text: query.Canonical(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_addFavouriteSuggestName_BusStopNotFound(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	stop := buildBusStop()
+	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
+	req := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        fmt.Sprintf(AddFavouriteSuggestName, query.Canonical()),
+		ReplyMarkup: addFavouriteSuggestNameMarkup(query, ""),
+	}
+
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(BusStop{}, ErrNotFound)
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			ReplyToMessage: &ted.Message{
+				Text: AddFavouritePromptForQuery,
+			},
+			Text: query.Canonical(),
 		},
 	}
 	b.HandleUpdate(context.Background(), update)
