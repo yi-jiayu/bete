@@ -13,7 +13,7 @@ const (
 	ErrQueryTooLong                     = Error("query too long")
 )
 
-const MaxQueryLength = 32
+const MaxQueryLength = 20
 
 var (
 	queryStartsWithBusStopCodeRegexp       = regexp.MustCompile(`^\d{5}(?:\s|$)`)
