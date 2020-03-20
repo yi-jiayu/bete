@@ -141,7 +141,7 @@ func TestBete_addFavouriteSuggestName(t *testing.T) {
 	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
 	req := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        fmt.Sprintf(AddFavouriteSuggestName, query.Canonical()),
+		Text:        fmt.Sprintf(stringAddFavouriteSuggestName, query.Canonical()),
 		ReplyMarkup: addFavouriteSuggestNameMarkup(query, stop.Description),
 	}
 
@@ -153,7 +153,7 @@ func TestBete_addFavouriteSuggestName(t *testing.T) {
 			From: &ted.User{ID: userID},
 			Chat: ted.Chat{ID: chatID},
 			ReplyToMessage: &ted.Message{
-				Text: AddFavouritePromptForQuery,
+				Text: stringAddFavouritePromptForQuery,
 			},
 			Text: query.Canonical(),
 		},
@@ -171,7 +171,7 @@ func TestBete_addFavouriteSuggestName_BusStopNotFound(t *testing.T) {
 	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
 	req := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        fmt.Sprintf(AddFavouriteSuggestName, query.Canonical()),
+		Text:        fmt.Sprintf(stringAddFavouriteSuggestName, query.Canonical()),
 		ReplyMarkup: addFavouriteSuggestNameMarkup(query, ""),
 	}
 
@@ -183,7 +183,7 @@ func TestBete_addFavouriteSuggestName_BusStopNotFound(t *testing.T) {
 			From: &ted.User{ID: userID},
 			Chat: ted.Chat{ID: chatID},
 			ReplyToMessage: &ted.Message{
-				Text: AddFavouritePromptForQuery,
+				Text: stringAddFavouritePromptForQuery,
 			},
 			Text: query.Canonical(),
 		},
@@ -215,7 +215,7 @@ func TestBete_HandleReply_AddFavourite_Finish(t *testing.T) {
 			From: &ted.User{ID: userID},
 			Chat: ted.Chat{ID: chatID},
 			ReplyToMessage: &ted.Message{
-				Text: fmt.Sprintf(AddFavouritePromptForName, query),
+				Text: fmt.Sprintf(stringAddFavouritePromptForName, query),
 			},
 			Text: name,
 		},
@@ -236,7 +236,7 @@ func TestBete_HandleReply_AddFavourite_HandleInvalidQuery(t *testing.T) {
 	}
 	askAgain := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        AddFavouritePromptForQuery,
+		Text:        stringAddFavouritePromptForQuery,
 		ReplyMarkup: ted.ForceReply{},
 	}
 
@@ -248,7 +248,7 @@ func TestBete_HandleReply_AddFavourite_HandleInvalidQuery(t *testing.T) {
 			From: &ted.User{ID: userID},
 			Chat: ted.Chat{ID: chatID},
 			ReplyToMessage: &ted.Message{
-				Text: AddFavouritePromptForQuery,
+				Text: stringAddFavouritePromptForQuery,
 			},
 			Text: messageText,
 		},
@@ -358,7 +358,7 @@ func TestBete_HandleCommand_Favourite_NonPrivateChat(t *testing.T) {
 }
 
 func Test_getFavouriteQuery(t *testing.T) {
-	text := fmt.Sprintf(AddFavouritePromptForName, "96049 5 24")
+	text := fmt.Sprintf(stringAddFavouritePromptForName, "96049 5 24")
 	assert.Equal(t, "96049 5 24", getFavouriteQuery(text))
 	assert.Equal(t, "", getFavouriteQuery("invalid"))
 }

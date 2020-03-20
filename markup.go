@@ -39,7 +39,7 @@ func manageFavouritesReplyMarkup() ted.InlineKeyboardMarkup {
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
 				{
-					Text: "Add a new favourite",
+					Text: stringFavouritesAddNew,
 					CallbackData: CallbackData{
 						Type: callbackAddFavourite,
 					}.Encode(),
@@ -47,7 +47,7 @@ func manageFavouritesReplyMarkup() ted.InlineKeyboardMarkup {
 			},
 			{
 				{
-					Text: "Manage existing favourites",
+					Text: stringFavouritesManage,
 					CallbackData: CallbackData{
 						Type: "edit_favourite",
 					}.Encode(),
@@ -55,7 +55,7 @@ func manageFavouritesReplyMarkup() ted.InlineKeyboardMarkup {
 			},
 			{
 				{
-					Text: "Show favourites keyboard",
+					Text: stringFavouritesShow,
 					CallbackData: CallbackData{
 						Type: "show_favourites",
 					}.Encode(),
@@ -63,7 +63,7 @@ func manageFavouritesReplyMarkup() ted.InlineKeyboardMarkup {
 			},
 			{
 				{
-					Text: "Hide favourites keyboard",
+					Text: stringFavouritesHide,
 					CallbackData: CallbackData{
 						Type: "hide_favourites",
 					}.Encode(),
@@ -111,7 +111,7 @@ func addFavouriteSuggestNameMarkup(query Query, description string) ted.InlineKe
 		},
 		[]ted.InlineKeyboardButton{
 			{
-				Text: "Set a custom name",
+				Text: stringFavouritesSetCustomName,
 				CallbackData: CallbackData{
 					Type:  callbackSaveFavourite,
 					Query: &query,

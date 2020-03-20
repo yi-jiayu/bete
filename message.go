@@ -127,7 +127,7 @@ func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
 
 func getFavouriteQuery(text string) string {
 	var query string
-	n, err := fmt.Sscanf(text, AddFavouritePromptForName, &query)
+	n, err := fmt.Sscanf(text, stringAddFavouritePromptForName, &query)
 	if err != nil {
 		return ""
 	}
@@ -138,7 +138,7 @@ func getFavouriteQuery(text string) string {
 }
 
 func (b Bete) HandleReply(ctx context.Context, m *ted.Message) {
-	if m.ReplyToMessage.Text == AddFavouritePromptForQuery {
+	if m.ReplyToMessage.Text == stringAddFavouritePromptForQuery {
 		b.addFavouriteSuggestName(ctx, m)
 	} else if query := getFavouriteQuery(m.ReplyToMessage.Text); query != "" {
 		b.addFavouriteFinish(ctx, m, query)
@@ -151,7 +151,7 @@ func (b Bete) addFavouriteSuggestName(ctx context.Context, m *ted.Message) {
 		b.sendQueryError(ctx, m.Chat.ID, err)
 		askAgain := ted.SendMessageRequest{
 			ChatID:      m.Chat.ID,
-			Text:        AddFavouritePromptForQuery,
+			Text:        stringAddFavouritePromptForQuery,
 			ReplyMarkup: ted.ForceReply{},
 		}
 		if _, err := b.Telegram.Do(askAgain); err != nil {
@@ -170,7 +170,7 @@ func (b Bete) addFavouriteSuggestName(ctx context.Context, m *ted.Message) {
 	}
 	req := ted.SendMessageRequest{
 		ChatID:      m.Chat.ID,
-		Text:        fmt.Sprintf(AddFavouriteSuggestName, query.Canonical()),
+		Text:        fmt.Sprintf(stringAddFavouriteSuggestName, query.Canonical()),
 		ReplyMarkup: addFavouriteSuggestNameMarkup(query, description),
 	}
 	_, err = b.Telegram.Do(req)

@@ -119,7 +119,7 @@ func TestBete_HandleCallbackQuery_AddFavourite(t *testing.T) {
 	callbackQueryID := randomStringID()
 	sendMessage := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        AddFavouritePromptForQuery,
+		Text:        stringAddFavouritePromptForQuery,
 		ReplyMarkup: ted.ForceReply{},
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
@@ -203,7 +203,7 @@ func TestBete_saveFavouriteCallback_WithoutName(t *testing.T) {
 	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
 	promptForName := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        fmt.Sprintf(AddFavouritePromptForName, query.Canonical()),
+		Text:        fmt.Sprintf(stringAddFavouritePromptForName, query.Canonical()),
 		ReplyMarkup: ted.ForceReply{},
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{

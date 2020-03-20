@@ -92,7 +92,7 @@ func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 func (b Bete) askForFavouriteQuery(ctx context.Context, q *ted.CallbackQuery) {
 	sendMessage := ted.SendMessageRequest{
 		ChatID:      q.Message.Chat.ID,
-		Text:        AddFavouritePromptForQuery,
+		Text:        stringAddFavouritePromptForQuery,
 		ReplyMarkup: ted.ForceReply{},
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
@@ -135,7 +135,7 @@ func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, d
 	} else {
 		promptForName := ted.SendMessageRequest{
 			ChatID:      q.Message.Chat.ID,
-			Text:        fmt.Sprintf(AddFavouritePromptForName, query.Canonical()),
+			Text:        fmt.Sprintf(stringAddFavouritePromptForName, query.Canonical()),
 			ReplyMarkup: ted.ForceReply{},
 		}
 		_, err := b.Telegram.Do(promptForName)
