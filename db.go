@@ -4,6 +4,8 @@ import (
 	"database/sql"
 )
 
+const ErrNotFound = Error("not found")
+
 type Error string
 
 func (e Error) Error() string {

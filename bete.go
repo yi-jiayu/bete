@@ -67,7 +67,7 @@ func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string
 	}
 	var stop BusStop
 	stop, err = b.BusStops.Find(stopID)
-	if err != nil {
+	if err != nil && err != ErrNotFound {
 		captureError(ctx, err)
 		stop = BusStop{ID: stopID}
 	}

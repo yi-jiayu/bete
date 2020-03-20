@@ -25,7 +25,7 @@ func (r SQLBusStopRepository) Find(id string) (BusStop, error) {
 	var stop BusStop
 	err := r.DB.QueryRow("select id, description, road from stops where id = $1", id).Scan(&stop.ID, &stop.Description, &stop.RoadName)
 	if err == sql.ErrNoRows {
-		return stop, Error("not found")
+		return stop, ErrNotFound
 	} else if err != nil {
 		return stop, errors.Wrap(err, "error querying bus stop")
 	}
