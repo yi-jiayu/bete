@@ -14,7 +14,7 @@ const (
 	callbackResend           = "resend"
 	callbackAddFavourite     = "af"
 	callbackSaveFavourite    = "sf"
-	callbackManageFavourites = "manage_favourites"
+	callbackDeleteFavourites = "delete_favourites"
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -34,8 +34,8 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.askForFavouriteQuery(ctx, q)
 	case callbackSaveFavourite:
 		b.saveFavouriteCallback(ctx, q, data)
-	case callbackManageFavourites:
-		b.manageFavouritesCallback(ctx, q)
+	case callbackDeleteFavourites:
+		b.deleteFavouritesCallback(ctx, q)
 	}
 }
 
@@ -164,7 +164,7 @@ func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, d
 	}
 }
 
-func (b Bete) manageFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
+func (b Bete) deleteFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
 	favourites, err := b.Favourites.List(q.From.ID)
 	if err != nil {
 		b.answerCallbackQueryError(ctx, q, err)
@@ -172,7 +172,7 @@ func (b Bete) manageFavouritesCallback(ctx context.Context, q *ted.CallbackQuery
 	}
 	if len(favourites) == 0 {
 		if _, err := b.Telegram.Do(ted.EditMessageTextRequest{
-			Text:        stringManageFavouritesNoFavourites,
+			Text:        stringDeleteFavouritesNoFavourites,
 			ChatID:      q.Message.Chat.ID,
 			MessageID:   q.Message.ID,
 			ReplyMarkup: manageFavouritesReplyMarkupP(nil),

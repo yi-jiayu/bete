@@ -235,7 +235,7 @@ func TestBete_saveFavouriteCallback_WithoutName(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_manageFavouritesCallback_ListError(t *testing.T) {
+func TestBete_deleteFavouritesCallback_ListError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
@@ -261,14 +261,14 @@ func TestBete_manageFavouritesCallback_ListError(t *testing.T) {
 				Chat: ted.Chat{ID: chatID},
 			},
 			Data: CallbackData{
-				Type: callbackManageFavourites,
+				Type: callbackDeleteFavourites,
 			}.Encode(),
 		},
 	}
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_manageFavouritesCallback_NoFavourites(t *testing.T) {
+func TestBete_deleteFavouritesCallback_NoFavourites(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
@@ -277,7 +277,7 @@ func TestBete_manageFavouritesCallback_NoFavourites(t *testing.T) {
 	messageID := randomID()
 	callbackQueryID := randomStringID()
 	editMessage := ted.EditMessageTextRequest{
-		Text:        stringManageFavouritesNoFavourites,
+		Text:        stringDeleteFavouritesNoFavourites,
 		ChatID:      chatID,
 		MessageID:   messageID,
 		ReplyMarkup: manageFavouritesReplyMarkupP(nil),
@@ -299,7 +299,7 @@ func TestBete_manageFavouritesCallback_NoFavourites(t *testing.T) {
 				Chat: ted.Chat{ID: chatID},
 			},
 			Data: CallbackData{
-				Type: callbackManageFavourites,
+				Type: callbackDeleteFavourites,
 			}.Encode(),
 		},
 	}

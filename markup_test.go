@@ -43,8 +43,8 @@ func Test_favouritesReplyMarkup(t *testing.T) {
 			},
 			{
 				{
-					Text:         stringFavouritesManage,
-					CallbackData: "{\"t\":\"manage_favourites\"}",
+					Text:         stringFavouritesDelete,
+					CallbackData: "{\"t\":\"delete_favourites\"}",
 				},
 			},
 			{
