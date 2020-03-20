@@ -143,7 +143,7 @@ func deleteFavouritesReplyMarkupP(favourites []string) *ted.InlineKeyboardMarkup
 			{
 				Text: f,
 				CallbackData: CallbackData{
-					Type: callbackDeleteFavourites,
+					Type: callbackDeleteFavourite,
 					Name: f,
 				}.Encode(),
 			},

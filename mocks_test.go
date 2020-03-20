@@ -163,21 +163,6 @@ func (mr *MockBusStopRepositoryMockRecorder) Find(arg0 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockBusStopRepository)(nil).Find), arg0)
 }
 
-// Nearby mocks base method
-func (m *MockBusStopRepository) Nearby(arg0, arg1 float32) ([]BusStop, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Nearby", arg0, arg1)
-	ret0, _ := ret[0].([]BusStop)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Nearby indicates an expected call of Nearby
-func (mr *MockBusStopRepositoryMockRecorder) Nearby(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Nearby", reflect.TypeOf((*MockBusStopRepository)(nil).Nearby), arg0, arg1)
-}
-
 // MockFavouriteRepository is a mock of FavouriteRepository interface
 type MockFavouriteRepository struct {
 	ctrl     *gomock.Controller
@@ -199,6 +184,20 @@ func NewMockFavouriteRepository(ctrl *gomock.Controller) *MockFavouriteRepositor
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockFavouriteRepository) EXPECT() *MockFavouriteRepositoryMockRecorder {
 	return m.recorder
+}
+
+// Delete mocks base method
+func (m *MockFavouriteRepository) Delete(arg0 int, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete
+func (mr *MockFavouriteRepositoryMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockFavouriteRepository)(nil).Delete), arg0, arg1)
 }
 
 // Find mocks base method

@@ -63,3 +63,24 @@ values ($1, $2, $3),
 	assert.NoError(t, err)
 	assert.Equal(t, names, actual)
 }
+
+func TestSQLFavouriteRepository_Delete(t *testing.T) {
+	tx := getDatabaseTx()
+	defer tx.Rollback()
+
+	userID := 123
+	name := "SUTD"
+	query := "96049 5 24"
+	_, err := tx.Exec(`insert into favourites (user_id, name, query) values ($1, $2, $3)`, userID, name, query)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	repo := SQLFavouriteRepository{DB: tx}
+	err = repo.Delete(userID, name)
+	assert.NoError(t, err)
+
+	favourites, err := repo.List(userID)
+	assert.NoError(t, err)
+	assert.Len(t, favourites, 0)
+}

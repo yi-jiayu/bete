@@ -150,7 +150,7 @@ func Test_deleteFavouritesReplyMarkup(t *testing.T) {
 					{
 						Text: "Home",
 						CallbackData: CallbackData{
-							Type: callbackDeleteFavourites,
+							Type: callbackDeleteFavourite,
 							Name: "Home",
 						}.Encode(),
 					},
@@ -159,7 +159,7 @@ func Test_deleteFavouritesReplyMarkup(t *testing.T) {
 					{
 						Text: "Work",
 						CallbackData: CallbackData{
-							Type: callbackDeleteFavourites,
+							Type: callbackDeleteFavourite,
 							Name: "Work",
 						}.Encode(),
 					},

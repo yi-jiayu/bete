@@ -15,6 +15,7 @@ const (
 	callbackAddFavourite     = "af"
 	callbackSaveFavourite    = "sf"
 	callbackDeleteFavourites = "delete_favourites"
+	callbackDeleteFavourite  = "delete_favourite"
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -36,6 +37,8 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.saveFavouriteCallback(ctx, q, data)
 	case callbackDeleteFavourites:
 		b.deleteFavouritesCallback(ctx, q)
+	case callbackDeleteFavourite:
+		b.deleteFavouriteCallback(ctx, q, data)
 	}
 }
 
@@ -186,6 +189,40 @@ func (b Bete) deleteFavouritesCallback(ctx context.Context, q *ted.CallbackQuery
 	}
 	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
+	}); err != nil {
+		captureError(ctx, err)
+	}
+}
+
+func (b Bete) deleteFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
+	userID := q.From.ID
+	err := b.Favourites.Delete(userID, data.Name)
+	if err != nil {
+		b.answerCallbackQueryError(ctx, q, err)
+		return
+	}
+	remainingFavourites, err := b.Favourites.List(userID)
+	if err != nil {
+		b.answerCallbackQueryError(ctx, q, err)
+		return
+	}
+	var text string
+	if len(remainingFavourites) == 0 {
+		text = stringDeleteFavouritesNoFavouritesLeft
+	} else {
+		text = stringDeleteFavouritesChoose
+	}
+	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
+		Text:            stringDeleteFavouriteDeleted,
+	}); err != nil {
+		captureError(ctx, err)
+	}
+	if _, err := b.Telegram.Do(ted.EditMessageTextRequest{
+		Text:        text,
+		ChatID:      q.Message.Chat.ID,
+		MessageID:   q.Message.ID,
+		ReplyMarkup: deleteFavouritesReplyMarkupP(remainingFavourites),
 	}); err != nil {
 		captureError(ctx, err)
 	}

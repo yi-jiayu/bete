@@ -10,6 +10,7 @@ type FavouriteRepository interface {
 	Find(userID int, name string) string
 	Put(userID int, name, query string) error
 	List(userID int) ([]string, error)
+	Delete(userID int, name string) error
 }
 
 type SQLFavouriteRepository struct {
@@ -53,4 +54,9 @@ func (r SQLFavouriteRepository) List(userID int) ([]string, error) {
 		return favourites, errors.Wrap(err, "error iterating rows")
 	}
 	return favourites, nil
+}
+
+func (r SQLFavouriteRepository) Delete(userID int, name string) error {
+	_, err := r.DB.Exec("delete from favourites where user_id = $1 and name = $2", userID, name)
+	return errors.Wrap(err, "error deleting favourite")
 }
