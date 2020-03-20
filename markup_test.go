@@ -127,8 +127,8 @@ func Test_addFavouriteSuggestNameMarkup(t *testing.T) {
 	})
 }
 
-func Test_manageFavouritesReplyMarkup(t *testing.T) {
-	t.Run("when favourites is empty", func(t *testing.T) {
+func Test_deleteFavouritesReplyMarkup(t *testing.T) {
+	t.Run("no favourites to delete", func(t *testing.T) {
 		expected := &ted.InlineKeyboardMarkup{
 			InlineKeyboard: [][]ted.InlineKeyboardButton{
 				{
@@ -139,7 +139,34 @@ func Test_manageFavouritesReplyMarkup(t *testing.T) {
 				},
 			},
 		}
-		actual := manageFavouritesReplyMarkupP(nil)
+		actual := deleteFavouritesReplyMarkupP(nil)
+		assert.Equal(t, expected, actual)
+	})
+	t.Run("with favourites to delete", func(t *testing.T) {
+		favourites := []string{"Home", "Work"}
+		expected := &ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text: "Home",
+						CallbackData: CallbackData{
+							Type: callbackDeleteFavourites,
+							Name: "Home",
+						}.Encode(),
+					},
+				},
+				{
+					{
+						Text: "Work",
+						CallbackData: CallbackData{
+							Type: callbackDeleteFavourites,
+							Name: "Work",
+						}.Encode(),
+					},
+				},
+			},
+		}
+		actual := deleteFavouritesReplyMarkupP(favourites)
 		assert.Equal(t, expected, actual)
 	})
 }

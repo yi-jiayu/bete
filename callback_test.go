@@ -280,13 +280,52 @@ func TestBete_deleteFavouritesCallback_NoFavourites(t *testing.T) {
 		Text:        stringDeleteFavouritesNoFavourites,
 		ChatID:      chatID,
 		MessageID:   messageID,
-		ReplyMarkup: manageFavouritesReplyMarkupP(nil),
+		ReplyMarkup: deleteFavouritesReplyMarkupP(nil),
 	}
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
 	}
 
 	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackDeleteFavourites,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_deleteFavouritesCallback(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	favourites := []string{"Home", "Work"}
+	editMessage := ted.EditMessageTextRequest{
+		ChatID:      chatID,
+		MessageID:   messageID,
+		Text:        stringDeleteFavouritesChoose,
+		ReplyMarkup: deleteFavouritesReplyMarkupP(favourites),
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(favourites, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
 

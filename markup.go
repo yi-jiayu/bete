@@ -124,15 +124,32 @@ func addFavouriteSuggestNameMarkup(query Query, description string) ted.InlineKe
 	}
 }
 
-func manageFavouritesReplyMarkupP(favourites []string) *ted.InlineKeyboardMarkup {
-	return &ted.InlineKeyboardMarkup{
-		InlineKeyboard: [][]ted.InlineKeyboardButton{
-			{
+func deleteFavouritesReplyMarkupP(favourites []string) *ted.InlineKeyboardMarkup {
+	if len(favourites) == 0 {
+		return &ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
 				{
-					Text:         stringFavouritesAddNew,
-					CallbackData: CallbackData{Type: callbackAddFavourite}.Encode(),
+					{
+						Text:         stringFavouritesAddNew,
+						CallbackData: CallbackData{Type: callbackAddFavourite}.Encode(),
+					},
 				},
 			},
-		},
+		}
+	}
+	var rows [][]ted.InlineKeyboardButton
+	for _, f := range favourites {
+		rows = append(rows, []ted.InlineKeyboardButton{
+			{
+				Text: f,
+				CallbackData: CallbackData{
+					Type: callbackDeleteFavourites,
+					Name: f,
+				}.Encode(),
+			},
+		})
+	}
+	return &ted.InlineKeyboardMarkup{
+		InlineKeyboard: rows,
 	}
 }
