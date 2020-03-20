@@ -2,6 +2,8 @@ package bete
 
 import (
 	"context"
+	"io/ioutil"
+	"log"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -9,6 +11,11 @@ import (
 )
 
 //go:generate bin/mockgen -destination mocks_test.go -package bete -self_package github.com/yi-jiayu/bete . Clock,DataMall,Telegram,BusStopRepository,FavouriteRepository
+
+func init() {
+	// Disable logging in tests.
+	log.SetOutput(ioutil.Discard)
+}
 
 func must(i interface{}, err error) interface{} {
 	if err != nil {
