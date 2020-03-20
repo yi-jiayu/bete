@@ -9,7 +9,7 @@ func etaMessageReplyMarkup(stopID string, filter []string) ted.InlineKeyboardMar
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
 				{
-					Text: callbackRefresh,
+					Text: stringCallbackRefresh,
 					CallbackData: CallbackData{
 						Type:   callbackRefresh,
 						StopID: stopID,
@@ -17,7 +17,7 @@ func etaMessageReplyMarkup(stopID string, filter []string) ted.InlineKeyboardMar
 					}.Encode(),
 				},
 				{
-					Text: callbackResend,
+					Text: stringCallbackResend,
 					CallbackData: CallbackData{
 						Type:   callbackResend,
 						StopID: stopID,

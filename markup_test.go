@@ -12,11 +12,11 @@ func Test_etaMessageReplyMarkup(t *testing.T) {
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
 				{
-					Text:         callbackRefresh,
+					Text:         stringCallbackRefresh,
 					CallbackData: "{\"t\":\"refresh\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
 				},
 				{
-					Text:         callbackResend,
+					Text:         stringCallbackResend,
 					CallbackData: "{\"t\":\"resend\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
 				},
 			},
