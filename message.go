@@ -115,7 +115,7 @@ func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
 		req = ted.SendMessageRequest{
 			ChatID:      m.Chat.ID,
 			Text:        "What would you like to do?",
-			ReplyMarkup: manageFavouritesReplyMarkup(),
+			ReplyMarkup: favouritesReplyMarkup(),
 		}
 	}
 	_, err := b.Telegram.Do(req)

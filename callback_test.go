@@ -234,3 +234,74 @@ func TestBete_saveFavouriteCallback_WithoutName(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_manageFavouritesCallback_ListError(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+		Text:            "Something went wrong!",
+		CacheTime:       60,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, Error("some error"))
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackManageFavourites,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_manageFavouritesCallback_NoFavourites(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	editMessage := ted.EditMessageTextRequest{
+		Text:        stringManageFavouritesNoFavourites,
+		ChatID:      chatID,
+		MessageID:   messageID,
+		ReplyMarkup: manageFavouritesReplyMarkupP(nil),
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackManageFavourites,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}

@@ -10,10 +10,11 @@ import (
 )
 
 const (
-	callbackRefresh       = "refresh"
-	callbackResend        = "resend"
-	callbackAddFavourite  = "af"
-	callbackSaveFavourite = "sf"
+	callbackRefresh          = "refresh"
+	callbackResend           = "resend"
+	callbackAddFavourite     = "af"
+	callbackSaveFavourite    = "sf"
+	callbackManageFavourites = "manage_favourites"
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -33,6 +34,8 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.askForFavouriteQuery(ctx, q)
 	case callbackSaveFavourite:
 		b.saveFavouriteCallback(ctx, q, data)
+	case callbackManageFavourites:
+		b.manageFavouritesCallback(ctx, q)
 	}
 }
 
@@ -157,6 +160,40 @@ func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, d
 	}
 	_, err = b.Telegram.Do(removeButtons)
 	if err != nil {
+		captureError(ctx, err)
+	}
+}
+
+func (b Bete) manageFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
+	favourites, err := b.Favourites.List(q.From.ID)
+	if err != nil {
+		b.answerCallbackQueryError(ctx, q, err)
+		return
+	}
+	if len(favourites) == 0 {
+		if _, err := b.Telegram.Do(ted.EditMessageTextRequest{
+			Text:        stringManageFavouritesNoFavourites,
+			ChatID:      q.Message.Chat.ID,
+			MessageID:   q.Message.ID,
+			ReplyMarkup: manageFavouritesReplyMarkupP(nil),
+		}); err != nil {
+			captureError(ctx, err)
+		}
+	}
+	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
+	}); err != nil {
+		captureError(ctx, err)
+	}
+}
+
+func (b Bete) answerCallbackQueryError(ctx context.Context, q *ted.CallbackQuery, err error) {
+	captureError(ctx, err)
+	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
+		Text:            "Something went wrong!",
+		CacheTime:       60,
+	}); err != nil {
 		captureError(ctx, err)
 	}
 }

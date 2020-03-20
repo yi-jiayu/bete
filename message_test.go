@@ -302,7 +302,7 @@ func TestBete_HandleCommand_Favourite(t *testing.T) {
 	req := ted.SendMessageRequest{
 		ChatID:      chatID,
 		Text:        "What would you like to do?",
-		ReplyMarkup: manageFavouritesReplyMarkup(),
+		ReplyMarkup: favouritesReplyMarkup(),
 	}
 
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)

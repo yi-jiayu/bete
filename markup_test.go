@@ -32,7 +32,7 @@ func Test_etaMessageReplyMarkupP(t *testing.T) {
 	assert.Equal(t, markup, *markupP)
 }
 
-func Test_manageFavouritesReplyMarkup(t *testing.T) {
+func Test_favouritesReplyMarkup(t *testing.T) {
 	expected := ted.InlineKeyboardMarkup{
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
@@ -44,7 +44,7 @@ func Test_manageFavouritesReplyMarkup(t *testing.T) {
 			{
 				{
 					Text:         stringFavouritesManage,
-					CallbackData: "{\"t\":\"edit_favourite\"}",
+					CallbackData: "{\"t\":\"manage_favourites\"}",
 				},
 			},
 			{
@@ -61,7 +61,7 @@ func Test_manageFavouritesReplyMarkup(t *testing.T) {
 			},
 		},
 	}
-	actual := manageFavouritesReplyMarkup()
+	actual := favouritesReplyMarkup()
 	assert.Equal(t, expected, actual)
 }
 
@@ -124,5 +124,22 @@ func Test_addFavouriteSuggestNameMarkup(t *testing.T) {
 		}
 		actual := addFavouriteSuggestNameMarkup(Query{Stop: "96049", Filter: []string{"5", "24"}}, "")
 		assert.Equal(t, actual, expected)
+	})
+}
+
+func Test_manageFavouritesReplyMarkup(t *testing.T) {
+	t.Run("when favourites is empty", func(t *testing.T) {
+		expected := &ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text:         stringFavouritesAddNew,
+						CallbackData: CallbackData{Type: callbackAddFavourite}.Encode(),
+					},
+				},
+			},
+		}
+		actual := manageFavouritesReplyMarkupP(nil)
+		assert.Equal(t, expected, actual)
 	})
 }

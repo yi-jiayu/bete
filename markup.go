@@ -34,7 +34,7 @@ func etaMessageReplyMarkupP(stopID string, filter []string) *ted.InlineKeyboardM
 	return &markup
 }
 
-func manageFavouritesReplyMarkup() ted.InlineKeyboardMarkup {
+func favouritesReplyMarkup() ted.InlineKeyboardMarkup {
 	return ted.InlineKeyboardMarkup{
 		InlineKeyboard: [][]ted.InlineKeyboardButton{
 			{
@@ -49,7 +49,7 @@ func manageFavouritesReplyMarkup() ted.InlineKeyboardMarkup {
 				{
 					Text: stringFavouritesManage,
 					CallbackData: CallbackData{
-						Type: "edit_favourite",
+						Type: callbackManageFavourites,
 					}.Encode(),
 				},
 			},
@@ -121,5 +121,18 @@ func addFavouriteSuggestNameMarkup(query Query, description string) ted.InlineKe
 	)
 	return ted.InlineKeyboardMarkup{
 		InlineKeyboard: rows,
+	}
+}
+
+func manageFavouritesReplyMarkupP(favourites []string) *ted.InlineKeyboardMarkup {
+	return &ted.InlineKeyboardMarkup{
+		InlineKeyboard: [][]ted.InlineKeyboardButton{
+			{
+				{
+					Text:         stringFavouritesAddNew,
+					CallbackData: CallbackData{Type: callbackAddFavourite}.Encode(),
+				},
+			},
+		},
 	}
 }
