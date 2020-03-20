@@ -76,7 +76,7 @@ func TestBete_HandleTextMessage_LongQuery(t *testing.T) {
 	chatID := randomInt64ID()
 	reply := ted.SendMessageRequest{
 		ChatID: chatID,
-		Text:   ETAQueryTooLong,
+		Text:   stringQueryTooLong,
 	}
 
 	b.Favourites.(*MockFavouriteRepository).EXPECT().Find(gomock.Any(), gomock.Any()).Return("")
@@ -231,9 +231,8 @@ func TestBete_HandleReply_AddFavourite_HandleInvalidQuery(t *testing.T) {
 	chatID := randomInt64ID()
 	messageText := `Invalid Query: !@#$%^&*"`
 	reportError := ted.SendMessageRequest{
-		ChatID:      chatID,
-		Text:        AddFavouriteReportQueryInvalid,
-		ReplyMarkup: ted.ForceReply{},
+		ChatID: chatID,
+		Text:   stringQueryShouldStartWithBusStopCode,
 	}
 	askAgain := ted.SendMessageRequest{
 		ChatID:      chatID,

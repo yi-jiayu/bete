@@ -3,7 +3,6 @@ package bete
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/yi-jiayu/ted"
@@ -28,31 +27,20 @@ func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
 }
 
 func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
-	var query string
+	var query Query
 	if favourite := b.Favourites.Find(m.From.ID, m.Text); favourite != "" {
-		query = favourite
+		query, _ = ParseQuery(favourite)
 	} else {
-		query = m.Text
-		if len(query) > MaxQueryLength {
-			_, err := b.Telegram.Do(ted.SendMessageRequest{
-				ChatID: m.Chat.ID,
-				Text:   ETAQueryTooLong,
-			})
-			if err != nil {
-				captureError(ctx, err)
+		var err error
+		query, err = ParseQuery(m.Text)
+		if err != nil {
+			if err != ErrQueryDoesNotStartWithBusStopCode {
+				b.sendQueryError(ctx, m.Chat.ID, err)
 			}
 			return
 		}
 	}
-	if valid := validQueryRegexp.MatchString(query); !valid {
-		return
-	}
-	parts := strings.Fields(query)
-	if len(parts) == 0 {
-		return
-	}
-	stop, filter := parts[0], parts[1:]
-	text, err := b.etaMessageText(ctx, stop, filter)
+	text, err := b.etaMessageText(ctx, query.Stop, query.Filter)
 	if err != nil {
 		captureError(ctx, err)
 		return
@@ -61,12 +49,32 @@ func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 		ChatID:      m.Chat.ID,
 		Text:        text,
 		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkup(stop, filter),
+		ReplyMarkup: etaMessageReplyMarkup(query.Stop, query.Filter),
 	}
 	_, err = b.Telegram.Do(req)
 	if err != nil {
 		captureError(ctx, errors.WithStack(err))
 		return
+	}
+}
+
+func (b Bete) sendQueryError(ctx context.Context, chatID int64, err error) {
+	var text string
+	switch err {
+	case ErrQueryDoesNotStartWithBusStopCode:
+		text = stringQueryShouldStartWithBusStopCode
+	case ErrQueryContainsInvalidCharacters:
+		text = stringQueryContainsInvalidCharacters
+	case ErrQueryTooLong:
+		text = stringQueryTooLong
+		// I want to know if anyone actually runs into this error.
+		captureError(ctx, err)
+	}
+	if _, err := b.Telegram.Do(ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   text,
+	}); err != nil {
+		captureError(ctx, errors.WithStack(err))
 	}
 }
 
@@ -140,26 +148,14 @@ func (b Bete) HandleReply(ctx context.Context, m *ted.Message) {
 func (b Bete) addFavouriteSuggestName(ctx context.Context, m *ted.Message) {
 	query, err := ParseQuery(m.Text)
 	if err != nil {
-		reportError := ted.SendMessageRequest{
-			ChatID:      m.Chat.ID,
-			Text:        AddFavouriteReportQueryInvalid,
-			ReplyMarkup: ted.ForceReply{},
-		}
+		b.sendQueryError(ctx, m.Chat.ID, err)
 		askAgain := ted.SendMessageRequest{
 			ChatID:      m.Chat.ID,
 			Text:        AddFavouritePromptForQuery,
 			ReplyMarkup: ted.ForceReply{},
 		}
-		var err error
-		_, err = b.Telegram.Do(reportError)
-		if err != nil {
+		if _, err := b.Telegram.Do(askAgain); err != nil {
 			captureError(ctx, errors.WithStack(err))
-			return
-		}
-		_, err = b.Telegram.Do(askAgain)
-		if err != nil {
-			captureError(ctx, errors.WithStack(err))
-			return
 		}
 		return
 	}
