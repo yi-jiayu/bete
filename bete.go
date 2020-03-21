@@ -27,6 +27,7 @@ type DataMall interface {
 
 type Telegram interface {
 	Do(request ted.Request) (ted.Response, error)
+	DoMulti(requests ...ted.Request) ([]ted.Response, error)
 }
 
 type Bete struct {

@@ -125,6 +125,25 @@ func (mr *MockTelegramMockRecorder) Do(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockTelegram)(nil).Do), arg0)
 }
 
+// DoMulti mocks base method
+func (m *MockTelegram) DoMulti(arg0 ...ted.Request) ([]ted.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{}
+	for _, a := range arg0 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DoMulti", varargs...)
+	ret0, _ := ret[0].([]ted.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DoMulti indicates an expected call of DoMulti
+func (mr *MockTelegramMockRecorder) DoMulti(arg0 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DoMulti", reflect.TypeOf((*MockTelegram)(nil).DoMulti), arg0...)
+}
+
 // MockBusStopRepository is a mock of BusStopRepository interface
 type MockBusStopRepository struct {
 	ctrl     *gomock.Controller
