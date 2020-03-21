@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/yi-jiayu/ted"
 )
 
@@ -62,14 +61,8 @@ func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 		CallbackQueryID: q.ID,
 		Text:            "ETAs updated!",
 	}
-	_, err = b.Telegram.Do(editMessageText)
-	if err != nil && !ted.IsMessageNotModified(err) {
-		captureError(ctx, errors.WithStack(err))
-	}
-	_, err = b.Telegram.Do(answerCallbackQuery)
-	if err != nil {
-		captureError(ctx, errors.WithStack(err))
-	}
+	b.send(ctx, editMessageText)
+	b.send(ctx, answerCallbackQuery)
 }
 
 func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, stop string, filter []string) {
@@ -88,14 +81,8 @@ func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 		CallbackQueryID: q.ID,
 		Text:            "ETAs sent!",
 	}
-	_, err = b.Telegram.Do(sendMessage)
-	if err != nil && !ted.IsMessageNotModified(err) {
-		captureError(ctx, errors.WithStack(err))
-	}
-	_, err = b.Telegram.Do(answerCallbackQuery)
-	if err != nil {
-		captureError(ctx, errors.WithStack(err))
-	}
+	b.send(ctx, sendMessage)
+	b.send(ctx, answerCallbackQuery)
 }
 
 func (b Bete) askForFavouriteQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -107,15 +94,8 @@ func (b Bete) askForFavouriteQuery(ctx context.Context, q *ted.CallbackQuery) {
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
 	}
-	var err error
-	_, err = b.Telegram.Do(sendMessage)
-	if err != nil {
-		captureError(ctx, errors.WithStack(err))
-	}
-	_, err = b.Telegram.Do(answerCallbackQuery)
-	if err != nil {
-		captureError(ctx, errors.WithStack(err))
-	}
+	b.send(ctx, sendMessage)
+	b.send(ctx, answerCallbackQuery)
 }
 
 func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
@@ -137,22 +117,15 @@ func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, d
 			Text:        fmt.Sprintf(stringAddFavouriteAdded, query.Canonical(), data.Name),
 			ReplyMarkup: showFavouritesReplyMarkup(favourites),
 		}
-		_, err = b.Telegram.Do(showFavourites)
-		if err != nil {
-			captureError(ctx, err)
-		}
+		b.send(ctx, showFavourites)
 	} else {
 		promptForName := ted.SendMessageRequest{
 			ChatID:      q.Message.Chat.ID,
 			Text:        fmt.Sprintf(stringAddFavouritePromptForName, query.Canonical()),
 			ReplyMarkup: ted.ForceReply{},
 		}
-		_, err := b.Telegram.Do(promptForName)
-		if err != nil {
-			captureError(ctx, err)
-		}
+		b.send(ctx, promptForName)
 	}
-	var err error
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
 	}
@@ -160,14 +133,8 @@ func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, d
 		ChatID:    q.Message.Chat.ID,
 		MessageID: q.Message.ID,
 	}
-	_, err = b.Telegram.Do(answerCallbackQuery)
-	if err != nil {
-		captureError(ctx, err)
-	}
-	_, err = b.Telegram.Do(removeButtons)
-	if err != nil {
-		captureError(ctx, err)
-	}
+	b.send(ctx, answerCallbackQuery)
+	b.send(ctx, removeButtons)
 }
 
 func (b Bete) deleteFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
@@ -182,19 +149,15 @@ func (b Bete) deleteFavouritesCallback(ctx context.Context, q *ted.CallbackQuery
 	} else {
 		text = stringDeleteFavouritesChoose
 	}
-	if _, err := b.Telegram.Do(ted.EditMessageTextRequest{
+	b.send(ctx, ted.EditMessageTextRequest{
 		Text:        text,
 		ChatID:      q.Message.Chat.ID,
 		MessageID:   q.Message.ID,
 		ReplyMarkup: deleteFavouritesReplyMarkupP(favourites),
-	}); err != nil {
-		captureError(ctx, err)
-	}
-	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
+	})
+	b.send(ctx, ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
-	}); err != nil {
-		captureError(ctx, err)
-	}
+	})
 }
 
 func (b Bete) deleteFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
@@ -210,25 +173,19 @@ func (b Bete) deleteFavouriteCallback(ctx context.Context, q *ted.CallbackQuery,
 		b.answerCallbackQueryError(ctx, q, err)
 		return
 	}
-	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
+	b.send(ctx, ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
-	}); err != nil {
-		captureError(ctx, err)
-	}
+	})
 	chatID := q.Message.Chat.ID
-	if _, err := b.Telegram.Do(ted.EditMessageReplyMarkupRequest{
+	b.send(ctx, ted.EditMessageReplyMarkupRequest{
 		ChatID:    chatID,
 		MessageID: q.Message.ID,
-	}); err != nil {
-		captureError(ctx, err)
-	}
-	if _, err := b.Telegram.Do(ted.SendMessageRequest{
+	})
+	b.send(ctx, ted.SendMessageRequest{
 		ChatID:      chatID,
 		Text:        fmt.Sprintf(stringDeleteFavouriteDeleted, favouriteToDelete),
 		ReplyMarkup: showFavouritesReplyMarkup(remainingFavourites),
-	}); err != nil {
-		captureError(ctx, err)
-	}
+	})
 }
 
 func (b Bete) showFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
@@ -237,8 +194,9 @@ func (b Bete) showFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) 
 		b.answerCallbackQueryError(ctx, q, err)
 		return
 	}
+	var req ted.Request
 	if len(favourites) == 0 {
-		if _, err := b.Telegram.Do(ted.EditMessageTextRequest{
+		req = ted.EditMessageTextRequest{
 			Text:      stringShowFavouritesNoFavourites,
 			ChatID:    q.Message.Chat.ID,
 			MessageID: q.Message.ID,
@@ -252,32 +210,25 @@ func (b Bete) showFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) 
 					},
 				},
 			},
-		}); err != nil {
-			captureError(ctx, err)
 		}
 	} else {
-		if _, err := b.Telegram.Do(ted.SendMessageRequest{
+		req = ted.SendMessageRequest{
 			ChatID:      q.Message.Chat.ID,
 			Text:        "Showing favourites keyboard",
 			ReplyMarkup: showFavouritesReplyMarkup(favourites),
-		}); err != nil {
-			captureError(ctx, err)
 		}
 	}
-	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
+	b.send(ctx, req)
+	b.send(ctx, ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
-	}); err != nil {
-		captureError(ctx, err)
-	}
+	})
 }
 
 func (b Bete) answerCallbackQueryError(ctx context.Context, q *ted.CallbackQuery, err error) {
 	captureError(ctx, err)
-	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
+	b.send(ctx, ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
 		Text:            "Something went wrong!",
 		CacheTime:       60,
-	}); err != nil {
-		captureError(ctx, err)
-	}
+	})
 }

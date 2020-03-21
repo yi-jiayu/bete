@@ -58,6 +58,17 @@ func (b Bete) HandleUpdate(ctx context.Context, u ted.Update) {
 	}
 }
 
+// send makes a request to the Telegram Bot API.
+func (b Bete) send(ctx context.Context, req ted.Request) {
+	_, err := b.Telegram.Do(req)
+	if err != nil {
+		if ted.IsMessageNotModified(err) {
+			return
+		}
+		captureError(ctx, errors.WithStack(err))
+	}
+}
+
 func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string) (string, error) {
 	t := b.Clock.Now()
 	arrivals, err := b.DataMall.GetBusArrival(stopID, "")
