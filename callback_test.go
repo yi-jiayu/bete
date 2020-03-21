@@ -355,11 +355,9 @@ func TestBete_deleteFavouriteCallback(t *testing.T) {
 	callbackQueryID := randomStringID()
 	favouriteToDelete := "Work"
 	remainingFavourites := []string{"Home"}
-	editMessage := ted.EditMessageTextRequest{
-		ChatID:      chatID,
-		MessageID:   messageID,
-		Text:        stringDeleteFavouritesChoose,
-		ReplyMarkup: deleteFavouritesReplyMarkupP(remainingFavourites),
+	removeButtons := ted.EditMessageReplyMarkupRequest{
+		ChatID:    chatID,
+		MessageID: messageID,
 	}
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
@@ -373,55 +371,8 @@ func TestBete_deleteFavouriteCallback(t *testing.T) {
 	b.Favourites.(*MockFavouriteRepository).EXPECT().Delete(userID, favouriteToDelete).Return(nil)
 	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(remainingFavourites, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
-	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(removeButtons).Return(ted.Response{}, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(showFavourites).Return(ted.Response{}, nil)
-
-	update := ted.Update{
-		CallbackQuery: &ted.CallbackQuery{
-			ID:   callbackQueryID,
-			From: ted.User{ID: userID},
-			Message: &ted.Message{
-				ID:   messageID,
-				Chat: ted.Chat{ID: chatID},
-			},
-			Data: CallbackData{
-				Type: callbackDeleteFavourite,
-				Name: favouriteToDelete,
-			}.Encode(),
-		},
-	}
-	b.HandleUpdate(context.Background(), update)
-}
-
-func TestBete_deleteFavouriteCallback_NoFavouritesLeft(t *testing.T) {
-	b, finish := newMockBete(t)
-	defer finish()
-
-	userID := randomID()
-	chatID := randomInt64ID()
-	messageID := randomID()
-	callbackQueryID := randomStringID()
-	favouriteToDelete := "Work"
-	editMessage := ted.EditMessageTextRequest{
-		ChatID:      chatID,
-		MessageID:   messageID,
-		Text:        stringDeleteFavouritesNoFavouritesLeft,
-		ReplyMarkup: deleteFavouritesReplyMarkupP(nil),
-	}
-	answerCallback := ted.AnswerCallbackQueryRequest{
-		CallbackQueryID: callbackQueryID,
-	}
-	removeKeyboard := ted.SendMessageRequest{
-		ChatID:      chatID,
-		Text:        fmt.Sprintf(stringDeleteFavouriteDeleted, favouriteToDelete),
-		ReplyMarkup: ted.ReplyKeyboardRemove{},
-	}
-
-	b.Favourites.(*MockFavouriteRepository).EXPECT().Delete(userID, favouriteToDelete).Return(nil)
-	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, nil)
-	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
-	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
-	b.Telegram.(*MockTelegram).EXPECT().Do(removeKeyboard).Return(ted.Response{}, nil)
 
 	update := ted.Update{
 		CallbackQuery: &ted.CallbackQuery{

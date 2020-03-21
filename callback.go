@@ -207,23 +207,15 @@ func (b Bete) deleteFavouriteCallback(ctx context.Context, q *ted.CallbackQuery,
 		b.answerCallbackQueryError(ctx, q, err)
 		return
 	}
-	var text string
-	if len(remainingFavourites) == 0 {
-		text = stringDeleteFavouritesNoFavouritesLeft
-	} else {
-		text = stringDeleteFavouritesChoose
-	}
 	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
 	}); err != nil {
 		captureError(ctx, err)
 	}
 	chatID := q.Message.Chat.ID
-	if _, err := b.Telegram.Do(ted.EditMessageTextRequest{
-		Text:        text,
-		ChatID:      chatID,
-		MessageID:   q.Message.ID,
-		ReplyMarkup: deleteFavouritesReplyMarkupP(remainingFavourites),
+	if _, err := b.Telegram.Do(ted.EditMessageReplyMarkupRequest{
+		ChatID:    chatID,
+		MessageID: q.Message.ID,
 	}); err != nil {
 		captureError(ctx, err)
 	}
