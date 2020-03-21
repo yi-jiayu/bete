@@ -51,7 +51,7 @@ func (b Bete) answerCallbackQueryError(ctx context.Context, q *ted.CallbackQuery
 	captureError(ctx, err)
 	b.send(ctx, ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
-		Text:            "Something went wrong!",
+		Text:            stringSomethingWentWrong,
 		CacheTime:       60,
 	})
 }
@@ -71,7 +71,7 @@ func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
-		Text:            "ETAs updated!",
+		Text:            stringRefreshETAsUpdated,
 	}
 	b.send(ctx, editMessageText)
 	b.send(ctx, answerCallbackQuery)
@@ -91,7 +91,7 @@ func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
-		Text:            "ETAs sent!",
+		Text:            stringResendETAsSent,
 	}
 	b.send(ctx, sendMessage)
 	b.send(ctx, answerCallbackQuery)

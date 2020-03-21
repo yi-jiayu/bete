@@ -34,7 +34,7 @@ func TestBete_HandleCallbackQuery_Refresh(t *testing.T) {
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
-		Text:            "ETAs updated!",
+		Text:            stringRefreshETAsUpdated,
 	}
 
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
@@ -84,7 +84,7 @@ func TestBete_HandleCallbackQuery_Resend(t *testing.T) {
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
-		Text:            "ETAs sent!",
+		Text:            stringResendETAsSent,
 	}
 
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
@@ -245,7 +245,7 @@ func TestBete_deleteFavouritesCallback_ListError(t *testing.T) {
 	callbackQueryID := randomStringID()
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
-		Text:            "Something went wrong!",
+		Text:            stringSomethingWentWrong,
 		CacheTime:       60,
 	}
 
@@ -402,7 +402,7 @@ func TestBete_deleteFavouriteCallback_DeleteError(t *testing.T) {
 	favouriteToDelete := "Work"
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
-		Text:            "Something went wrong!",
+		Text:            stringSomethingWentWrong,
 		CacheTime:       60,
 	}
 
@@ -437,7 +437,7 @@ func TestBete_deleteFavouriteCallback_ListError(t *testing.T) {
 	favouriteToDelete := "Work"
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
-		Text:            "Something went wrong!",
+		Text:            stringSomethingWentWrong,
 		CacheTime:       60,
 	}
 
@@ -472,7 +472,7 @@ func TestBete_showFavouritesCallback_ListError(t *testing.T) {
 	callbackQueryID := randomStringID()
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
-		Text:            "Something went wrong!",
+		Text:            stringSomethingWentWrong,
 		CacheTime:       60,
 	}
 
@@ -553,7 +553,7 @@ func TestBete_showFavouritesCallback(t *testing.T) {
 	favourites := []string{"Home", "Work"}
 	showFavourites := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        "Showing favourites keyboard",
+		Text:        stringShowFavouritesShowing,
 		ReplyMarkup: showFavouritesReplyMarkup(favourites),
 	}
 	answerCallback := ted.AnswerCallbackQueryRequest{
@@ -590,7 +590,7 @@ func TestBete_hideFavouritesCallback(t *testing.T) {
 	callbackQueryID := randomStringID()
 	hideKeyboard := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        "Hiding favourites keyboard",
+		Text:        stringHideFavouritesHiding,
 		ReplyMarkup: ted.ReplyKeyboardRemove{},
 	}
 

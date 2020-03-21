@@ -23,4 +23,7 @@ const (
 	stringQueryContainsInvalidCharacters  = "An ETA query should contain only letters and numbers."
 	stringQueryShouldStartWithBusStopCode = "An ETA query should start with a 5-digit bus stop code."
 	stringQueryTooLong                    = "An ETA query should be less than 20 characters long (sorry about that)."
+	stringRefreshETAsUpdated              = "ETAs updated!"
+	stringResendETAsSent                  = "ETAs sent!"
+	stringSomethingWentWrong              = "Something went wrong!"
 )
