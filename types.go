@@ -30,7 +30,7 @@ type CallbackData struct {
 	Type   string   `json:"t"`
 	StopID string   `json:"b,omitempty"`
 	Filter []string `json:"s,omitempty"`
-	Format string   `json:"f,omitempty"`
+	Format Format   `json:"f,omitempty"`
 	Name   string   `json:"n,omitempty"`
 	Query  *Query   `json:"q,omitempty"`
 }

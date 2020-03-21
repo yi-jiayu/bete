@@ -70,7 +70,7 @@ func (b Bete) send(ctx context.Context, req ted.Request) {
 	}
 }
 
-func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string) (string, error) {
+func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string, format Format) (string, error) {
 	t := b.Clock.Now()
 	arrivals, err := b.DataMall.GetBusArrival(stopID, "")
 	if err != nil {
@@ -84,10 +84,11 @@ func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string
 		}
 		stop = BusStop{ID: stopID}
 	}
-	return FormatArrivalsByService(ArrivalInfo{
+	info := ArrivalInfo{
 		Stop:     stop,
 		Time:     t,
 		Services: arrivals.Services,
 		Filter:   filter,
-	})
+	}
+	return FormatArrivals(info, format)
 }

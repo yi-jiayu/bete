@@ -8,27 +8,97 @@ import (
 )
 
 func Test_etaMessageReplyMarkup(t *testing.T) {
-	expected := ted.InlineKeyboardMarkup{
-		InlineKeyboard: [][]ted.InlineKeyboardButton{
-			{
-				{
-					Text:         stringCallbackRefresh,
-					CallbackData: "{\"t\":\"refresh\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
+	tests := []struct {
+		name     string
+		format   Format
+		expected ted.InlineKeyboardMarkup
+	}{
+		{
+			name:   "summary",
+			format: FormatSummary,
+			expected: ted.InlineKeyboardMarkup{
+				InlineKeyboard: [][]ted.InlineKeyboardButton{
+					{
+						{
+							Text:         "Show arriving bus details",
+							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"f"}`},
+					},
+					{
+						{
+							Text:         "Refresh",
+							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"s"}`,
+						},
+						{
+							Text:         "Resend",
+							CallbackData: `{"t":"resend","b":"96049","s":["5","24"],"f":"s"}`,
+						},
+					},
 				},
-				{
-					Text:         stringCallbackResend,
-					CallbackData: "{\"t\":\"resend\",\"b\":\"96049\",\"s\":[\"5\",\"24\"]}",
+			},
+		},
+		{
+			name:   "details",
+			format: FormatDetails,
+			expected: ted.InlineKeyboardMarkup{
+				InlineKeyboard: [][]ted.InlineKeyboardButton{
+					{
+						{
+							Text:         "Show arriving bus summary",
+							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"s"}`,
+						},
+					},
+					{
+						{
+							Text:         "Refresh",
+							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"f"}`,
+						},
+						{
+							Text:         "Resend",
+							CallbackData: `{"t":"resend","b":"96049","s":["5","24"],"f":"f"}`,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "defaults to summary",
+			expected: ted.InlineKeyboardMarkup{
+				InlineKeyboard: [][]ted.InlineKeyboardButton{
+					{
+						{
+							Text:         "Show arriving bus details",
+							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"f"}`},
+					},
+					{
+						{
+							Text:         "Refresh",
+							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"s"}`,
+						},
+						{
+							Text:         "Resend",
+							CallbackData: `{"t":"resend","b":"96049","s":["5","24"],"f":"s"}`,
+						},
+					},
 				},
 			},
 		},
 	}
-	actual := etaMessageReplyMarkup("96049", []string{"5", "24"})
-	assert.Equal(t, expected, actual)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := etaMessageReplyMarkup("96049", []string{"5", "24"}, tt.format)
+			assert.Equal(t, tt.expected, actual)
+		})
+	}
 }
 
 func Test_etaMessageReplyMarkupP(t *testing.T) {
-	markup := etaMessageReplyMarkup("96049", []string{"5", "24"})
-	markupP := etaMessageReplyMarkupP("96049", []string{"5", "24"})
+	var markup ted.InlineKeyboardMarkup
+	var markupP *ted.InlineKeyboardMarkup
+	markup = etaMessageReplyMarkup("96049", []string{"5", "24"}, FormatSummary)
+	markupP = etaMessageReplyMarkupP("96049", []string{"5", "24"}, FormatSummary)
+	assert.Equal(t, markup, *markupP)
+	markup = etaMessageReplyMarkup("96049", []string{"5", "24"}, FormatDetails)
+	markupP = etaMessageReplyMarkupP("96049", []string{"5", "24"}, FormatDetails)
 	assert.Equal(t, markup, *markupP)
 }
 

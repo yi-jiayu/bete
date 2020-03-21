@@ -29,9 +29,9 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	}
 	switch data.Type {
 	case callbackRefresh:
-		b.updateETAs(ctx, q, data.StopID, data.Filter)
+		b.updateETAs(ctx, q, data)
 	case callbackResend:
-		b.resendETAs(ctx, q, data.StopID, data.Filter)
+		b.resendETAs(ctx, q, data)
 	case callbackAddFavourite:
 		b.askForFavouriteQuery(ctx, q)
 	case callbackSaveFavourite:
@@ -56,8 +56,8 @@ func (b Bete) answerCallbackQueryError(ctx context.Context, q *ted.CallbackQuery
 	})
 }
 
-func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, stop string, filter []string) {
-	text, err := b.etaMessageText(ctx, stop, filter)
+func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
+	text, err := b.etaMessageText(ctx, data.StopID, data.Filter, data.Format)
 	if err != nil {
 		captureError(ctx, err)
 		return
@@ -67,7 +67,7 @@ func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 		MessageID:   q.Message.ID,
 		Text:        text,
 		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkupP(stop, filter),
+		ReplyMarkup: etaMessageReplyMarkupP(data.StopID, data.Filter, data.Format),
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
@@ -77,8 +77,8 @@ func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 	b.send(ctx, answerCallbackQuery)
 }
 
-func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, stop string, filter []string) {
-	text, err := b.etaMessageText(ctx, stop, filter)
+func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
+	text, err := b.etaMessageText(ctx, data.StopID, data.Filter, data.Format)
 	if err != nil {
 		captureError(ctx, err)
 		return
@@ -87,7 +87,7 @@ func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, stop string,
 		ChatID:      q.Message.Chat.ID,
 		Text:        text,
 		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkup(stop, filter),
+		ReplyMarkup: etaMessageReplyMarkup(data.StopID, data.Filter, data.Format),
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,

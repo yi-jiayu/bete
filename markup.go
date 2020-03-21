@@ -4,33 +4,61 @@ import (
 	"github.com/yi-jiayu/ted"
 )
 
-func etaMessageReplyMarkup(stopID string, filter []string) ted.InlineKeyboardMarkup {
-	return ted.InlineKeyboardMarkup{
-		InlineKeyboard: [][]ted.InlineKeyboardButton{
+func etaMessageReplyMarkup(stopID string, filter []string, format Format) ted.InlineKeyboardMarkup {
+	var rows [][]ted.InlineKeyboardButton
+	if format == FormatDetails {
+		rows = append(rows, []ted.InlineKeyboardButton{
 			{
-				{
-					Text: stringCallbackRefresh,
-					CallbackData: CallbackData{
-						Type:   callbackRefresh,
-						StopID: stopID,
-						Filter: filter,
-					}.Encode(),
-				},
-				{
-					Text: stringCallbackResend,
-					CallbackData: CallbackData{
-						Type:   callbackResend,
-						StopID: stopID,
-						Filter: filter,
-					}.Encode(),
-				},
+				Text: "Show arriving bus summary",
+				CallbackData: CallbackData{
+					Type:   callbackRefresh,
+					StopID: stopID,
+					Filter: filter,
+					Format: FormatSummary,
+				}.Encode(),
 			},
+		})
+	} else {
+		format = FormatSummary
+		rows = append(rows, []ted.InlineKeyboardButton{
+			{
+				Text: "Show arriving bus details",
+				CallbackData: CallbackData{
+					Type:   callbackRefresh,
+					StopID: stopID,
+					Filter: filter,
+					Format: FormatDetails,
+				}.Encode(),
+			},
+		})
+	}
+	rows = append(rows, []ted.InlineKeyboardButton{
+		{
+			Text: stringCallbackRefresh,
+			CallbackData: CallbackData{
+				Type:   callbackRefresh,
+				StopID: stopID,
+				Filter: filter,
+				Format: format,
+			}.Encode(),
 		},
+		{
+			Text: stringCallbackResend,
+			CallbackData: CallbackData{
+				Type:   callbackResend,
+				StopID: stopID,
+				Filter: filter,
+				Format: format,
+			}.Encode(),
+		},
+	})
+	return ted.InlineKeyboardMarkup{
+		InlineKeyboard: rows,
 	}
 }
 
-func etaMessageReplyMarkupP(stopID string, filter []string) *ted.InlineKeyboardMarkup {
-	markup := etaMessageReplyMarkup(stopID, filter)
+func etaMessageReplyMarkupP(stopID string, filter []string, format Format) *ted.InlineKeyboardMarkup {
+	markup := etaMessageReplyMarkup(stopID, filter, format)
 	return &markup
 }
 

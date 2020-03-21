@@ -18,7 +18,7 @@ func TestBete_HandleTextMessage(t *testing.T) {
 	filter := []string{"5", "24"}
 	arrivals := buildDataMallBusArrival()
 	chatID := randomInt64ID()
-	text := must(FormatArrivalsByService(ArrivalInfo{
+	text := must(formatArrivalsSummary(ArrivalInfo{
 		Stop:     stop,
 		Time:     refTime,
 		Services: arrivals.Services,
@@ -28,7 +28,7 @@ func TestBete_HandleTextMessage(t *testing.T) {
 		ChatID:      chatID,
 		Text:        text,
 		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkup(stop.ID, filter),
+		ReplyMarkup: etaMessageReplyMarkup(stop.ID, filter, FormatSummary),
 	}
 
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
@@ -102,7 +102,7 @@ func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 	userID := randomID()
 	chatID := randomInt64ID()
 	messageText := "SUTD"
-	replyText := must(FormatArrivalsByService(ArrivalInfo{
+	replyText := must(formatArrivalsSummary(ArrivalInfo{
 		Stop:     stop,
 		Time:     refTime,
 		Services: arrivals.Services,
@@ -112,7 +112,7 @@ func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 		ChatID:      chatID,
 		Text:        replyText,
 		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkup(stop.ID, filter),
+		ReplyMarkup: etaMessageReplyMarkup(stop.ID, filter, FormatSummary),
 	}
 
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)

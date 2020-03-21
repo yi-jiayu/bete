@@ -39,7 +39,7 @@ func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 			return
 		}
 	}
-	text, err := b.etaMessageText(ctx, query.Stop, query.Filter)
+	text, err := b.etaMessageText(ctx, query.Stop, query.Filter, FormatSummary)
 	if err != nil {
 		captureError(ctx, err)
 		return
@@ -48,7 +48,7 @@ func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 		ChatID:      m.Chat.ID,
 		Text:        text,
 		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkup(query.Stop, query.Filter),
+		ReplyMarkup: etaMessageReplyMarkup(query.Stop, query.Filter, FormatSummary),
 	}
 	b.send(ctx, req)
 }

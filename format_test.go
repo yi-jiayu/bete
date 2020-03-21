@@ -214,7 +214,7 @@ Filtered by services: 2, 24
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			actual, err := FormatArrivalsByService(c.arrivals)
+			actual, err := formatArrivalsSummary(c.arrivals)
 			assert.NoError(t, err)
 			assert.Equal(t, c.expected, actual)
 		})
@@ -222,7 +222,6 @@ Filtered by services: 2, 24
 }
 
 func TestFormatArrivalsShowingDetails(t *testing.T) {
-
 	cases := []struct {
 		name     string
 		arrivals ArrivalInfo
@@ -323,9 +322,44 @@ Filtered by services: 2, 24
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			actual, err := FormatArrivalsShowingDetails(c.arrivals)
+			actual, err := formatArrivalsDetails(c.arrivals)
 			assert.NoError(t, err)
 			assert.Equal(t, c.expected, actual)
+		})
+	}
+}
+
+func TestFormatArrivals(t *testing.T) {
+	info := ArrivalInfo{
+		Stop: BusStop{
+			ID:          "96049",
+			Description: "UPP CHANGI STN/SUTD",
+			RoadName:    "Upp Changi Rd East",
+		},
+		Time:     refTime,
+		Services: buildDataMallBusArrival().Services,
+	}
+	tests := []struct {
+		name     string
+		format   Format
+		expected string
+	}{
+		{
+			name:     "summary",
+			format:   FormatSummary,
+			expected: must(formatArrivalsSummary(info)).(string),
+		},
+		{
+			name:     "details",
+			format:   FormatDetails,
+			expected: must(formatArrivalsDetails(info)).(string),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual, err := FormatArrivals(info, tt.format)
+			assert.NoError(t, err)
+			assert.Equal(t, actual, tt.expected)
 		})
 	}
 }

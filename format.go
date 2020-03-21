@@ -12,6 +12,19 @@ import (
 	"github.com/yi-jiayu/datamall/v3"
 )
 
+// Format represents how arrivals should be formatted.
+type Format string
+
+const (
+	// FormatSummary shows up to the next 3 incoming buses for each service.
+	FormatSummary Format = "s"
+
+	// FormatDetails shows up to the next 10 incoming buses and their ETA,
+	// occupancy, type (single or double-decked) and additional features
+	// (whether the bus is wheelchair accessible).
+	FormatDetails Format = "f"
+)
+
 var trimTrailingLettersRegexp = regexp.MustCompile("[^0-9]$")
 
 var funcMap = map[string]interface{}{
@@ -138,7 +151,7 @@ type ArrivalInfo struct {
 	Filter   []string
 }
 
-func FormatArrivalsByService(arrivals ArrivalInfo) (string, error) {
+func formatArrivalsSummary(arrivals ArrivalInfo) (string, error) {
 	b := new(bytes.Buffer)
 	err := arrivalSummaryTemplate.Execute(b, arrivals)
 	if err != nil {
@@ -147,11 +160,21 @@ func FormatArrivalsByService(arrivals ArrivalInfo) (string, error) {
 	return b.String(), nil
 }
 
-func FormatArrivalsShowingDetails(arrivals ArrivalInfo) (string, error) {
+func formatArrivalsDetails(arrivals ArrivalInfo) (string, error) {
 	b := new(bytes.Buffer)
 	err := arrivalDetailsTemplate.Execute(b, arrivals)
 	if err != nil {
 		return "", err
 	}
 	return b.String(), nil
+}
+
+// FormatArrivals formats arrivals with the specified format.
+func FormatArrivals(arrivals ArrivalInfo, format Format) (string, error) {
+	switch format {
+	case FormatDetails:
+		return formatArrivalsDetails(arrivals)
+	default:
+		return formatArrivalsSummary(arrivals)
+	}
 }

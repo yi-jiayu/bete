@@ -37,26 +37,39 @@ func newMockBete(t *testing.T) (Bete, func()) {
 }
 
 func TestBete_etaMessageText(t *testing.T) {
-	b, finish := newMockBete(t)
-	defer finish()
-
 	stop := buildBusStop()
 	arrivals := buildDataMallBusArrival()
-
-	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
-	b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
-	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
-
-	actual, err := b.etaMessageText(context.Background(), stop.ID, nil)
-	assert.NoError(t, err)
-	expected, err := FormatArrivalsByService(ArrivalInfo{
-		Stop:     stop,
-		Time:     refTime,
-		Services: arrivals.Services,
-		Filter:   nil,
-	})
-	if err != nil {
-		panic(err)
+	tests := []struct {
+		name   string
+		format Format
+	}{
+		{
+			name:   "summary",
+			format: FormatSummary,
+		},
+		{
+			name:   "details",
+			format: FormatDetails,
+		},
 	}
-	assert.Equal(t, expected, actual)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, finish := newMockBete(t)
+			defer finish()
+
+			b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+			b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+			b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+
+			actual, err := b.etaMessageText(context.Background(), stop.ID, nil, tt.format)
+			assert.NoError(t, err)
+			expected := must(FormatArrivals(ArrivalInfo{
+				Stop:     stop,
+				Time:     refTime,
+				Services: arrivals.Services,
+				Filter:   nil,
+			}, tt.format)).(string)
+			assert.Equal(t, expected, actual)
+		})
+	}
 }
