@@ -78,6 +78,12 @@ func Test_showFavouritesReplyMarkup(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func Test_showFavouritesReplyMarkup_NoFavourites(t *testing.T) {
+	expected := ted.ReplyKeyboardRemove{}
+	actual := showFavouritesReplyMarkup(nil)
+	assert.Equal(t, expected, actual)
+}
+
 func Test_addFavouriteSuggestNameMarkup(t *testing.T) {
 	t.Run("with bus stop description", func(t *testing.T) {
 		expected := ted.InlineKeyboardMarkup{

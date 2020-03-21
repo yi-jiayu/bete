@@ -363,13 +363,18 @@ func TestBete_deleteFavouriteCallback(t *testing.T) {
 	}
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
-		Text:            stringDeleteFavouriteDeleted,
+	}
+	showFavourites := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        fmt.Sprintf(stringDeleteFavouriteDeleted, favouriteToDelete),
+		ReplyMarkup: showFavouritesReplyMarkup(remainingFavourites),
 	}
 
 	b.Favourites.(*MockFavouriteRepository).EXPECT().Delete(userID, favouriteToDelete).Return(nil)
 	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(remainingFavourites, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(showFavourites).Return(ted.Response{}, nil)
 
 	update := ted.Update{
 		CallbackQuery: &ted.CallbackQuery{
@@ -388,7 +393,7 @@ func TestBete_deleteFavouriteCallback(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_deleteFavouriteCallback_NoFavouritesRemaining(t *testing.T) {
+func TestBete_deleteFavouriteCallback_NoFavouritesLeft(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
@@ -405,13 +410,18 @@ func TestBete_deleteFavouriteCallback_NoFavouritesRemaining(t *testing.T) {
 	}
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: callbackQueryID,
-		Text:            stringDeleteFavouriteDeleted,
+	}
+	removeKeyboard := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        fmt.Sprintf(stringDeleteFavouriteDeleted, favouriteToDelete),
+		ReplyMarkup: ted.ReplyKeyboardRemove{},
 	}
 
 	b.Favourites.(*MockFavouriteRepository).EXPECT().Delete(userID, favouriteToDelete).Return(nil)
 	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(removeKeyboard).Return(ted.Response{}, nil)
 
 	update := ted.Update{
 		CallbackQuery: &ted.CallbackQuery{

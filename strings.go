@@ -14,7 +14,7 @@ const (
 	stringFavouritesShow                   = "Show favourites keyboard"
 	stringFavouritesChooseAction           = "What would you like to do?"
 	stringFavouritesOnlyPrivateChat        = "Sorry, you can only manage your favourites in a private chat."
-	stringDeleteFavouriteDeleted           = "Favourite deleted!"
+	stringDeleteFavouriteDeleted           = "Removed %s from your favourites!"
 	stringDeleteFavouritesNoFavourites     = "Oops, you don't have any favourites to delete! How about creating one first?"
 	stringDeleteFavouritesNoFavouritesLeft = "You deleted your last favourite! How about creating another one?"
 	stringDeleteFavouritesChoose           = "Select a favourite to delete it:"

@@ -73,7 +73,10 @@ func favouritesReplyMarkup() ted.InlineKeyboardMarkup {
 	}
 }
 
-func showFavouritesReplyMarkup(favourites []string) ted.ReplyKeyboardMarkup {
+func showFavouritesReplyMarkup(favourites []string) ted.ReplyMarkup {
+	if len(favourites) == 0 {
+		return ted.ReplyKeyboardRemove{}
+	}
 	var keyboard [][]interface{}
 	for _, f := range favourites {
 		keyboard = append(keyboard, []interface{}{f})
