@@ -301,7 +301,7 @@ func TestBete_HandleCommand_Favourite(t *testing.T) {
 	chatID := randomInt64ID()
 	req := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        "What would you like to do?",
+		Text:        stringFavouritesChooseAction,
 		ReplyMarkup: favouritesReplyMarkup(),
 	}
 
@@ -333,7 +333,7 @@ func TestBete_HandleCommand_Favourite_NonPrivateChat(t *testing.T) {
 	messageID := randomID()
 	req := ted.SendMessageRequest{
 		ChatID:           chatID,
-		Text:             "Sorry, you can only manage your favourites in a private chat.",
+		Text:             stringFavouritesOnlyPrivateChat,
 		ReplyToMessageID: messageID,
 	}
 

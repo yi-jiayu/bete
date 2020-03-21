@@ -108,13 +108,13 @@ func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
 	if m.Chat.Type != "private" {
 		req = ted.SendMessageRequest{
 			ChatID:           m.Chat.ID,
-			Text:             "Sorry, you can only manage your favourites in a private chat.",
+			Text:             stringFavouritesOnlyPrivateChat,
 			ReplyToMessageID: m.ID,
 		}
 	} else {
 		req = ted.SendMessageRequest{
 			ChatID:      m.Chat.ID,
-			Text:        "What would you like to do?",
+			Text:        stringFavouritesChooseAction,
 			ReplyMarkup: favouritesReplyMarkup(),
 		}
 	}
