@@ -116,12 +116,12 @@ func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, d
 		userID := q.From.ID
 		err := b.Favourites.Put(userID, name, query.Canonical())
 		if err != nil {
-			captureError(ctx, err)
+			b.answerCallbackQueryError(ctx, q, err)
 			return
 		}
 		favourites, err := b.Favourites.List(userID)
 		if err != nil {
-			captureError(ctx, err)
+			b.answerCallbackQueryError(ctx, q, err)
 			return
 		}
 		showFavourites := ted.SendMessageRequest{

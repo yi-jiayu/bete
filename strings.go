@@ -1,6 +1,7 @@
 package bete
 
 const (
+	stringErrorSorry                      = "Oh no, Something went wrong! Sorry about that, we're looking into it."
 	stringAddFavouritePromptForName       = "Adding the query %q to your favourites with a custom name. Send me the name for this query."
 	stringAddFavouritePromptForQuery      = "Send me the ETA query you wish to save as a favourite."
 	stringAddFavouriteSuggestName         = "Adding the query %q to your favourites. What would you like to name it?"

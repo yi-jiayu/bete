@@ -223,6 +223,65 @@ func TestBete_addFavouriteFinish(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+func TestBete_addFavouriteFinish_PutError(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	query := "96049 5 24"
+	name := "SUTD"
+	req := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   stringErrorSorry,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Put(userID, name, query).Return(Error("some error"))
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			ReplyToMessage: &ted.Message{
+				Text: fmt.Sprintf(stringAddFavouritePromptForName, query),
+			},
+			Text: name,
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_addFavouriteFinish_ListError(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	query := "96049 5 24"
+	name := "SUTD"
+	req := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   stringErrorSorry,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Put(userID, name, query).Return(nil)
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, Error("some error"))
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			ReplyToMessage: &ted.Message{
+				Text: fmt.Sprintf(stringAddFavouritePromptForName, query),
+			},
+			Text: name,
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func TestBete_HandleReply_AddFavourite_HandleInvalidQuery(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()

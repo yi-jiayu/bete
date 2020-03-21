@@ -164,11 +164,19 @@ func (b Bete) addFavouriteFinish(ctx context.Context, m *ted.Message, query stri
 	err := b.Favourites.Put(userID, name, query)
 	if err != nil {
 		captureError(ctx, err)
+		b.send(ctx, ted.SendMessageRequest{
+			ChatID: m.Chat.ID,
+			Text:   stringErrorSorry,
+		})
 		return
 	}
 	favourites, err := b.Favourites.List(userID)
 	if err != nil {
 		captureError(ctx, err)
+		b.send(ctx, ted.SendMessageRequest{
+			ChatID: m.Chat.ID,
+			Text:   stringErrorSorry,
+		})
 		return
 	}
 	req := ted.SendMessageRequest{

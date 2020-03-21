@@ -192,6 +192,79 @@ func TestBete_saveFavouriteCallback_WithName(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+func TestBete_saveFavouriteCallback_WithName_PutError(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	name := "Opp Tropicana Condo"
+	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
+	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+		Text:            stringSomethingWentWrong,
+		CacheTime:       60,
+	}
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Put(userID, name, query.Canonical()).Return(Error("some error"))
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type:  callbackSaveFavourite,
+				Query: &query,
+				Name:  name,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_saveFavouriteCallback_WithName_ListError(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	name := "Opp Tropicana Condo"
+	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
+	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+		Text:            stringSomethingWentWrong,
+		CacheTime:       60,
+	}
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Put(userID, name, query.Canonical())
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, Error("some error"))
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type:  callbackSaveFavourite,
+				Query: &query,
+				Name:  name,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func TestBete_saveFavouriteCallback_WithoutName(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
