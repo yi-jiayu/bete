@@ -3,7 +3,6 @@ package bete
 import (
 	"database/sql"
 
-	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 

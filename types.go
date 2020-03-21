@@ -18,7 +18,6 @@ const MaxQueryLength = 20
 var (
 	queryStartsWithBusStopCodeRegexp       = regexp.MustCompile(`^\d{5}(?:\s|$)`)
 	queryContainsOnlyValidCharactersRegexp = regexp.MustCompile(`^[0-9A-Za-z\s]+$`)
-	validQueryRegexp                       = regexp.MustCompile(`\d{5}(\s[0-9A-Za-z\s]+)?$`)
 )
 
 type Error string
