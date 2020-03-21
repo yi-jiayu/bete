@@ -66,7 +66,7 @@ jobs:
       - run:
           name: Helm upgrade
           command: |
-            helm upgrade --install \
+            helm upgrade --install --wait \
               bete deploy/charts/server \
               -n bete \
               -f deploy/values.yaml \
