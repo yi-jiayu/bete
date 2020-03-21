@@ -78,7 +78,7 @@ func (b Bete) sendQueryError(ctx context.Context, chatID int64, err error) {
 	}
 }
 
-func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args string) {
+func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, _ string) {
 	switch cmd {
 	case "favourites":
 		b.handleFavouritesCommand(ctx, m)
