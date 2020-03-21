@@ -579,3 +579,35 @@ func TestBete_showFavouritesCallback(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_hideFavouritesCallback(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	hideKeyboard := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        "Hiding favourites keyboard",
+		ReplyMarkup: ted.ReplyKeyboardRemove{},
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(hideKeyboard).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackHideFavourites,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}

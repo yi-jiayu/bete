@@ -16,6 +16,7 @@ const (
 	callbackDeleteFavourites = "delete_favourites"
 	callbackDeleteFavourite  = "delete_favourite"
 	callbackShowFavourites   = "show_favourites"
+	callbackHideFavourites   = "hide_favourites"
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -41,7 +42,18 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.deleteFavouriteCallback(ctx, q, data)
 	case callbackShowFavourites:
 		b.showFavouritesCallback(ctx, q)
+	case callbackHideFavourites:
+		b.hideFavouritesCallback(ctx, q)
 	}
+}
+
+func (b Bete) answerCallbackQueryError(ctx context.Context, q *ted.CallbackQuery, err error) {
+	captureError(ctx, err)
+	b.send(ctx, ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
+		Text:            "Something went wrong!",
+		CacheTime:       60,
+	})
 }
 
 func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, stop string, filter []string) {
@@ -214,7 +226,7 @@ func (b Bete) showFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) 
 	} else {
 		req = ted.SendMessageRequest{
 			ChatID:      q.Message.Chat.ID,
-			Text:        "Showing favourites keyboard",
+			Text:        stringShowFavouritesShowing,
 			ReplyMarkup: showFavouritesReplyMarkup(favourites),
 		}
 	}
@@ -224,11 +236,11 @@ func (b Bete) showFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) 
 	})
 }
 
-func (b Bete) answerCallbackQueryError(ctx context.Context, q *ted.CallbackQuery, err error) {
-	captureError(ctx, err)
-	b.send(ctx, ted.AnswerCallbackQueryRequest{
-		CallbackQueryID: q.ID,
-		Text:            "Something went wrong!",
-		CacheTime:       60,
-	})
+func (b Bete) hideFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
+	hideKeyboard := ted.SendMessageRequest{
+		ChatID:      q.Message.Chat.ID,
+		Text:        stringHideFavouritesHiding,
+		ReplyMarkup: ted.ReplyKeyboardRemove{},
+	}
+	b.send(ctx, hideKeyboard)
 }

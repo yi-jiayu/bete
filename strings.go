@@ -18,6 +18,8 @@ const (
 	stringDeleteFavouritesNoFavourites    = "Oops, you don't have any favourites to delete! How about creating one first?"
 	stringDeleteFavouritesChoose          = "Select a favourite to delete it:"
 	stringShowFavouritesNoFavourites      = "Oops, you haven't added any favourites yet! How about creating one first?"
+	stringShowFavouritesShowing           = "Showing favourites keyboard"
+	stringHideFavouritesHiding            = "Hiding favourites keyboard"
 	stringQueryContainsInvalidCharacters  = "An ETA query should contain only letters and numbers."
 	stringQueryShouldStartWithBusStopCode = "An ETA query should start with a 5-digit bus stop code."
 	stringQueryTooLong                    = "An ETA query should be less than 20 characters long (sorry about that)."
