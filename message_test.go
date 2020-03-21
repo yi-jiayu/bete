@@ -191,7 +191,7 @@ func TestBete_addFavouriteSuggestName_BusStopNotFound(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_HandleReply_AddFavourite_Finish(t *testing.T) {
+func TestBete_addFavouriteFinish(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
@@ -202,7 +202,7 @@ func TestBete_HandleReply_AddFavourite_Finish(t *testing.T) {
 	name := "SUTD"
 	req := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        "New favourite added!",
+		Text:        fmt.Sprintf(stringAddFavouriteAdded, query, name),
 		ReplyMarkup: showFavouritesReplyMarkup(favourites),
 	}
 

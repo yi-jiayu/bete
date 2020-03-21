@@ -131,7 +131,7 @@ func (b Bete) saveFavouriteCallback(ctx context.Context, q *ted.CallbackQuery, d
 		}
 		showFavourites := ted.SendMessageRequest{
 			ChatID:      q.Message.Chat.ID,
-			Text:        fmt.Sprintf("Added the query %q to your favourites as %q!", query.Canonical(), data.Name),
+			Text:        fmt.Sprintf(stringAddFavouriteAdded, query.Canonical(), data.Name),
 			ReplyMarkup: showFavouritesReplyMarkup(favourites),
 		}
 		_, err = b.Telegram.Do(showFavourites)

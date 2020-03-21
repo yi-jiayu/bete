@@ -4,6 +4,7 @@ const (
 	stringAddFavouritePromptForName        = "Adding the query %q to your favourites with a custom name. Send me the name for this query."
 	stringAddFavouritePromptForQuery       = "Send me the ETA query you wish to save as a favourite."
 	stringAddFavouriteSuggestName          = "Adding the query %q to your favourites. What would you like to name it?"
+	stringAddFavouriteAdded                = "Added the query %q to your favourites as %q!"
 	stringCallbackRefresh                  = "Refresh"
 	stringCallbackResend                   = "Resend"
 	stringFavouritesAddNew                 = "Add a new favourite"

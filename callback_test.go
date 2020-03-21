@@ -157,7 +157,7 @@ func TestBete_saveFavouriteCallback_WithName(t *testing.T) {
 	favourites := []string{"Home", name}
 	showFavourites := ted.SendMessageRequest{
 		ChatID:      chatID,
-		Text:        fmt.Sprintf("Added the query %q to your favourites as %q!", query.Canonical(), name),
+		Text:        fmt.Sprintf(stringAddFavouriteAdded, query.Canonical(), name),
 		ReplyMarkup: showFavouritesReplyMarkup(favourites),
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{

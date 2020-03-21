@@ -194,7 +194,7 @@ func (b Bete) addFavouriteFinish(ctx context.Context, m *ted.Message, query stri
 	}
 	req := ted.SendMessageRequest{
 		ChatID:      m.Chat.ID,
-		Text:        "New favourite added!",
+		Text:        fmt.Sprintf(stringAddFavouriteAdded, query, name),
 		ReplyMarkup: showFavouritesReplyMarkup(favourites),
 	}
 	_, err = b.Telegram.Do(req)
