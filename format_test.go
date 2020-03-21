@@ -70,6 +70,61 @@ func Test_sortByService(t *testing.T) {
 	}
 }
 
+func Test_filterByService(t *testing.T) {
+	cases := []struct {
+		name     string
+		services []datamall.Service
+		filter   []string
+		expected []datamall.Service
+	}{
+		{
+			name: "noop when filter is empty",
+			services: []datamall.Service{
+				{ServiceNo: "2"},
+				{ServiceNo: "5"},
+				{ServiceNo: "24"},
+			},
+			filter: nil,
+			expected: []datamall.Service{
+				{ServiceNo: "2"},
+				{ServiceNo: "5"},
+				{ServiceNo: "24"},
+			},
+		},
+		{
+			name: "returns only services in filter",
+			services: []datamall.Service{
+				{ServiceNo: "2"},
+				{ServiceNo: "5"},
+				{ServiceNo: "24"},
+			},
+			filter: []string{"5", "24"},
+			expected: []datamall.Service{
+				{ServiceNo: "5"},
+				{ServiceNo: "24"},
+			},
+		},
+		{
+			name: "filter should be case-insensitive",
+			services: []datamall.Service{
+				{ServiceNo: "2A"},
+				{ServiceNo: "5e"},
+			},
+			filter: []string{"2a", "5E"},
+			expected: []datamall.Service{
+				{ServiceNo: "2A"},
+				{ServiceNo: "5e"},
+			},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			filtered := filterByService(c.filter, c.services)
+			assert.Equal(t, c.expected, filtered)
+		})
+	}
+}
+
 func TestFormatArrivalsByService(t *testing.T) {
 	cases := []struct {
 		name     string
@@ -166,57 +221,111 @@ Filtered by services: 2, 24
 	}
 }
 
-func Test_filterByService(t *testing.T) {
+func TestFormatArrivalsShowingDetails(t *testing.T) {
+
 	cases := []struct {
 		name     string
-		services []datamall.Service
-		filter   []string
-		expected []datamall.Service
+		arrivals ArrivalInfo
+		expected string
 	}{
 		{
-			name: "noop when filter is empty",
-			services: []datamall.Service{
-				{ServiceNo: "2"},
-				{ServiceNo: "5"},
-				{ServiceNo: "24"},
+			name: "show bus stop details when available",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID:          "96049",
+					Description: "UPP CHANGI STN/SUTD",
+					RoadName:    "Upp Changi Rd East",
+				},
+				Time:     refTime,
+				Services: buildDataMallBusArrival().Services,
 			},
-			filter: nil,
-			expected: []datamall.Service{
-				{ServiceNo: "2"},
-				{ServiceNo: "5"},
-				{ServiceNo: "24"},
-			},
+			expected: `<strong>UPP CHANGI STN/SUTD (96049)</strong>
+Upp Changi Rd East
+<pre>
+Svc   Eta  Sea  Typ  Fea
+---   ---  ---  ---  ---
+5      -1  SDA   DD     
+24      1  SEA   SD     
+24      3  SDA   DD  WAB
+24      6  LSD   BD     
+5      10  SDA   DD     
+5      36  LSD   BD  WAB
+</pre>
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
-			name: "returns only services in filter",
-			services: []datamall.Service{
-				{ServiceNo: "2"},
-				{ServiceNo: "5"},
-				{ServiceNo: "24"},
+			name: "escapes dangerous HTML",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID: "<em>Hello</em>",
+				},
+				Time:     refTime,
+				Services: buildDataMallBusArrival().Services,
+				Filter:   []string{"2", "5", "<strong>24</strong>"},
 			},
-			filter: []string{"5", "24"},
-			expected: []datamall.Service{
-				{ServiceNo: "5"},
-				{ServiceNo: "24"},
-			},
+			expected: `<strong>&lt;em&gt;Hello&lt;/em&gt;</strong>
+<pre>
+Svc   Eta  Sea  Typ  Fea
+---   ---  ---  ---  ---
+5      -1  SDA   DD     
+5      10  SDA   DD     
+5      36  LSD   BD  WAB
+</pre>
+Filtered by services: 2, 5, &lt;strong&gt;24&lt;/strong&gt;
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
-			name: "filter should be case-insensitive",
-			services: []datamall.Service{
-				{ServiceNo: "2A"},
-				{ServiceNo: "5e"},
+			name: "show only bus stop id when details not available",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID: "96049",
+				},
+				Time:     refTime,
+				Services: buildDataMallBusArrival().Services,
 			},
-			filter: []string{"2a", "5E"},
-			expected: []datamall.Service{
-				{ServiceNo: "2A"},
-				{ServiceNo: "5e"},
+			expected: `<strong>96049</strong>
+<pre>
+Svc   Eta  Sea  Typ  Fea
+---   ---  ---  ---  ---
+5      -1  SDA   DD     
+24      1  SEA   SD     
+24      3  SDA   DD  WAB
+24      6  LSD   BD     
+5      10  SDA   DD     
+5      36  LSD   BD  WAB
+</pre>
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
+		},
+		{
+			name: "filters services and shows filtered services when filter provided",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID:          "96049",
+					Description: "UPP CHANGI STN/SUTD",
+					RoadName:    "Upp Changi Rd East",
+				},
+				Time:     refTime,
+				Services: buildDataMallBusArrival().Services,
+				Filter:   []string{"2", "24"},
 			},
+			expected: `<strong>UPP CHANGI STN/SUTD (96049)</strong>
+Upp Changi Rd East
+<pre>
+Svc   Eta  Sea  Typ  Fea
+---   ---  ---  ---  ---
+24      1  SEA   SD     
+24      3  SDA   DD  WAB
+24      6  LSD   BD     
+</pre>
+Filtered by services: 2, 24
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			filtered := filterByService(c.filter, c.services)
-			assert.Equal(t, c.expected, filtered)
+			actual, err := FormatArrivalsShowingDetails(c.arrivals)
+			assert.NoError(t, err)
+			assert.Equal(t, c.expected, actual)
 		})
 	}
 }

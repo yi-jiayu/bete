@@ -15,17 +15,23 @@ import (
 var trimTrailingLettersRegexp = regexp.MustCompile("[^0-9]$")
 
 var funcMap = map[string]interface{}{
-	"inSGT":           inSGT,
+	"arrivingBuses":   arrivingBuses,
 	"filterByService": filterByService,
+	"inSGT":           inSGT,
 	"join":            strings.Join,
+	"sortByArrival":   sortByArrival,
 	"sortByService":   sortByService,
+	"take":            take,
 	"until":           minutesUntil,
 }
 
 var (
-	arrivalsByServiceTemplate = template.Must(template.New("arrivals_by_service.tmpl").
-		Funcs(funcMap).
-		Parse(arrivalsByServiceTemplateString))
+	arrivalSummaryTemplate = template.Must(template.New("arrival_summary").
+				Funcs(funcMap).
+				Parse(templateArrivalSummary))
+	arrivalDetailsTemplate = template.Must(template.New("arrival_details").
+				Funcs(funcMap).
+				Parse(templateArrivalDetails))
 )
 
 var sgt = time.FixedZone("SGT", 8*3600)
@@ -80,6 +86,51 @@ func filterByService(filter []string, services []datamall.Service) []datamall.Se
 	return filtered
 }
 
+type ArrivingBus struct {
+	ServiceNo string
+	datamall.ArrivingBus
+}
+
+func arrivingBuses(services []datamall.Service) []ArrivingBus {
+	var buses []ArrivingBus
+	for _, service := range services {
+		if !service.NextBus.EstimatedArrival.IsZero() {
+			buses = append(buses, ArrivingBus{
+				ServiceNo:   service.ServiceNo,
+				ArrivingBus: service.NextBus,
+			})
+		}
+		if !service.NextBus2.EstimatedArrival.IsZero() {
+			buses = append(buses, ArrivingBus{
+				ServiceNo:   service.ServiceNo,
+				ArrivingBus: service.NextBus2,
+			})
+		}
+		if !service.NextBus3.EstimatedArrival.IsZero() {
+			buses = append(buses, ArrivingBus{
+				ServiceNo:   service.ServiceNo,
+				ArrivingBus: service.NextBus3,
+			})
+		}
+	}
+	return buses
+}
+
+func sortByArrival(buses []ArrivingBus) []ArrivingBus {
+	sort.Slice(buses, func(i, j int) bool {
+		return buses[i].EstimatedArrival.Before(buses[j].EstimatedArrival)
+	})
+	return buses
+}
+
+// take returns up to the first n arriving buses.
+func take(n int, arriving []ArrivingBus) []ArrivingBus {
+	if n <= 0 || n > len(arriving) {
+		n = len(arriving)
+	}
+	return arriving[:n]
+}
+
 type ArrivalInfo struct {
 	Stop     BusStop
 	Time     time.Time
@@ -89,7 +140,16 @@ type ArrivalInfo struct {
 
 func FormatArrivalsByService(arrivals ArrivalInfo) (string, error) {
 	b := new(bytes.Buffer)
-	err := arrivalsByServiceTemplate.Execute(b, arrivals)
+	err := arrivalSummaryTemplate.Execute(b, arrivals)
+	if err != nil {
+		return "", err
+	}
+	return b.String(), nil
+}
+
+func FormatArrivalsShowingDetails(arrivals ArrivalInfo) (string, error) {
+	b := new(bytes.Buffer)
+	err := arrivalDetailsTemplate.Execute(b, arrivals)
 	if err != nil {
 		return "", err
 	}
