@@ -461,3 +461,121 @@ func TestBete_deleteFavouriteCallback_ListError(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_showFavouritesCallback_ListError(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+		Text:            "Something went wrong!",
+		CacheTime:       60,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, Error("some error"))
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackShowFavourites,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_showFavouritesCallback_NoFavourites(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	editMessage := ted.EditMessageTextRequest{
+		Text:      stringShowFavouritesNoFavourites,
+		ChatID:    chatID,
+		MessageID: messageID,
+		ReplyMarkup: &ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text:         stringFavouritesAddNew,
+						CallbackData: CallbackData{Type: callbackAddFavourite}.Encode(),
+					},
+				},
+			},
+		},
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(nil, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackShowFavourites,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_showFavouritesCallback(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	messageID := randomID()
+	callbackQueryID := randomStringID()
+	favourites := []string{"Home", "Work"}
+	showFavourites := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        "Showing favourites keyboard",
+		ReplyMarkup: showFavouritesReplyMarkup(favourites),
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+
+	b.Favourites.(*MockFavouriteRepository).EXPECT().List(userID).Return(favourites, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(showFavourites).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID:   callbackQueryID,
+			From: ted.User{ID: userID},
+			Message: &ted.Message{
+				ID:   messageID,
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackShowFavourites,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}

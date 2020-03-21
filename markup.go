@@ -57,7 +57,7 @@ func favouritesReplyMarkup() ted.InlineKeyboardMarkup {
 				{
 					Text: stringFavouritesShow,
 					CallbackData: CallbackData{
-						Type: "show_favourites",
+						Type: callbackShowFavourites,
 					}.Encode(),
 				},
 			},

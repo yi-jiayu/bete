@@ -16,6 +16,7 @@ const (
 	callbackSaveFavourite    = "sf"
 	callbackDeleteFavourites = "delete_favourites"
 	callbackDeleteFavourite  = "delete_favourite"
+	callbackShowFavourites   = "show_favourites"
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -39,6 +40,8 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.deleteFavouritesCallback(ctx, q)
 	case callbackDeleteFavourite:
 		b.deleteFavouriteCallback(ctx, q, data)
+	case callbackShowFavourites:
+		b.showFavouritesCallback(ctx, q)
 	}
 }
 
@@ -223,6 +226,46 @@ func (b Bete) deleteFavouriteCallback(ctx context.Context, q *ted.CallbackQuery,
 		ChatID:      chatID,
 		Text:        fmt.Sprintf(stringDeleteFavouriteDeleted, favouriteToDelete),
 		ReplyMarkup: showFavouritesReplyMarkup(remainingFavourites),
+	}); err != nil {
+		captureError(ctx, err)
+	}
+}
+
+func (b Bete) showFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
+	favourites, err := b.Favourites.List(q.From.ID)
+	if err != nil {
+		b.answerCallbackQueryError(ctx, q, err)
+		return
+	}
+	if len(favourites) == 0 {
+		if _, err := b.Telegram.Do(ted.EditMessageTextRequest{
+			Text:      stringShowFavouritesNoFavourites,
+			ChatID:    q.Message.Chat.ID,
+			MessageID: q.Message.ID,
+			ReplyMarkup: &ted.InlineKeyboardMarkup{
+				InlineKeyboard: [][]ted.InlineKeyboardButton{
+					{
+						{
+							Text:         stringFavouritesAddNew,
+							CallbackData: CallbackData{Type: callbackAddFavourite}.Encode(),
+						},
+					},
+				},
+			},
+		}); err != nil {
+			captureError(ctx, err)
+		}
+	} else {
+		if _, err := b.Telegram.Do(ted.SendMessageRequest{
+			ChatID:      q.Message.Chat.ID,
+			Text:        "Showing favourites keyboard",
+			ReplyMarkup: showFavouritesReplyMarkup(favourites),
+		}); err != nil {
+			captureError(ctx, err)
+		}
+	}
+	if _, err := b.Telegram.Do(ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
 	}); err != nil {
 		captureError(ctx, err)
 	}
