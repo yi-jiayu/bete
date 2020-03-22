@@ -14,7 +14,7 @@ type FavouriteRepository interface {
 }
 
 type SQLFavouriteRepository struct {
-	DB Queryable
+	DB Conn
 }
 
 func (r SQLFavouriteRepository) Find(userID int, text string) string {
