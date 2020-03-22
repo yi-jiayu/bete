@@ -7,23 +7,16 @@ import (
 	"log"
 	"os"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"github.com/yi-jiayu/datamall/v3"
 )
 
 var db *sql.DB
 
-func createStops() error {
-	log.Println("creating table stops")
-	_, err := db.Exec(`create table if not exists stops (id text primary key, road text, description text, location point)`)
-	if err != nil {
-		return fmt.Errorf("error creating table stops: %w", err)
-	}
-	return nil
-}
-
-func syncStops(accountKey string) error {
-	log.Println("syncing data in stops table")
+func syncStops(dm datamall.APIClient) error {
 	txn, err := db.Begin()
 	if err != nil {
 		return fmt.Errorf("error beginning transaction: %w", err)
@@ -36,7 +29,6 @@ on conflict (id) do update set road        = excluded.road,
 	if err != nil {
 		return fmt.Errorf("error preparing statement: %w", err)
 	}
-	dm := datamall.NewDefaultClient(accountKey)
 	offset := 0
 	for {
 		stops, err := dm.GetBusStops(offset)
@@ -48,7 +40,7 @@ on conflict (id) do update set road        = excluded.road,
 			break
 		}
 		for _, stop := range stops.Value {
-			location := fmt.Sprintf("(%f, %f)", stop.Latitude, stop.Longitude)
+			location := fmt.Sprintf("(%f, %f)", stop.Longitude, stop.Latitude)
 			_, err := stmt.Exec(stop.BusStopCode, stop.RoadName, stop.Description, location)
 			if err != nil {
 				return fmt.Errorf("error inserting stop: %w", err)
@@ -68,48 +60,42 @@ on conflict (id) do update set road        = excluded.road,
 	return nil
 }
 
-func createFavourites() error {
-	log.Println("creating table favourites")
-	_, err := db.Exec(`create table if not exists favourites
-(
-    user_id integer,
-    name    text,
-    query   text not null,
-    primary key (user_id, name)
-)`)
-	if err != nil {
-		return fmt.Errorf("error creating table favourites: %w", err)
-	}
-	return nil
+var migrationsDir = flag.String("path", "migrations", "path to migrations directory")
+
+func init() {
+	flag.Parse()
 }
 
-var sync = flag.Bool("sync", false, "whether to sync data from datamall")
-
 func main() {
-	flag.Parse()
-
 	var err error
 	databaseURL := os.Getenv("DATABASE_URL")
 	db, err = sql.Open("postgres", databaseURL)
 	if err != nil {
-		log.Fatalf("error connecting to postgres: %v", err)
+		panic(err)
+	}
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		panic(err)
+	}
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://"+*migrationsDir,
+		"postgres", driver)
+	if err != nil {
+		panic(err)
+	}
+	log.Println("migrating database")
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		panic(err)
 	}
 
-	if err := createStops(); err != nil {
-		log.Fatal(err)
+	accountKey := os.Getenv("DATAMALL_ACCOUNT_KEY")
+	if accountKey == "" {
+		panic("DATAMALL_ACCOUNT_KEY environment variable not set")
 	}
-	if err := createFavourites(); err != nil {
-		log.Fatal(err)
-	}
-
-	if *sync {
-		accountKey := os.Getenv("DATAMALL_ACCOUNT_KEY")
-		if accountKey == "" {
-			log.Fatal("DATAMALL_ACCOUNT_KEY environment variable not set")
-		}
-
-		if err := syncStops(accountKey); err != nil {
-			log.Fatal(err)
-		}
+	dm := datamall.NewDefaultClient(accountKey)
+	log.Println("syncing bus stop data from datamall")
+	if err := syncStops(dm); err != nil {
+		panic(err)
 	}
 }
