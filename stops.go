@@ -43,6 +43,9 @@ type BusStopRepository interface {
 
 	// Nearby returns up to limit bus stops within radius km of the point specified by lat and lon.
 	Nearby(lat, lon, radius float32, limit int) ([]NearbyBusStop, error)
+
+	// Search searches for stops with a text query.
+	Search(query string) ([]BusStop, error)
 }
 
 type SQLBusStopRepository struct {
@@ -88,4 +91,31 @@ limit $3`,
 		return nearby, errors.Wrap(err, "error iterating rows")
 	}
 	return nearby, nil
+}
+
+func (r SQLBusStopRepository) Search(query string) ([]BusStop, error) {
+
+	rows, err := r.DB.Query(
+		`select id, road, description, location::text
+from stops
+where tokens @@ to_tsquery($1)
+order by ts_rank(tokens, to_tsquery($1)) desc;`,
+		query,
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "error searching bus stops")
+	}
+	defer rows.Close()
+	var matches []BusStop
+	for rows.Next() {
+		var s BusStop
+		if err := rows.Scan(&s.ID, &s.RoadName, &s.Description, &s.Location); err != nil {
+			return matches, errors.Wrap(err, "error scanning row")
+		}
+		matches = append(matches, s)
+	}
+	if err := rows.Err(); err != nil {
+		return matches, errors.Wrap(err, "error iterating rows")
+	}
+	return matches, nil
 }

@@ -62,7 +62,7 @@ func TestSQLBusStopRepository_Nearby(t *testing.T) {
 						ID:          "01319",
 						Description: "Lavender Stn Exit A/ICA",
 						RoadName:    "Kallang Rd",
-						Location:    Location{1.307574, 103.863256}},
+						Location:    Location{Latitude: 1.307574, Longitude: 103.863256}},
 					Distance: 0,
 				},
 				{
@@ -70,7 +70,7 @@ func TestSQLBusStopRepository_Nearby(t *testing.T) {
 						ID:          "01339",
 						Description: "Bef Crawford Bridge",
 						RoadName:    "Crawford St",
-						Location:    Location{1.307746, 103.864263},
+						Location:    Location{Latitude: 1.307746, Longitude: 103.864263},
 					},
 					Distance: 0.11356564947243729,
 				},
@@ -79,7 +79,7 @@ func TestSQLBusStopRepository_Nearby(t *testing.T) {
 						ID:          "07371",
 						Description: "Aft Kallang Rd",
 						RoadName:    "Lavender St",
-						Location:    Location{1.309508, 103.863501},
+						Location:    Location{Latitude: 1.309508, Longitude: 103.863501},
 					},
 					Distance: 0.21676780485189698,
 				},
@@ -120,13 +120,50 @@ func TestSQLBusStopRepository_Nearby(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Len(t, actual, len(tt.expected))
 			for i, nearby := range actual {
-				assert.Equal(t, tt.expected[i].BusStop.ID, nearby.BusStop.ID)
-				assert.Equal(t, tt.expected[i].BusStop.Description, nearby.BusStop.Description)
-				assert.Equal(t, tt.expected[i].BusStop.RoadName, nearby.BusStop.RoadName)
-				assert.InDelta(t, tt.expected[i].BusStop.Location.Latitude, nearby.BusStop.Location.Latitude, 0.001)
-				assert.InDelta(t, tt.expected[i].BusStop.Location.Longitude, nearby.BusStop.Location.Longitude, 0.001)
+				assert.Equal(t, tt.expected[i].BusStop, nearby.BusStop)
 				assert.InDelta(t, tt.expected[i].Distance, nearby.Distance, 0.001)
 			}
 		})
 	}
+}
+
+func TestSQLBusStopRepository_Search(t *testing.T) {
+	tx := getDatabaseTx()
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(`insert into stops (id, road, description, location) values ($1, $2, $3, $4)`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	stops := [][]interface{}{
+		{"01319", "Kallang Rd", "Lavender Stn Exit A/ICA", "(103.863256,1.307574)"},
+		{"01339", "Crawford St", "Bef Crawford Bridge", "(103.864263,1.307746)"},
+		{"07371", "Lavender St", "Aft Kallang Rd", "(103.863501,1.309508)"},
+	}
+	for _, stop := range stops {
+		_, err := stmt.Exec(stop...)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	repo := SQLBusStopRepository{DB: tx}
+	query := "lavender"
+	actual, err := repo.Search(query)
+	assert.NoError(t, err)
+	expected := []BusStop{
+		{
+			ID:          "01319",
+			Description: "Lavender Stn Exit A/ICA",
+			RoadName:    "Kallang Rd",
+			Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+		},
+		{
+			ID:          "07371",
+			Description: "Aft Kallang Rd",
+			RoadName:    "Lavender St",
+			Location:    Location{Latitude: 1.309508, Longitude: 103.8635},
+		},
+	}
+	assert.Equal(t, expected, actual)
 }
