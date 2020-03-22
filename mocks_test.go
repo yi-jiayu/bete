@@ -198,18 +198,18 @@ func (mr *MockBusStopRepositoryMockRecorder) Nearby(arg0, arg1, arg2, arg3 inter
 }
 
 // Search mocks base method
-func (m *MockBusStopRepository) Search(arg0 string) ([]BusStop, error) {
+func (m *MockBusStopRepository) Search(arg0 string, arg1 int) ([]BusStop, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Search", arg0)
+	ret := m.ctrl.Call(m, "Search", arg0, arg1)
 	ret0, _ := ret[0].([]BusStop)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Search indicates an expected call of Search
-func (mr *MockBusStopRepositoryMockRecorder) Search(arg0 interface{}) *gomock.Call {
+func (mr *MockBusStopRepositoryMockRecorder) Search(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockBusStopRepository)(nil).Search), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockBusStopRepository)(nil).Search), arg0, arg1)
 }
 
 // MockFavouriteRepository is a mock of FavouriteRepository interface

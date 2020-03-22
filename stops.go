@@ -45,7 +45,7 @@ type BusStopRepository interface {
 	Nearby(lat, lon, radius float32, limit int) ([]NearbyBusStop, error)
 
 	// Search searches for stops with a text query.
-	Search(query string) ([]BusStop, error)
+	Search(query string, limit int) ([]BusStop, error)
 }
 
 type SQLBusStopRepository struct {
@@ -93,17 +93,30 @@ limit $3`,
 	return nearby, nil
 }
 
-func (r SQLBusStopRepository) Search(query string) ([]BusStop, error) {
-
-	rows, err := r.DB.Query(
-		`select id, road, description, location::text
+func (r SQLBusStopRepository) Search(query string, limit int) ([]BusStop, error) {
+	var rows *sql.Rows
+	var err error
+	if query != "" {
+		rows, err = r.DB.Query(
+			`select id, road, description, location::text
 from stops
 where tokens @@ to_tsquery($1)
-order by ts_rank(tokens, to_tsquery($1)) desc;`,
-		query,
-	)
+order by ts_rank(tokens, to_tsquery($1)) desc
+limit $2;`,
+			query,
+			limit,
+		)
+	} else {
+		rows, err = r.DB.Query(
+			`select id, road, description, location::text
+from stops
+order by id
+limit $1;`,
+			limit,
+		)
+	}
 	if err != nil {
-		return nil, errors.Wrap(err, "error searching bus stops")
+		return nil, errors.Wrapf(err, "error searching bus stops (query: %q)", query)
 	}
 	defer rows.Close()
 	var matches []BusStop

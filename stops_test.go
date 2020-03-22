@@ -147,23 +147,95 @@ func TestSQLBusStopRepository_Search(t *testing.T) {
 		}
 	}
 
-	repo := SQLBusStopRepository{DB: tx}
-	query := "lavender"
-	actual, err := repo.Search(query)
-	assert.NoError(t, err)
-	expected := []BusStop{
+	tests := []struct {
+		name     string
+		query    string
+		limit    int
+		expected []BusStop
+	}{
 		{
-			ID:          "01319",
-			Description: "Lavender Stn Exit A/ICA",
-			RoadName:    "Kallang Rd",
-			Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+			name:  "returns all matches",
+			query: "lavender",
+			limit: 50,
+			expected: []BusStop{
+				{
+					ID:          "01319",
+					Description: "Lavender Stn Exit A/ICA",
+					RoadName:    "Kallang Rd",
+					Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+				},
+				{
+					ID:          "07371",
+					Description: "Aft Kallang Rd",
+					RoadName:    "Lavender St",
+					Location:    Location{Latitude: 1.309508, Longitude: 103.8635},
+				},
+			},
 		},
 		{
-			ID:          "07371",
-			Description: "Aft Kallang Rd",
-			RoadName:    "Lavender St",
-			Location:    Location{Latitude: 1.309508, Longitude: 103.8635},
+			name:  "returns all matches with limit",
+			query: "lavender",
+			limit: 1,
+			expected: []BusStop{
+				{
+					ID:          "01319",
+					Description: "Lavender Stn Exit A/ICA",
+					RoadName:    "Kallang Rd",
+					Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+				},
+			},
+		},
+		{
+			name:  "returns all bus stops when query is empty",
+			query: "",
+			limit: 50,
+			expected: []BusStop{
+				{
+					ID:          "01319",
+					Description: "Lavender Stn Exit A/ICA",
+					RoadName:    "Kallang Rd",
+					Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+				},
+				{
+					ID:          "01339",
+					Description: "Bef Crawford Bridge",
+					RoadName:    "Crawford St",
+					Location:    Location{Latitude: 1.307746, Longitude: 103.864263},
+				},
+				{
+					ID:          "07371",
+					Description: "Aft Kallang Rd",
+					RoadName:    "Lavender St",
+					Location:    Location{Latitude: 1.309508, Longitude: 103.8635},
+				},
+			},
+		},
+		{
+			name:  "returns up to limit bus stops when query is empty",
+			query: "",
+			limit: 2,
+			expected: []BusStop{
+				{
+					ID:          "01319",
+					Description: "Lavender Stn Exit A/ICA",
+					RoadName:    "Kallang Rd",
+					Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+				},
+				{
+					ID:          "01339",
+					Description: "Bef Crawford Bridge",
+					RoadName:    "Crawford St",
+					Location:    Location{Latitude: 1.307746, Longitude: 103.864263},
+				},
+			},
 		},
 	}
-	assert.Equal(t, expected, actual)
+	repo := SQLBusStopRepository{DB: tx}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual, err := repo.Search(tt.query, tt.limit)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expected, actual)
+		})
+	}
 }
