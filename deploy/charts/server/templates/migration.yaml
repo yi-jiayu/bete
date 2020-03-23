@@ -1,15 +1,15 @@
-{{- if .Values.job.enabled -}}
+{{- if .Values.migration.enabled -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "server.fullname" . }}
+  name: {{ include "server.fullname" . }}-migration
   labels:
     {{- include "server.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
-  activeDeadlineSeconds: {{ .Values.job.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ .Values.migration.activeDeadlineSeconds }}
   template:
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -23,7 +23,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          {{- with .Values.job.command }}
+          {{- with .Values.migration.command }}
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}

@@ -86,7 +86,7 @@ readinessProbe:
   enabled: true
   path: /
 
-job:
+migration:
   enabled: false
   activeDeadlineSeconds: 60
   command: []

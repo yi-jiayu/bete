@@ -32,7 +32,7 @@ readinessProbe:
   enabled: true
   path: /metrics
 
-job:
+migration:
   enabled: true
   command:
     - /bete/bin/migrate
