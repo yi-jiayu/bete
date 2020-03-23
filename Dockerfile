@@ -9,7 +9,7 @@ RUN go build -o /go/bin/bete -ldflags "-X main.commit=$commit"
 WORKDIR /go/src/bete
 RUN go get -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate
 
-FROM gcr.io/distroless/base-debian10:debug
+FROM gcr.io/distroless/base-debian10
 
 COPY --from=build /go/bin/bete /bete/bin/bete
 
