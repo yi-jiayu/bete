@@ -13,16 +13,16 @@ spec:
     metadata:
       labels:
         {{- include "server.selectorLabels" . | nindent 8 }}
-      {{ if .Values.prometheus.enabled }}
+      {{- if .Values.prometheus.enabled }}
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: {{ quote .Values.prometheus.port}}
-      {{ end }}
+      {{- end }}
     spec:
-    {{- with .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
       serviceAccountName: {{ include "server.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -35,27 +35,27 @@ spec:
           env:
             - name: ENVIRONMENT
               value: {{ .Values.environment | quote }}
-          {{ with .Values.envFromConfigMap }}
+          {{- with .Values.envFromConfigMap }}
           envFrom:
             - configMapRef:
                 name: {{ . }}
-          {{ end }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}
               protocol: TCP
-          {{ if .Values.livenessProbe.enabled }}
+          {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
               path: {{ .Values.livenessProbe.path }}
               port: http
-          {{ end }}
-          {{ if .Values.readinessProbe.enabled }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
               path: {{ .Values.readinessProbe.path }}
               port: http
-          {{ end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

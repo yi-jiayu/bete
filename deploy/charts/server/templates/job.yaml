@@ -12,12 +12,24 @@ spec:
   activeDeadlineSeconds: {{ .Values.job.activeDeadlineSeconds }}
   template:
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       restartPolicy: Never
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          {{ with .Values.job.command }}
+          {{- with .Values.job.command }}
           command:
             {{- toYaml . | nindent 12 }}
-          {{ end }}
+          {{- end }}
+          {{- with .Values.envFromConfigMap }}
+          envFrom:
+            - configMapRef:
+                name: {{ . }}
+          {{- end }}
 {{- end}}
