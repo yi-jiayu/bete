@@ -36,6 +36,8 @@ migration:
   enabled: true
   command:
     - /bete/bin/migrate
-    - -path=/bete/migrations
-    - -database="$(DATABASE_URL)"
+    - -path
+    - /bete/migrations
+    - -database
+    - $(DATABASE_URL)
     - up
