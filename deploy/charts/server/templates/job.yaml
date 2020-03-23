@@ -12,6 +12,7 @@ spec:
   activeDeadlineSeconds: {{ .Values.job.activeDeadlineSeconds }}
   template:
     spec:
+      restartPolicy: Never
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
