@@ -184,3 +184,39 @@ func deleteFavouritesReplyMarkupP(favourites []string) *ted.InlineKeyboardMarkup
 		InlineKeyboard: rows,
 	}
 }
+
+func inlineETAMessageReplyMarkupP(stopID string, format Format) *ted.InlineKeyboardMarkup {
+	var showOtherFormat string
+	var otherFormat Format
+	if format == FormatDetails {
+		showOtherFormat = "Show arriving bus summary"
+		otherFormat = FormatSummary
+	} else {
+		showOtherFormat = "Show arriving bus details"
+		otherFormat = FormatDetails
+	}
+	return &ted.InlineKeyboardMarkup{
+		InlineKeyboard: [][]ted.InlineKeyboardButton{
+			{
+				{
+					Text: showOtherFormat,
+					CallbackData: CallbackData{
+						Type:   callbackRefresh,
+						StopID: stopID,
+						Format: otherFormat,
+					}.Encode(),
+				},
+			},
+			{
+				{
+					Text: "Refresh",
+					CallbackData: CallbackData{
+						Type:   callbackRefresh,
+						StopID: stopID,
+						Format: format,
+					}.Encode(),
+				},
+			},
+		},
+	}
+}

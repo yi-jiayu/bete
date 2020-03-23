@@ -63,11 +63,16 @@ func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, data Callbac
 		return
 	}
 	editMessageText := ted.EditMessageTextRequest{
-		ChatID:      q.Message.Chat.ID,
-		MessageID:   q.Message.ID,
-		Text:        text,
-		ParseMode:   "HTML",
-		ReplyMarkup: etaMessageReplyMarkupP(data.StopID, data.Filter, data.Format),
+		Text:      text,
+		ParseMode: "HTML",
+	}
+	if q.Message != nil {
+		editMessageText.ChatID = q.Message.Chat.ID
+		editMessageText.MessageID = q.Message.ID
+		editMessageText.ReplyMarkup = etaMessageReplyMarkupP(data.StopID, data.Filter, data.Format)
+	} else {
+		editMessageText.InlineMessageID = q.InlineMessageID
+		editMessageText.ReplyMarkup = inlineETAMessageReplyMarkupP(data.StopID, data.Format)
 	}
 	answerCallbackQuery := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,

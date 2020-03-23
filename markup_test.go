@@ -246,3 +246,45 @@ func Test_deleteFavouritesReplyMarkup(t *testing.T) {
 		assert.Equal(t, expected, actual)
 	})
 }
+
+func Test_inlineETAMessageReplyMarkupP(t *testing.T) {
+	t.Run("summary", func(t *testing.T) {
+		expected := &ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text:         "Show arriving bus details",
+						CallbackData: `{"t":"refresh","b":"96049","f":"f"}`},
+				},
+				{
+					{
+						Text:         "Refresh",
+						CallbackData: `{"t":"refresh","b":"96049","f":"s"}`,
+					},
+				},
+			},
+		}
+		actual := inlineETAMessageReplyMarkupP("96049", FormatSummary)
+		assert.Equal(t, expected, actual)
+	})
+	t.Run("details", func(t *testing.T) {
+		expected := &ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text:         "Show arriving bus summary",
+						CallbackData: `{"t":"refresh","b":"96049","f":"s"}`,
+					},
+				},
+				{
+					{
+						Text:         "Refresh",
+						CallbackData: `{"t":"refresh","b":"96049","f":"f"}`,
+					},
+				},
+			},
+		}
+		actual := inlineETAMessageReplyMarkupP("96049", FormatDetails)
+		assert.Equal(t, expected, actual)
+	})
+}

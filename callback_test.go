@@ -79,6 +79,70 @@ func TestBete_updateETAs(t *testing.T) {
 	}
 }
 
+func TestBete_updateETAs_Inline(t *testing.T) {
+	tests := []struct {
+		name   string
+		format Format
+	}{
+		{
+			name:   "arriving bus summary",
+			format: FormatSummary,
+		},
+		{
+			name:   "arriving bus details",
+			format: FormatDetails,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, finish := newMockBete(t)
+			defer finish()
+
+			stop := buildBusStop()
+			filter := []string{"5", "24"}
+			arrivals := buildDataMallBusArrival()
+			inlineMessageID := randomStringID()
+			callbackQueryID := randomStringID()
+			text := must(FormatArrivals(ArrivalInfo{
+				Stop:     stop,
+				Time:     refTime,
+				Services: arrivals.Services,
+				Filter:   filter,
+			}, tt.format)).(string)
+			editMessageText := ted.EditMessageTextRequest{
+				InlineMessageID: inlineMessageID,
+				Text:            text,
+				ParseMode:       "HTML",
+				ReplyMarkup:     inlineETAMessageReplyMarkupP(stop.ID, tt.format),
+			}
+			answerCallbackQuery := ted.AnswerCallbackQueryRequest{
+				CallbackQueryID: callbackQueryID,
+				Text:            stringRefreshETAsUpdated,
+			}
+
+			b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+			b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+			b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+			b.Telegram.(*MockTelegram).EXPECT().Do(editMessageText).Return(ted.Response{}, nil)
+			b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
+
+			update := ted.Update{
+				CallbackQuery: &ted.CallbackQuery{
+					ID:              callbackQueryID,
+					InlineMessageID: inlineMessageID,
+					Data: CallbackData{
+						Type:   callbackRefresh,
+						StopID: stop.ID,
+						Filter: filter,
+						Format: tt.format,
+					}.Encode(),
+				},
+			}
+			b.HandleUpdate(context.Background(), update)
+		})
+	}
+}
+
 func TestBete_resendETAs(t *testing.T) {
 	tests := []struct {
 		name   string

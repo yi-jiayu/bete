@@ -56,6 +56,8 @@ func (b Bete) HandleUpdate(ctx context.Context, u ted.Update) {
 		b.HandleMessage(ctx, u.Message)
 	case u.CallbackQuery != nil:
 		b.HandleCallbackQuery(ctx, u.CallbackQuery)
+	case u.InlineQuery != nil:
+		b.HandleInlineQuery(ctx, u.InlineQuery)
 	}
 }
 
