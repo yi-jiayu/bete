@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/yi-jiayu/ted"
 )
 
@@ -54,7 +53,7 @@ func TestBete_updateETAs(t *testing.T) {
 			}
 
 			b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
-			b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+			b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
 			b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 			b.Telegram.(*MockTelegram).EXPECT().Do(editMessageText).Return(ted.Response{}, nil)
 			b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
@@ -121,7 +120,7 @@ func TestBete_updateETAs_Inline(t *testing.T) {
 			}
 
 			b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
-			b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+			b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
 			b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 			b.Telegram.(*MockTelegram).EXPECT().Do(editMessageText).Return(ted.Response{}, nil)
 			b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)
@@ -186,7 +185,7 @@ func TestBete_resendETAs(t *testing.T) {
 			}
 
 			b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
-			b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+			b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
 			b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 			b.Telegram.(*MockTelegram).EXPECT().Do(sendMessage).Return(ted.Response{}, nil)
 			b.Telegram.(*MockTelegram).EXPECT().Do(answerCallbackQuery).Return(ted.Response{}, nil)

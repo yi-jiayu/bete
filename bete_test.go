@@ -58,7 +58,7 @@ func TestBete_etaMessageText(t *testing.T) {
 			defer finish()
 
 			b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
-			b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+			b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
 			b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 
 			actual, err := b.etaMessageText(context.Background(), stop.ID, nil, tt.format)

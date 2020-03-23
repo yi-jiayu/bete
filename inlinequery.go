@@ -88,3 +88,19 @@ func (b Bete) HandleInlineQuery(ctx context.Context, q *ted.InlineQuery) {
 	}
 	b.send(ctx, answer)
 }
+
+func (b Bete) HandleChosenInlineResult(ctx context.Context, r *ted.ChosenInlineResult) {
+	stopID := r.ID
+	text, err := b.etaMessageText(ctx, stopID, nil, FormatSummary)
+	if err != nil {
+		captureError(ctx, err)
+		return
+	}
+	editMessageText := ted.EditMessageTextRequest{
+		Text:            text,
+		ParseMode:       "HTML",
+		InlineMessageID: r.InlineMessageID,
+		ReplyMarkup:     inlineETAMessageReplyMarkupP(stopID, FormatSummary),
+	}
+	b.send(ctx, editMessageText)
+}

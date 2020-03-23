@@ -17,6 +17,7 @@ func TestBete_HandleTextMessage(t *testing.T) {
 	stop := buildBusStop()
 	filter := []string{"5", "24"}
 	arrivals := buildDataMallBusArrival()
+	userID := randomID()
 	chatID := randomInt64ID()
 	text := must(formatArrivalsSummary(ArrivalInfo{
 		Stop:     stop,
@@ -32,14 +33,14 @@ func TestBete_HandleTextMessage(t *testing.T) {
 	}
 
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
-	b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
 	b.Favourites.(*MockFavouriteRepository).EXPECT().Find(gomock.Any(), gomock.Any()).Return("")
 	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
 
 	update := ted.Update{
 		Message: &ted.Message{
-			From: &ted.User{ID: randomID()},
+			From: &ted.User{ID: userID},
 			Chat: ted.Chat{ID: chatID},
 			Text: "96049 5 24",
 		},
@@ -116,7 +117,7 @@ func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 	}
 
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
-	b.BusStops.(*MockBusStopRepository).EXPECT().Find(gomock.Any()).Return(stop, nil)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
 	b.Favourites.(*MockFavouriteRepository).EXPECT().Find(userID, messageText).Return("96049 5 24")
 	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)

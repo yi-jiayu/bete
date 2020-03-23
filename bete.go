@@ -67,6 +67,11 @@ func (b Bete) HandleUpdate(ctx context.Context, u ted.Update) {
 		sentrySetUser(ctx, u.InlineQuery.From.ID)
 
 		b.HandleInlineQuery(ctx, u.InlineQuery)
+	case u.ChosenInlineResult != nil:
+		telegramUpdates.WithLabelValues("chosen_inline_result").Inc()
+		sentrySetUser(ctx, u.ChosenInlineResult.From.ID)
+
+		b.HandleChosenInlineResult(ctx, u.ChosenInlineResult)
 	}
 }
 

@@ -188,3 +188,36 @@ func TestBete_HandleInlineQuery_SearchNoResults(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_HandleChosenInlineResult(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	stop := buildBusStop()
+	arrivals := buildDataMallBusArrival()
+	inlineMessageID := randomStringID()
+	text := must(FormatArrivals(ArrivalInfo{
+		Stop:     stop,
+		Time:     refTime,
+		Services: arrivals.Services,
+	}, FormatSummary)).(string)
+	editMessageText := ted.EditMessageTextRequest{
+		InlineMessageID: inlineMessageID,
+		Text:            text,
+		ParseMode:       "HTML",
+		ReplyMarkup:     inlineETAMessageReplyMarkupP(stop.ID, FormatSummary),
+	}
+
+	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
+	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(editMessageText).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		ChosenInlineResult: &ted.ChosenInlineResult{
+			ID:              stop.ID,
+			InlineMessageID: inlineMessageID,
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}

@@ -442,12 +442,8 @@ github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:
 github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0/go.mod h1:/LWChgwKmvncFJFHJ7Gvn9wZArjbV5/FppcK2fKk/tI=
 github.com/yi-jiayu/datamall/v3 v3.1.0 h1:jRxvumFTuPngBYEaopduZQLkg/jaiX0kbGrx02v7fP0=
 github.com/yi-jiayu/datamall/v3 v3.1.0/go.mod h1:jT2m4Iwr+Js4J/wcuCT7d4Su94U8rm+0scpygqDJJiI=
-github.com/yi-jiayu/ted v0.0.0-20200320154151-70f04e8b42e6 h1:vc90XwyiVaNAZbK0sste/tHpdCXTE9p5cwFTnOvtJ/g=
-github.com/yi-jiayu/ted v0.0.0-20200320154151-70f04e8b42e6/go.mod h1:XN9J9OOiT+A+c+usXAv9xQL9f1mKsvZcJRovhE92CQU=
-github.com/yi-jiayu/ted v0.0.0-20200323051445-c0af2fcb2089 h1:nWR8Ot8Q0MHuo026LDml7M6/DJj6l3HhC3NaoyyH060=
-github.com/yi-jiayu/ted v0.0.0-20200323051445-c0af2fcb2089/go.mod h1:XN9J9OOiT+A+c+usXAv9xQL9f1mKsvZcJRovhE92CQU=
-github.com/yi-jiayu/ted v0.0.0-20200323111512-1cc38db371f4 h1:3qQa5Dr4r3R9utqPyiIlwKU0013xluNTzOv2TQdCYto=
-github.com/yi-jiayu/ted v0.0.0-20200323111512-1cc38db371f4/go.mod h1:XN9J9OOiT+A+c+usXAv9xQL9f1mKsvZcJRovhE92CQU=
+github.com/yi-jiayu/ted v0.0.0-20200323121430-34df995e5c15 h1:03Z0GAAkdZ10JBN52IkJF3V3mbcCA1vNdCtblGqZgCo=
+github.com/yi-jiayu/ted v0.0.0-20200323121430-34df995e5c15/go.mod h1:XN9J9OOiT+A+c+usXAv9xQL9f1mKsvZcJRovhE92CQU=
 github.com/yudai/gojsondiff v1.0.0/go.mod h1:AY32+k2cwILAkW1fbgxQ5mUmMiZFgLIV+FBNExI05xg=
 github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82/go.mod h1:lgjkn3NuSvDfVJdfcVVdX+jpBxNmX4rDAzaS45IcYoM=
 github.com/yudai/pp v2.0.1+incompatible/go.mod h1:PuxR/8QJ7cyCkFp/aUDS+JY727OFEZkTdatxwunjIkc=
