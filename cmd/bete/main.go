@@ -107,13 +107,18 @@ func main() {
 			),
 		},
 	}
+	streetViewStaticApiKey := os.Getenv("STREET_VIEW_STATIC_API_KEY")
+	if streetViewStaticApiKey == "" {
+		log.Fatal("STREET_VIEW_STATIC_API_KEY environment variable not set")
+	}
 	b := bete.Bete{
-		Version:    commit,
-		Clock:      bete.RealClock{},
-		BusStops:   bete.SQLBusStopRepository{DB: db},
-		Favourites: bete.SQLFavouriteRepository{DB: db},
-		DataMall:   dm,
-		Telegram:   bot,
+		Version:                commit,
+		StreetViewStaticAPIKey: streetViewStaticApiKey,
+		Clock:                  bete.RealClock{},
+		BusStops:               bete.SQLBusStopRepository{DB: db},
+		Favourites:             bete.SQLFavouriteRepository{DB: db},
+		DataMall:               dm,
+		Telegram:               bot,
 	}
 	sentryHandler := sentryhttp.New(sentryhttp.Options{Repanic: true})
 	http.Handle(

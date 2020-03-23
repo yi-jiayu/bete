@@ -15,6 +15,7 @@ func Test_inlineQueryResult(t *testing.T) {
 		RoadName:    "Kallang Rd",
 		Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
 	}
+	thumbURL := "abc"
 	expected := ted.InlineQueryResultArticle{
 		ID:    "01319",
 		Title: "Lavender Stn Exit A/ICA (01319)",
@@ -28,8 +29,9 @@ Fetching ETAs...
 		},
 		ReplyMarkup: inlineETAMessageReplyMarkupP("01319", FormatSummary),
 		Description: "Kallang Rd",
+		ThumbURL:    thumbURL,
 	}
-	actual := inlineQueryResult(stop)
+	actual := inlineQueryResult(stop, thumbURL)
 	assert.Equal(t, expected, actual)
 }
 
@@ -57,7 +59,7 @@ Fetching ETAs...
 		ReplyMarkup: inlineETAMessageReplyMarkupP("01339", FormatSummary),
 		Description: "114 m away",
 	}
-	actual := nearbyInlineQueryResult(stop)
+	actual := nearbyInlineQueryResult(stop, "")
 	assert.Equal(t, expected, actual)
 }
 
@@ -91,8 +93,8 @@ func TestBete_HandleInlineQuery_Nearby(t *testing.T) {
 	answerInlineQuery := ted.AnswerInlineQueryRequest{
 		InlineQueryID: inlineQueryID,
 		Results: []ted.InlineQueryResult{
-			nearbyInlineQueryResult(stops[0]),
-			nearbyInlineQueryResult(stops[1]),
+			nearbyInlineQueryResult(stops[0], getStreetViewStaticURL("", stops[0].BusStop)),
+			nearbyInlineQueryResult(stops[1], getStreetViewStaticURL("", stops[1].BusStop)),
 		},
 	}
 
@@ -151,8 +153,8 @@ func TestBete_HandleInlineQuery_Search(t *testing.T) {
 			answerInlineQuery := ted.AnswerInlineQueryRequest{
 				InlineQueryID: inlineQueryID,
 				Results: []ted.InlineQueryResult{
-					inlineQueryResult(stops[0]),
-					inlineQueryResult(stops[1]),
+					inlineQueryResult(stops[0], getStreetViewStaticURL("", stops[0])),
+					inlineQueryResult(stops[1], getStreetViewStaticURL("", stops[1])),
 				},
 			}
 

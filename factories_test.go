@@ -78,5 +78,9 @@ func buildBusStop() BusStop {
 		ID:          "96049",
 		Description: "UPP CHANGI STN/SUTD",
 		RoadName:    "Upp Changi Rd East",
+		Location: Location{
+			Latitude:  1.340874,
+			Longitude: 103.961433,
+		},
 	}
 }

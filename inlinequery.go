@@ -9,7 +9,7 @@ import (
 
 const resultsPerQuery = 50
 
-func inlineQueryResult(stop BusStop) ted.InlineQueryResult {
+func inlineQueryResult(stop BusStop, thumbURL string) ted.InlineQueryResult {
 	return ted.InlineQueryResultArticle{
 		ID:    stop.ID,
 		Title: fmt.Sprintf("%s (%s)", stop.Description, stop.ID),
@@ -23,10 +23,11 @@ Fetching ETAs...
 		},
 		ReplyMarkup: inlineETAMessageReplyMarkupP(stop.ID, FormatSummary),
 		Description: stop.RoadName,
+		ThumbURL:    thumbURL,
 	}
 }
 
-func nearbyInlineQueryResult(stop NearbyBusStop) ted.InlineQueryResult {
+func nearbyInlineQueryResult(stop NearbyBusStop, thumbURL string) ted.InlineQueryResult {
 	return ted.InlineQueryResultArticle{
 		ID:    stop.ID,
 		Title: fmt.Sprintf("%s (%s)", stop.Description, stop.ID),
@@ -40,6 +41,7 @@ Fetching ETAs...
 		},
 		ReplyMarkup: inlineETAMessageReplyMarkupP(stop.ID, FormatSummary),
 		Description: fmt.Sprintf("%.0f m away", stop.Distance*1000),
+		ThumbURL:    thumbURL,
 	}
 }
 
@@ -50,7 +52,7 @@ func (b Bete) searchBusStopsResults(query string) ([]ted.InlineQueryResult, erro
 	}
 	results := make([]ted.InlineQueryResult, len(stops))
 	for i, stop := range stops {
-		results[i] = inlineQueryResult(stop)
+		results[i] = inlineQueryResult(stop, getStreetViewStaticURL(b.StreetViewStaticAPIKey, stop))
 	}
 	return results, nil
 }
@@ -62,7 +64,7 @@ func (b Bete) nearbyBusStopsResults(lat, lon float32) ([]ted.InlineQueryResult, 
 	}
 	results := make([]ted.InlineQueryResult, len(stops))
 	for i, stop := range stops {
-		results[i] = nearbyInlineQueryResult(stop)
+		results[i] = nearbyInlineQueryResult(stop, getStreetViewStaticURL(b.StreetViewStaticAPIKey, stop.BusStop))
 	}
 	return results, nil
 }

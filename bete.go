@@ -31,7 +31,8 @@ type Telegram interface {
 }
 
 type Bete struct {
-	Version string
+	Version                string
+	StreetViewStaticAPIKey string
 
 	Clock      Clock
 	BusStops   BusStopRepository
