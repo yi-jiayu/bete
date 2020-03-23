@@ -20,25 +20,27 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: bete
         ports:
-        - 5432/tcp
+          - 5432/tcp
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - name: Set up Go 1.14
-      uses: actions/setup-go@v1
-      with:
-        go-version: 1.14
-      id: go
+      - name: Set up Go 1.14
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.14
+        id: go
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-    - name: Initialise database
-      run: go run cmd/seed/main.go
-      env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/bete?sslmode=disable
+      - name: Initialise database
+        run: |
+          GOBIN=$PWD/bin go get -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate
+          bin/migrate -path migrations -database "$DATABASE_URL" up
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/bete?sslmode=disable
 
-    - name: Run tests
-      run: go test -v ./...
-      env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/bete?sslmode=disable
+      - name: Run tests
+        run: go test -v ./...
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/bete?sslmode=disable

@@ -26,7 +26,9 @@ jobs:
             echo Failed waiting for Postgres && exit 1
       - run:
           name: Initialise database
-          command: go run cmd/seed/main.go
+          command: |
+            GOBIN=$PWD/bin go get -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate
+            bin/migrate -path migrations -database "$DATABASE_URL" up
       - run:
           name: Run tests
           command: go test -v -cover -coverprofile=coverage.out -covermode=count ./...
