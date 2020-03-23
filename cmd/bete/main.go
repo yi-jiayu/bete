@@ -67,6 +67,12 @@ func main() {
 	if err := sentry.Init(sentry.ClientOptions{
 		Release:     commit,
 		Environment: environment,
+		BeforeSend: func(event *sentry.Event, hint *sentry.EventHint) *sentry.Event {
+			if hint.OriginalException != nil {
+				log.Printf("%+v", hint.OriginalException)
+			}
+			return event
+		},
 	}); err != nil {
 		log.Printf("Sentry initialization failed: %v\n", err)
 	}
@@ -109,7 +115,7 @@ func main() {
 		DataMall:   dm,
 		Telegram:   bot,
 	}
-	sentryHandler := sentryhttp.New(sentryhttp.Options{})
+	sentryHandler := sentryhttp.New(sentryhttp.Options{Repanic: true})
 	http.Handle(
 		"/telegram/updates",
 		sentryHandler.Handle(
