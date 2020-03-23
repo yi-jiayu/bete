@@ -173,24 +173,6 @@ func TestBete_HandleInlineQuery_Search(t *testing.T) {
 	}
 }
 
-func TestBete_HandleInlineQuery_SearchNoResults(t *testing.T) {
-	b, finish := newMockBete(t)
-	defer finish()
-
-	query := "tropicana"
-	inlineQueryID := randomStringID()
-
-	b.BusStops.(*MockBusStopRepository).EXPECT().Search(query, resultsPerQuery).Return(nil, nil)
-
-	update := ted.Update{
-		InlineQuery: &ted.InlineQuery{
-			ID:    inlineQueryID,
-			Query: query,
-		},
-	}
-	b.HandleUpdate(context.Background(), update)
-}
-
 func TestBete_HandleChosenInlineResult(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()

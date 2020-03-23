@@ -81,9 +81,6 @@ func (b Bete) HandleInlineQuery(ctx context.Context, q *ted.InlineQuery) {
 		captureError(ctx, err)
 		return
 	}
-	if len(results) == 0 {
-		return
-	}
 	answer := ted.AnswerInlineQueryRequest{
 		InlineQueryID: q.ID,
 		Results:       results,
