@@ -85,3 +85,7 @@ livenessProbe:
 readinessProbe:
   enabled: true
   path: /
+
+job:
+  enabled: false
+  activeDeadlineSeconds: 60

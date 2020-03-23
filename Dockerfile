@@ -1,12 +1,21 @@
 FROM golang:1.14-buster as build
 
-ADD . /go/src/bete
-WORKDIR /go/src/bete/cmd/bete
+COPY . /go/src/bete
 
+WORKDIR /go/src/bete/cmd/bete
 ARG commit
 RUN go build -o /go/bin/bete -ldflags "-X main.commit=$commit"
 
-# Now copy it into our base image.
-FROM gcr.io/distroless/base-debian10
-COPY --from=build /go/bin/bete /bete
-ENTRYPOINT ["/bete"]
+WORKDIR /go/src/bete
+RUN go get -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate
+
+FROM gcr.io/distroless/base-debian10:debug
+
+COPY --from=build /go/bin/bete /bete/bin/bete
+
+COPY --from=build /go/src/bete/migrations /bete/migrations
+
+COPY --from=build /go/bin/migrate /bete/bin/migrate
+
+WORKDIR /bete
+ENTRYPOINT ["/bete/bin/bete"]

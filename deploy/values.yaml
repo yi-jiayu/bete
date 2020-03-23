@@ -31,3 +31,11 @@ livenessProbe:
 readinessProbe:
   enabled: true
   path: /metrics
+
+job:
+  enabled: true
+  command:
+    - /bin/migrate
+    - -path migrations
+    - -database "$(DATABASE_URL)"
+    - up
