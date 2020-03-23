@@ -89,3 +89,4 @@ readinessProbe:
 job:
   enabled: false
   activeDeadlineSeconds: 60
+  command: []

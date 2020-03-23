@@ -35,7 +35,7 @@ readinessProbe:
 job:
   enabled: true
   command:
-    - /bin/migrate
+    - /bete/bin/migrate
     - -path migrations
     - -database "$(DATABASE_URL)"
     - up

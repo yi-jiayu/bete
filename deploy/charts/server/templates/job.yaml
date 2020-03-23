@@ -32,4 +32,4 @@ spec:
             - configMapRef:
                 name: {{ . }}
           {{- end }}
-{{- end}}
+{{- end }}
