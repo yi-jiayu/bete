@@ -8,8 +8,6 @@ import (
 )
 
 func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
-	sentrySetUser(ctx, m.From.ID)
-
 	if m.Text == "" {
 		// Ignore non-text messages.
 		return
