@@ -110,43 +110,65 @@ func TestBete_HandleInlineQuery_Nearby(t *testing.T) {
 }
 
 func TestBete_HandleInlineQuery_Search(t *testing.T) {
-	b, finish := newMockBete(t)
-	defer finish()
-
-	stops := []BusStop{
+	tests := []struct {
+		name     string
+		location *ted.Location
+	}{
 		{
-			ID:          "01319",
-			Description: "Lavender Stn Exit A/ICA",
-			RoadName:    "Kallang Rd",
-			Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+			name:     "without location",
+			location: nil,
 		},
 		{
-			ID:          "07371",
-			Description: "Aft Kallang Rd",
-			RoadName:    "Lavender St",
-			Location:    Location{Latitude: 1.309508, Longitude: 103.8635},
+			name: "with location",
+			location: &ted.Location{
+				Latitude:  1.307574,
+				Longitude: 103.86326,
+			},
 		},
 	}
-	query := "tropicana"
-	inlineQueryID := randomStringID()
-	answerInlineQuery := ted.AnswerInlineQueryRequest{
-		InlineQueryID: inlineQueryID,
-		Results: []ted.InlineQueryResult{
-			inlineQueryResult(stops[0]),
-			inlineQueryResult(stops[1]),
-		},
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 
-	b.BusStops.(*MockBusStopRepository).EXPECT().Search(query, resultsPerQuery).Return(stops, nil)
-	b.Telegram.(*MockTelegram).EXPECT().Do(answerInlineQuery).Return(ted.Response{}, nil)
+			b, finish := newMockBete(t)
+			defer finish()
 
-	update := ted.Update{
-		InlineQuery: &ted.InlineQuery{
-			ID:    inlineQueryID,
-			Query: query,
-		},
+			stops := []BusStop{
+				{
+					ID:          "01319",
+					Description: "Lavender Stn Exit A/ICA",
+					RoadName:    "Kallang Rd",
+					Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+				},
+				{
+					ID:          "07371",
+					Description: "Aft Kallang Rd",
+					RoadName:    "Lavender St",
+					Location:    Location{Latitude: 1.309508, Longitude: 103.8635},
+				},
+			}
+			query := "tropicana"
+			inlineQueryID := randomStringID()
+			answerInlineQuery := ted.AnswerInlineQueryRequest{
+				InlineQueryID: inlineQueryID,
+				Results: []ted.InlineQueryResult{
+					inlineQueryResult(stops[0]),
+					inlineQueryResult(stops[1]),
+				},
+			}
+
+			b.BusStops.(*MockBusStopRepository).EXPECT().Search(query, resultsPerQuery).Return(stops, nil)
+			b.Telegram.(*MockTelegram).EXPECT().Do(answerInlineQuery).Return(ted.Response{}, nil)
+
+			update := ted.Update{
+				InlineQuery: &ted.InlineQuery{
+					ID:       inlineQueryID,
+					Location: tt.location,
+					Query:    query,
+				},
+			}
+			b.HandleUpdate(context.Background(), update)
+		})
 	}
-	b.HandleUpdate(context.Background(), update)
 }
 
 func TestBete_HandleInlineQuery_SearchNoResults(t *testing.T) {

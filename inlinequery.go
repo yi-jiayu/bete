@@ -70,7 +70,7 @@ func (b Bete) nearbyBusStopsResults(lat, lon float32) ([]ted.InlineQueryResult, 
 func (b Bete) HandleInlineQuery(ctx context.Context, q *ted.InlineQuery) {
 	var results []ted.InlineQueryResult
 	var err error
-	if q.Location != nil {
+	if q.Location != nil && q.Query == "" {
 		results, err = b.nearbyBusStopsResults(q.Location.Latitude, q.Location.Longitude)
 	} else {
 		results, err = b.searchBusStopsResults(q.Query)
