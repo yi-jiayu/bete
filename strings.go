@@ -27,4 +27,6 @@ const (
 	stringRefreshETAsUpdated              = "ETAs updated!"
 	stringResendETAsSent                  = "ETAs sent!"
 	stringSomethingWentWrong              = "Something went wrong!"
+	stringFormatSwitchSummary             = "Show arriving bus summary"
+	stringFormatSwitchDetails             = "Show arriving bus details"
 )

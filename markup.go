@@ -9,7 +9,7 @@ func etaMessageReplyMarkup(stopID string, filter []string, format Format) ted.In
 	if format == FormatDetails {
 		rows = append(rows, []ted.InlineKeyboardButton{
 			{
-				Text: "Show arriving bus summary",
+				Text: stringFormatSwitchSummary,
 				CallbackData: CallbackData{
 					Type:   callbackRefresh,
 					StopID: stopID,
@@ -22,7 +22,7 @@ func etaMessageReplyMarkup(stopID string, filter []string, format Format) ted.In
 		format = FormatSummary
 		rows = append(rows, []ted.InlineKeyboardButton{
 			{
-				Text: "Show arriving bus details",
+				Text: stringFormatSwitchDetails,
 				CallbackData: CallbackData{
 					Type:   callbackRefresh,
 					StopID: stopID,
@@ -189,10 +189,10 @@ func inlineETAMessageReplyMarkupP(stopID string, format Format) *ted.InlineKeybo
 	var showOtherFormat string
 	var otherFormat Format
 	if format == FormatDetails {
-		showOtherFormat = "Show arriving bus summary"
+		showOtherFormat = stringFormatSwitchSummary
 		otherFormat = FormatSummary
 	} else {
-		showOtherFormat = "Show arriving bus details"
+		showOtherFormat = stringFormatSwitchDetails
 		otherFormat = FormatDetails
 	}
 	return &ted.InlineKeyboardMarkup{

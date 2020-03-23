@@ -20,7 +20,7 @@ func Test_etaMessageReplyMarkup(t *testing.T) {
 				InlineKeyboard: [][]ted.InlineKeyboardButton{
 					{
 						{
-							Text:         "Show arriving bus details",
+							Text:         stringFormatSwitchDetails,
 							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"f"}`},
 					},
 					{
@@ -43,7 +43,7 @@ func Test_etaMessageReplyMarkup(t *testing.T) {
 				InlineKeyboard: [][]ted.InlineKeyboardButton{
 					{
 						{
-							Text:         "Show arriving bus summary",
+							Text:         stringFormatSwitchSummary,
 							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"s"}`,
 						},
 					},
@@ -66,7 +66,7 @@ func Test_etaMessageReplyMarkup(t *testing.T) {
 				InlineKeyboard: [][]ted.InlineKeyboardButton{
 					{
 						{
-							Text:         "Show arriving bus details",
+							Text:         stringFormatSwitchDetails,
 							CallbackData: `{"t":"refresh","b":"96049","s":["5","24"],"f":"f"}`},
 					},
 					{
@@ -253,7 +253,7 @@ func Test_inlineETAMessageReplyMarkupP(t *testing.T) {
 			InlineKeyboard: [][]ted.InlineKeyboardButton{
 				{
 					{
-						Text:         "Show arriving bus details",
+						Text:         stringFormatSwitchDetails,
 						CallbackData: `{"t":"refresh","b":"96049","f":"f"}`},
 				},
 				{
@@ -272,7 +272,7 @@ func Test_inlineETAMessageReplyMarkupP(t *testing.T) {
 			InlineKeyboard: [][]ted.InlineKeyboardButton{
 				{
 					{
-						Text:         "Show arriving bus summary",
+						Text:         stringFormatSwitchSummary,
 						CallbackData: `{"t":"refresh","b":"96049","f":"s"}`,
 					},
 				},
