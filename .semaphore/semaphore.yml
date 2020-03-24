@@ -1,0 +1,22 @@
+version: v1.0
+name: Go
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Test
+    task:
+      jobs:
+        - name: go test
+          commands:
+            - sem-version go 1.14
+            - checkout
+            - sem-service start postgres
+            - createdb -U postgres bete_test
+            - GOBIN=$PWD/bin go get -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate
+            - bin/migrate -path migrations -database "$DATABASE_URL" up
+            - go test ./...
+      env_vars:
+        - name: DATABASE_URL
+          value: 'postgres://localhost/bete_test?sslmode=disable'
