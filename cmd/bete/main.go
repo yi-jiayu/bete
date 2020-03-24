@@ -98,12 +98,32 @@ func main() {
 	if botToken == "" {
 		log.Fatal("TELEGRAM_BOT_TOKEN environment variable not set")
 	}
+	logTime := func(label string) func(float64) {
+		return func(n float64) {
+			log.Printf("%s: %f s", label, n)
+		}
+	}
+	trace := promhttp.InstrumentTrace{
+		GotConn:              logTime("GotConn"),
+		PutIdleConn:          logTime("PutIdleConn"),
+		GotFirstResponseByte: logTime("GotFirstResponseByte"),
+		Got100Continue:       logTime("Got100Continue"),
+		DNSStart:             logTime("DNSStart"),
+		DNSDone:              logTime("DNSDone"),
+		ConnectStart:         logTime("ConnectStart"),
+		ConnectDone:          logTime("ConnectDone"),
+		TLSHandshakeStart:    logTime("TLSHandshakeStart"),
+		TLSHandshakeDone:     logTime("TLSHandshakeDone"),
+		WroteHeaders:         logTime("WroteHeaders"),
+		Wait100Continue:      logTime("Wait100Continue"),
+		WroteRequest:         logTime("WroteRequest"),
+	}
 	bot := ted.Bot{
 		Token: botToken,
 		HTTPClient: &http.Client{
 			Transport: promhttp.InstrumentRoundTripperDuration(
 				httpOutgoingRequestDurationSeconds.MustCurryWith(prometheus.Labels{"service": "telegram"}),
-				http.DefaultTransport,
+				promhttp.InstrumentRoundTripperTrace(&trace, http.DefaultTransport),
 			),
 		},
 	}
