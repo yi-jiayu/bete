@@ -71,6 +71,8 @@ func (b Bete) reportInvalidQuery(ctx context.Context, chatID int64, err error) {
 
 func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args string) {
 	switch cmd {
+	case "start":
+		b.handleStartCommand(ctx, m)
 	case "favourites":
 		b.handleFavouritesCommand(ctx, m)
 	case "about":
@@ -123,6 +125,14 @@ func (b Bete) handleAboutCommand(ctx context.Context, m *ted.Message) {
 		ReplyToMessageID: m.ID,
 	}
 	b.send(ctx, req)
+}
+
+func (b Bete) handleStartCommand(ctx context.Context, m *ted.Message) {
+	reply := ted.SendMessageRequest{
+		ChatID: m.Chat.ID,
+		Text:   fmt.Sprintf(stringWelcomeMessage, m.From.FirstName),
+	}
+	b.send(ctx, reply)
 }
 
 func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {

@@ -475,6 +475,40 @@ func TestBete_HandleCommand_About(t *testing.T) {
 	}
 }
 
+func TestBete_handleStartCommand(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	firstName := "Bete"
+	command := "/start"
+	version := randomStringID()
+	userID := randomID()
+	chatID := randomInt64ID()
+	req := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   fmt.Sprintf(stringWelcomeMessage, firstName),
+	}
+
+	b.Version = version
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID, FirstName: firstName},
+			Chat: ted.Chat{ID: chatID, Type: "private"},
+			Text: command,
+			Entities: []ted.MessageEntity{
+				{
+					Type:   "bot_command",
+					Offset: 0,
+					Length: len(command),
+				},
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func TestBete_handleFavouritesCommand(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()

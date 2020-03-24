@@ -30,4 +30,11 @@ const (
 	stringSomethingWentWrong              = "Something went wrong!"
 	stringFormatSwitchSummary             = "Show arriving bus summary"
 	stringFormatSwitchDetails             = "Show arriving bus details"
+	stringWelcomeMessage                  = `Hi %s,
+
+Bus Eta Bot tells you when your bus will arrive!
+
+To get started, send me a 5-digit bus stop code like "02151".
+
+I hope that you will find Bus Eta Bot useful! For questions or feedback, feel free to reach out to @jiayu.`
 )
