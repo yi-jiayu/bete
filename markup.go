@@ -101,6 +101,11 @@ func favouritesReplyMarkup() ted.InlineKeyboardMarkup {
 	}
 }
 
+func favouritesReplyMarkupP() *ted.InlineKeyboardMarkup {
+	markup := favouritesReplyMarkup()
+	return &markup
+}
+
 func showFavouritesReplyMarkup(favourites []string) ted.ReplyMarkup {
 	if len(favourites) == 0 {
 		return ted.ReplyKeyboardRemove{}
@@ -180,6 +185,14 @@ func deleteFavouritesReplyMarkupP(favourites []string) *ted.InlineKeyboardMarkup
 			},
 		})
 	}
+	rows = append(rows, []ted.InlineKeyboardButton{
+		{
+			Text: "Back",
+			CallbackData: CallbackData{
+				Type: callbackFavourites,
+			}.Encode(),
+		},
+	})
 	return &ted.InlineKeyboardMarkup{
 		InlineKeyboard: rows,
 	}

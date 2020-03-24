@@ -13,6 +13,7 @@ const (
 	callbackResend           = "resend"
 	callbackAddFavourite     = "af"
 	callbackSaveFavourite    = "sf"
+	callbackFavourites       = "favourites"
 	callbackDeleteFavourites = "delete_favourites"
 	callbackDeleteFavourite  = "delete_favourite"
 	callbackShowFavourites   = "show_favourites"
@@ -42,6 +43,8 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.showFavouritesCallback(ctx, q)
 	case callbackHideFavourites:
 		b.hideFavouritesCallback(ctx, q)
+	case callbackFavourites:
+		b.favouritesCallback(ctx, q)
 	}
 }
 
@@ -246,4 +249,18 @@ func (b Bete) hideFavouritesCallback(ctx context.Context, q *ted.CallbackQuery) 
 		ReplyMarkup: ted.ReplyKeyboardRemove{},
 	}
 	b.send(ctx, hideKeyboard)
+}
+
+func (b Bete) favouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
+	editMessage := ted.EditMessageTextRequest{
+		ChatID:      q.Message.Chat.ID,
+		MessageID:   q.Message.ID,
+		Text:        stringFavouritesChooseAction,
+		ReplyMarkup: favouritesReplyMarkupP(),
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
+	}
+	b.send(ctx, editMessage)
+	b.send(ctx, answerCallback)
 }

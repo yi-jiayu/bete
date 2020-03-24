@@ -784,3 +784,40 @@ func TestBete_hideFavouritesCallback(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_favouritesCallback(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	callbackQueryID := randomStringID()
+	messageID := randomID()
+	chatID := randomInt64ID()
+	editMessage := ted.EditMessageTextRequest{
+		ChatID:      chatID,
+		MessageID:   messageID,
+		Text:        stringFavouritesChooseAction,
+		ReplyMarkup: favouritesReplyMarkupP(),
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(editMessage).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID: callbackQueryID,
+			Message: &ted.Message{
+				ID:   messageID,
+				From: &ted.User{ID: userID},
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackFavourites,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}

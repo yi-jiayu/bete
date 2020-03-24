@@ -475,7 +475,7 @@ func TestBete_HandleCommand_About(t *testing.T) {
 	}
 }
 
-func TestBete_HandleCommand_Favourite(t *testing.T) {
+func TestBete_handleFavouritesCommand(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 

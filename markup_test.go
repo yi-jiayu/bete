@@ -203,7 +203,7 @@ func Test_addFavouriteSuggestNameMarkup(t *testing.T) {
 	})
 }
 
-func Test_deleteFavouritesReplyMarkup(t *testing.T) {
+func Test_deleteFavouritesReplyMarkupP(t *testing.T) {
 	t.Run("no favourites to delete", func(t *testing.T) {
 		expected := &ted.InlineKeyboardMarkup{
 			InlineKeyboard: [][]ted.InlineKeyboardButton{
@@ -237,6 +237,14 @@ func Test_deleteFavouritesReplyMarkup(t *testing.T) {
 						CallbackData: CallbackData{
 							Type: callbackDeleteFavourite,
 							Name: "Work",
+						}.Encode(),
+					},
+				},
+				{
+					{
+						Text: "Back",
+						CallbackData: CallbackData{
+							Type: callbackFavourites,
 						}.Encode(),
 					},
 				},
