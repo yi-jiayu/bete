@@ -412,6 +412,32 @@ func TestBete_HandleReply_etaCommandArgsInvalid(t *testing.T) {
 	}
 }
 
+func TestBete_HandleReply_noMatch(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	req := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   "Sorry, I forgot what we were talking about.",
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			Text: "anything",
+			ReplyToMessage: &ted.Message{
+				Text: "forgotten message",
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func TestBete_HandleCommand_About(t *testing.T) {
 	variants := []string{"/about", "/version"}
 	for _, variant := range variants {
