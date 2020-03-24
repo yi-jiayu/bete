@@ -12,8 +12,7 @@ blocks:
           commands:
             - sem-version go 1.14
             - checkout
-            - change-pg-version 10
-            - sem-service start postgres
+            - sem-service start postgres 11
             - createdb -U postgres bete_test
             - GOBIN=$PWD/bin go get -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate
             - bin/migrate -path migrations -database "$DATABASE_URL" up
