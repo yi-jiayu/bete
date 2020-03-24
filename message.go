@@ -69,7 +69,7 @@ func (b Bete) reportInvalidQuery(ctx context.Context, chatID int64, err error) {
 	})
 }
 
-func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, _ string) {
+func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args string) {
 	switch cmd {
 	case "favourites":
 		b.handleFavouritesCommand(ctx, m)
@@ -77,7 +77,21 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, _ string) 
 		fallthrough
 	case "version":
 		b.handleAboutCommand(ctx, m)
+	case "eta":
+		b.handleETACommand(ctx, m, args)
 	}
+}
+
+func (b Bete) handleETACommand(ctx context.Context, m *ted.Message, args string) {
+	reply := ted.SendMessageRequest{
+		ChatID:    m.Chat.ID,
+		Text:      stringETACommandPrompt,
+		ParseMode: "HTML",
+	}
+	if m.Chat.Type != "private" {
+		reply.ReplyMarkup = ted.ForceReply{}
+	}
+	b.send(ctx, reply)
 }
 
 func (b Bete) handleAboutCommand(ctx context.Context, m *ted.Message) {

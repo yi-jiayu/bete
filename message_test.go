@@ -417,6 +417,75 @@ func TestBete_HandleCommand_Favourite_NonPrivateChat(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+func TestBete_handleETACommand_withoutArgs(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	command := "/eta"
+	userID := randomID()
+	messageID := randomID()
+	chatID := randomInt64ID()
+	req := ted.SendMessageRequest{
+		ChatID:    chatID,
+		Text:      stringETACommandPrompt,
+		ParseMode: "HTML",
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			ID:   messageID,
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID, Type: "private"},
+			Text: command,
+			Entities: []ted.MessageEntity{
+				{
+					Type:   "bot_command",
+					Offset: 0,
+					Length: len(command),
+				},
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
+func TestBete_handleETACommand_withoutArgsGroup(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	command := "/eta"
+	userID := randomID()
+	messageID := randomID()
+	chatID := randomInt64ID()
+	req := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        stringETACommandPrompt,
+		ParseMode:   "HTML",
+		ReplyMarkup: ted.ForceReply{},
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			ID:   messageID,
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			Text: command,
+			Entities: []ted.MessageEntity{
+				{
+					Type:   "bot_command",
+					Offset: 0,
+					Length: len(command),
+				},
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func Test_getFavouriteQuery(t *testing.T) {
 	text := fmt.Sprintf(stringAddFavouritePromptForName, "96049 5 24")
 	assert.Equal(t, "96049 5 24", getFavouriteQuery(text))
