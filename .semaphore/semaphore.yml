@@ -19,4 +19,4 @@ blocks:
             - go test ./...
       env_vars:
         - name: DATABASE_URL
-          value: 'postgres://localhost/bete_test?sslmode=disable'
+          value: 'postgres://postgres@localhost/bete_test?sslmode=disable'
