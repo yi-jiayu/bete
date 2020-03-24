@@ -88,14 +88,21 @@ workflows:
   version: 2
   deploy:
     jobs:
-      - test
-      - build:
-          requires:
-            - test
+      - test:
           filters:
             branches:
               only:
                 - master
+      - build:
+          requires:
+            - test
       - deploy:
           requires:
             - build
+  test:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore:
+                - master
