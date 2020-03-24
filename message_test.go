@@ -316,6 +316,102 @@ func TestBete_HandleReply_AddFavourite_HandleInvalidQuery(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+func TestBete_HandleReply_etaCommandArgs(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	stop := buildBusStop()
+	query := Query{Stop: stop.ID, Filter: []string{"5", "24"}}
+	arrivals := buildDataMallBusArrival()
+	userID := randomID()
+	messageID := randomID()
+	chatID := randomInt64ID()
+	text := must(formatArrivalsSummary(ArrivalInfo{
+		Stop:     stop,
+		Time:     refTime,
+		Services: arrivals.Services,
+		Filter:   query.Filter,
+	})).(string)
+	req := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(stop.ID, query.Filter, FormatSummary),
+	}
+
+	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
+	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			ID:   messageID,
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			Text: query.Canonical(),
+			ReplyToMessage: &ted.Message{
+				Text: stringETACommandPrompt,
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+
+}
+
+func TestBete_HandleReply_etaCommandArgsInvalid(t *testing.T) {
+	tests := []struct {
+		name         string
+		args         string
+		expectedText string
+	}{
+		{
+			name:         "does not start with a bus stop code",
+			args:         "ABCDE 5 24",
+			expectedText: stringQueryShouldStartWithBusStopCode,
+		},
+		{
+			name:         "contains invalid characters",
+			args:         "12345 5! '2'",
+			expectedText: stringQueryContainsInvalidCharacters,
+		},
+		{
+			name:         "too long",
+			args:         "12345 24 28 43 70 76 134 135 137 154 155",
+			expectedText: stringQueryTooLong,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, finish := newMockBete(t)
+			defer finish()
+
+			userID := randomID()
+			messageID := randomID()
+			chatID := randomInt64ID()
+			req := ted.SendMessageRequest{
+				ChatID: chatID,
+				Text:   tt.expectedText,
+			}
+
+			b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+			update := ted.Update{
+				Message: &ted.Message{
+					ID:   messageID,
+					From: &ted.User{ID: userID},
+					Chat: ted.Chat{ID: chatID},
+					Text: tt.args,
+					ReplyToMessage: &ted.Message{
+						Text: stringETACommandPrompt,
+					},
+				},
+			}
+			b.HandleUpdate(context.Background(), update)
+		})
+	}
+}
+
 func TestBete_HandleCommand_About(t *testing.T) {
 	variants := []string{"/about", "/version"}
 	for _, variant := range variants {
@@ -417,20 +513,33 @@ func TestBete_HandleCommand_Favourite_NonPrivateChat(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_handleETACommand_withoutArgs(t *testing.T) {
+func TestBete_handleETACommand_withArgs(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
 	command := "/eta"
+	stop := buildBusStop()
+	query := Query{Stop: stop.ID, Filter: []string{"5", "24"}}
+	arrivals := buildDataMallBusArrival()
 	userID := randomID()
 	messageID := randomID()
 	chatID := randomInt64ID()
+	text := must(formatArrivalsSummary(ArrivalInfo{
+		Stop:     stop,
+		Time:     refTime,
+		Services: arrivals.Services,
+		Filter:   query.Filter,
+	})).(string)
 	req := ted.SendMessageRequest{
-		ChatID:    chatID,
-		Text:      stringETACommandPrompt,
-		ParseMode: "HTML",
+		ChatID:      chatID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(stop.ID, query.Filter, FormatSummary),
 	}
 
+	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
+	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
 
 	update := ted.Update{
@@ -438,7 +547,7 @@ func TestBete_handleETACommand_withoutArgs(t *testing.T) {
 			ID:   messageID,
 			From: &ted.User{ID: userID},
 			Chat: ted.Chat{ID: chatID, Type: "private"},
-			Text: command,
+			Text: command + " " + query.Canonical(),
 			Entities: []ted.MessageEntity{
 				{
 					Type:   "bot_command",
@@ -451,7 +560,65 @@ func TestBete_handleETACommand_withoutArgs(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_handleETACommand_withoutArgsGroup(t *testing.T) {
+func TestBete_handleETACommand_withInvalidArgs(t *testing.T) {
+	tests := []struct {
+		name         string
+		args         string
+		expectedText string
+	}{
+		{
+			name:         "does not start with a bus stop code",
+			args:         "ABCDE 5 24",
+			expectedText: stringQueryShouldStartWithBusStopCode,
+		},
+		{
+			name:         "contains invalid characters",
+			args:         "12345 5! '2'",
+			expectedText: stringQueryContainsInvalidCharacters,
+		},
+		{
+			name:         "too long",
+			args:         "12345 24 28 43 70 76 134 135 137 154 155",
+			expectedText: stringQueryTooLong,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, finish := newMockBete(t)
+			defer finish()
+
+			command := "/eta"
+			userID := randomID()
+			messageID := randomID()
+			chatID := randomInt64ID()
+			req := ted.SendMessageRequest{
+				ChatID: chatID,
+				Text:   tt.expectedText,
+			}
+
+			b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+			update := ted.Update{
+				Message: &ted.Message{
+					ID:   messageID,
+					From: &ted.User{ID: userID},
+					Chat: ted.Chat{ID: chatID, Type: "private"},
+					Text: command + " " + tt.args,
+					Entities: []ted.MessageEntity{
+						{
+							Type:   "bot_command",
+							Offset: 0,
+							Length: len(command),
+						},
+					},
+				},
+			}
+			b.HandleUpdate(context.Background(), update)
+		})
+	}
+}
+
+func TestBete_handleETACommand_withoutArgs(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 

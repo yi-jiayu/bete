@@ -83,13 +83,35 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args strin
 }
 
 func (b Bete) handleETACommand(ctx context.Context, m *ted.Message, args string) {
-	reply := ted.SendMessageRequest{
-		ChatID:    m.Chat.ID,
-		Text:      stringETACommandPrompt,
-		ParseMode: "HTML",
+	if args == "" {
+		b.handleETACommandWithoutArgs(ctx, m)
+		return
 	}
-	if m.Chat.Type != "private" {
-		reply.ReplyMarkup = ted.ForceReply{}
+	query, err := ParseQuery(args)
+	if err != nil {
+		b.reportInvalidQuery(ctx, m.Chat.ID, err)
+		return
+	}
+	text, err := b.etaMessageText(ctx, query.Stop, query.Filter, FormatSummary)
+	if err != nil {
+		captureError(ctx, err)
+		return
+	}
+	req := ted.SendMessageRequest{
+		ChatID:      m.Chat.ID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(query.Stop, query.Filter, FormatSummary),
+	}
+	b.send(ctx, req)
+}
+
+func (b Bete) handleETACommandWithoutArgs(ctx context.Context, m *ted.Message) {
+	reply := ted.SendMessageRequest{
+		ChatID:      m.Chat.ID,
+		Text:        stringETACommandPrompt,
+		ParseMode:   "HTML",
+		ReplyMarkup: ted.ForceReply{},
 	}
 	b.send(ctx, reply)
 }
@@ -133,11 +155,16 @@ func getFavouriteQuery(text string) string {
 	return query
 }
 
+// HandleReply handles messages which are replies.
+//
+// When matching against the reply text, note that formatting markup in the original message will not be present.
 func (b Bete) HandleReply(ctx context.Context, m *ted.Message) {
 	if m.ReplyToMessage.Text == stringAddFavouritePromptForQuery {
 		b.addFavouriteSuggestName(ctx, m)
 	} else if query := getFavouriteQuery(m.ReplyToMessage.Text); query != "" {
 		b.addFavouriteFinish(ctx, m, query)
+	} else if m.ReplyToMessage.Text == stringETACommandPrompt {
+		b.handleETACommand(ctx, m, m.Text)
 	}
 }
 
