@@ -41,3 +41,9 @@ migration:
     - -database
     - $(DATABASE_URL)
     - up
+
+cronJobs:
+  - name: sync-bus-stops
+    schedule: "0 1 * * *"
+    command:
+      - /bete/bin/seed

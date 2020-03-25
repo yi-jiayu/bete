@@ -90,3 +90,5 @@ migration:
   enabled: false
   activeDeadlineSeconds: 60
   command: []
+
+cronJobs: []

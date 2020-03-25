@@ -2,14 +2,10 @@ package main
 
 import (
 	"database/sql"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"github.com/yi-jiayu/datamall/v3"
 )
@@ -60,35 +56,7 @@ on conflict (id) do update set road        = excluded.road,
 	return nil
 }
 
-var migrationsDir = flag.String("path", "migrations", "path to migrations directory")
-
-func init() {
-	flag.Parse()
-}
-
 func main() {
-	var err error
-	databaseURL := os.Getenv("DATABASE_URL")
-	db, err = sql.Open("postgres", databaseURL)
-	if err != nil {
-		panic(err)
-	}
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
-	if err != nil {
-		panic(err)
-	}
-	m, err := migrate.NewWithDatabaseInstance(
-		"file://"+*migrationsDir,
-		"postgres", driver)
-	if err != nil {
-		panic(err)
-	}
-	log.Println("migrating database")
-	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
-		panic(err)
-	}
-
 	accountKey := os.Getenv("DATAMALL_ACCOUNT_KEY")
 	if accountKey == "" {
 		panic("DATAMALL_ACCOUNT_KEY environment variable not set")
