@@ -12,6 +12,7 @@ spec:
   activeDeadlineSeconds: {{ .Values.migration.activeDeadlineSeconds }}
   template:
     spec:
+      backoffLimit: 1
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
