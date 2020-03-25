@@ -8,6 +8,9 @@ metadata:
     {{- include "server.labels" $ | nindent 4 }}
 spec:
   schedule: {{ .schedule }}
+  {{- with .concurrencyPolicy }}
+  concurrencyPolicy: {{ . }}
+  {{- end }}
   jobTemplate:
     spec:
       template:
