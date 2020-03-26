@@ -821,3 +821,85 @@ func TestBete_favouritesCallback(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_tourCallback(t *testing.T) {
+	callbackQueryID := randomStringID()
+	chatID := randomInt64ID()
+	tests := []struct {
+		name     string
+		step     string
+		expected ted.Request
+	}{
+		{
+			name: "eta queries",
+			step: tourETAQueries,
+			expected: ted.SendMessageRequest{
+				ChatID:    chatID,
+				Text:      stringTourETAQueries,
+				ParseMode: "HTML",
+				ReplyMarkup: ted.InlineKeyboardMarkup{
+					InlineKeyboard: [][]ted.InlineKeyboardButton{
+						{
+							{
+								Text: "Next: " + stringTourTitleFilteringETAQueries,
+								CallbackData: CallbackData{
+									Type: callbackTour,
+									Name: tourFilteringETAQueries,
+								}.Encode(),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "filtering eta queries",
+			step: tourFilteringETAQueries,
+			expected: ted.SendMessageRequest{
+				ChatID:    chatID,
+				Text:      stringTourFilteringETAQueries,
+				ParseMode: "HTML",
+				ReplyMarkup: ted.InlineKeyboardMarkup{
+					InlineKeyboard: [][]ted.InlineKeyboardButton{
+						{
+							{
+								Text: "Next: " + stringTourTitleRefreshResend,
+								CallbackData: CallbackData{
+									Type: callbackTour,
+									Name: tourRefreshResend,
+								}.Encode(),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, finish := newMockBete(t)
+			defer finish()
+
+			answerCallback := ted.AnswerCallbackQueryRequest{
+				CallbackQueryID: callbackQueryID,
+			}
+
+			b.Telegram.(*MockTelegram).EXPECT().Do(tt.expected).Return(ted.Response{}, nil)
+			b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+			update := ted.Update{
+				CallbackQuery: &ted.CallbackQuery{
+					ID: callbackQueryID,
+					Message: &ted.Message{
+						Chat: ted.Chat{ID: chatID},
+					},
+					Data: CallbackData{
+						Type: callbackTour,
+						Name: tt.step,
+					}.Encode(),
+				},
+			}
+			b.HandleUpdate(context.Background(), update)
+		})
+	}
+}

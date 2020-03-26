@@ -509,6 +509,49 @@ func TestBete_handleStartCommand(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+func TestBete_handleTourCommand(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	req := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   stringTourStart,
+		ReplyMarkup: ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text: "Next: " + stringTourTitleETAQueries,
+						CallbackData: CallbackData{
+							Type: callbackTour,
+							Name: "eta_queries",
+						}.Encode(),
+					},
+				},
+			},
+		},
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			Text: "/tour",
+			Entities: []ted.MessageEntity{
+				{
+					Type:   "bot_command",
+					Offset: 0,
+					Length: 5,
+				},
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func TestBete_handleFavouritesCommand(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()

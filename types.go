@@ -87,3 +87,10 @@ func ParseQuery(text string) (Query, error) {
 func (q *Query) Canonical() string {
 	return strings.Join(append([]string{q.Stop}, q.Filter...), " ")
 }
+
+// TourSection is a section of the Bus Eta Bot tour.
+type TourSection struct {
+	Title string
+	Text  string
+	Next  string
+}

@@ -8,6 +8,7 @@ import (
 	"github.com/yi-jiayu/ted"
 )
 
+// Callback query types
 const (
 	callbackRefresh          = "refresh"
 	callbackResend           = "resend"
@@ -18,7 +19,50 @@ const (
 	callbackDeleteFavourite  = "delete_favourite"
 	callbackShowFavourites   = "show_favourites"
 	callbackHideFavourites   = "hide_favourites"
+	callbackTour             = "tour"
 )
+
+// Tour sections
+const (
+	tourETAQueries          = "eta_queries"
+	tourFilteringETAQueries = "filtering_eta_queries"
+	tourRefreshResend       = "refresh_resend"
+	tourArrivingBusDetails  = "bus_details"
+	tourFavourites          = "favourites"
+	tourInlineQueries       = "inline_queries"
+)
+
+var tourSections = map[string]TourSection{
+	tourETAQueries: {
+		Title: stringTourTitleETAQueries,
+		Text:  stringTourETAQueries,
+		Next:  tourFilteringETAQueries,
+	},
+	tourFilteringETAQueries: {
+		Title: stringTourTitleFilteringETAQueries,
+		Text:  stringTourFilteringETAQueries,
+		Next:  tourRefreshResend,
+	},
+	tourRefreshResend: {
+		Title: stringTourTitleRefreshResend,
+		Text:  stringTourRefreshResend,
+		Next:  tourArrivingBusDetails,
+	},
+	tourArrivingBusDetails: {
+		Title: stringTourTitleArrivingBusDetails,
+		Text:  stringTourArrivingBusDetails,
+		Next:  tourFavourites,
+	},
+	tourFavourites: {
+		Title: stringTourTitleFavourites,
+		Text:  stringTourFavourites,
+		Next:  tourInlineQueries,
+	},
+	tourInlineQueries: {
+		Title: stringTourTitleInlineQueries,
+		Text:  stringTourInlineQueries,
+	},
+}
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	var data CallbackData
@@ -45,6 +89,8 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.hideFavouritesCallback(ctx, q)
 	case callbackFavourites:
 		b.favouritesCallback(ctx, q)
+	case callbackTour:
+		b.tourCallback(ctx, q, data)
 	}
 }
 
@@ -262,5 +308,38 @@ func (b Bete) favouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
 		CallbackQueryID: q.ID,
 	}
 	b.send(ctx, editMessage)
+	b.send(ctx, answerCallback)
+}
+
+func (b Bete) tourCallback(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
+	section, ok := tourSections[data.Name]
+	if !ok {
+		return
+	}
+	sendMessage := ted.SendMessageRequest{
+		ChatID:    q.Message.Chat.ID,
+		Text:      section.Text,
+		ParseMode: "HTML",
+	}
+	if section.Next != "" {
+		next := tourSections[section.Next]
+		sendMessage.ReplyMarkup = ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text: "Next: " + next.Title,
+						CallbackData: CallbackData{
+							Type: callbackTour,
+							Name: section.Next,
+						}.Encode(),
+					},
+				},
+			},
+		}
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
+	}
+	b.send(ctx, sendMessage)
 	b.send(ctx, answerCallback)
 }

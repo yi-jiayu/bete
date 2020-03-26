@@ -81,6 +81,8 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args strin
 		b.handleAboutCommand(ctx, m)
 	case "eta":
 		b.handleETACommand(ctx, m, args)
+	case callbackTour:
+		b.handleTourCommand(ctx, m)
 	}
 }
 
@@ -131,6 +133,27 @@ func (b Bete) handleStartCommand(ctx context.Context, m *ted.Message) {
 	reply := ted.SendMessageRequest{
 		ChatID: m.Chat.ID,
 		Text:   fmt.Sprintf(stringWelcomeMessage, m.From.FirstName),
+	}
+	b.send(ctx, reply)
+}
+
+func (b Bete) handleTourCommand(ctx context.Context, m *ted.Message) {
+	reply := ted.SendMessageRequest{
+		ChatID: m.Chat.ID,
+		Text:   stringTourStart,
+		ReplyMarkup: ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text: "Next: " + stringTourTitleETAQueries,
+						CallbackData: CallbackData{
+							Type: callbackTour,
+							Name: "eta_queries",
+						}.Encode(),
+					},
+				},
+			},
+		},
 	}
 	b.send(ctx, reply)
 }
