@@ -44,7 +44,7 @@ migration:
 
 cronJobs:
   - name: sync-bus-stops
-    schedule: "0 1 * * *"
+    schedule: "0 9 * * *"
     concurrencyPolicy: Forbid
     command:
       - /bete/bin/seed
