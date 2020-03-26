@@ -15,6 +15,12 @@ spec:
     spec:
       template:
         spec:
+          {{- with $.Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "server.serviceAccountName" $ }}
+          restartPolicy: OnFailure
           containers:
             - name: {{ .name }}
               image: {{ .repository | default $.Values.image.repository }}:{{ .tag | default $.Values.image.tag }}
@@ -27,6 +33,5 @@ spec:
                 - configMapRef:
                     name: {{ . }}
               {{- end }}
-          restartPolicy: OnFailure
 ...
 {{- end }}
