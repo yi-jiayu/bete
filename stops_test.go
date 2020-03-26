@@ -229,6 +229,19 @@ func TestSQLBusStopRepository_Search(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:  "doesn't treat slash as part of a token",
+			query: "ica",
+			limit: 5,
+			expected: []BusStop{
+				{
+					ID:          "01319",
+					Description: "Lavender Stn Exit A/ICA",
+					RoadName:    "Kallang Rd",
+					Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+				},
+			},
+		},
 	}
 	repo := SQLBusStopRepository{DB: tx}
 	for _, tt := range tests {
