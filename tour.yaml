@@ -8,6 +8,7 @@ start:
     4. Arriving bus details
     5. Favourites
     6. Inline queries
+    7. Searching for bus stops
 
     Use the button below to get started:
   navigation:
@@ -64,6 +65,8 @@ favourites:
     <strong>Favourites</strong>
 
     If you frequently make certain ETA queries, you can add them as favourites for quicker access. Use the /favourites command to manage your favourites.
+
+    Take a moment now to issue the /favourites command and follow the instructions to add your first favourite if you'd like to find out how it works.
   navigation:
     - text: "Next: Inline queries"
       target: inline_queries
@@ -71,7 +74,21 @@ inline_queries:
   text: |-
     <strong>Inline queries</strong>
 
-    You can send ETA messages to any chat, including this one, using Bus Eta Bot's inline mode. Give it a try now by starting a message with @BusEtaBot followed by a space---you should see a list of bus stops appear. Selecting any of them will send an ETA message to the current chat.
+    You can send ETA messages to any chat, including this one, using Bus Eta Bot's inline mode. This lets you share ETAs with a friend or even a group.
+
+    Give it a try now by starting a message with @BusEtaBot followed by a space. You should see a list of bus stops appear. Selecting any of them will send an ETA message to the current chat.
+
+    If your location is available, the bus stops shown will be those nearest to you.
+  navigation:
+    - text: "Next: Searching for bus stops"
+      target: searching_bus_stops
+searching_bus_stops:
+  text: |-
+    <strong>Searching for bus stops</strong>
+
+    You can also search for specific bus stops in your inline query. Just include the bus stop code, description or road name in your query and only bus stops which match will be returned.
+
+    Try making an inline query for the same bus stop "02151". Then try again with the word "suntec".
   navigation:
     - text: "Finish tour"
       target: finish
