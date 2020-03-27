@@ -1,96 +1,39 @@
 package bete
 
+import (
+	"os"
+
+	"gopkg.in/yaml.v2"
+)
+
 // Tour section slugs
 const (
-	tourSectionStart               = "start"
-	tourSectionETAQueries          = "eta_queries"
-	tourSectionFilteringETAQueries = "filtering_eta_queries"
-	tourSectionRefreshResend       = "refresh_resend"
-	tourSectionArrivingBusDetails  = "bus_details"
-	tourSectionFavourites          = "favourites"
-	tourSectionInlineQueries       = "inline_queries"
-	tourSectionFinish              = "finish"
+	tourSectionStart = "start"
 )
 
 // TourSectionData contains what to display for a tour section.
 type TourSectionData struct {
-	Text       string
-	Navigation []TourSectionNavigation
+	Text       string                  `yaml:"text"`
+	Navigation []TourSectionNavigation `yaml:"navigation"`
 }
 
 // TourSectionNavigation describes a link between tour sections.
 type TourSectionNavigation struct {
-	Text   string
-	Target string
+	Text   string `yaml:"text"`
+	Target string `yaml:"target"`
 }
 
-type Tour map[string]TourSectionData
+var tour = mustLoadTour("tour.yaml")
 
-var tour = Tour{
-	tourSectionStart: {
-		Text: stringTourStart,
-		Navigation: []TourSectionNavigation{
-			{
-				Text:   "Next: " + stringTourTitleETAQueries,
-				Target: tourSectionETAQueries,
-			},
-		},
-	},
-	tourSectionETAQueries: {
-		Text: stringTourETAQueries,
-		Navigation: []TourSectionNavigation{
-			{
-				Text:   "Next: " + stringTourTitleFilteringETAQueries,
-				Target: tourSectionFilteringETAQueries,
-			},
-		},
-	},
-	tourSectionFilteringETAQueries: {
-		Text: stringTourFilteringETAQueries,
-		Navigation: []TourSectionNavigation{
-			{
-				Text:   "Next: " + stringTourTitleRefreshResend,
-				Target: tourSectionRefreshResend,
-			},
-		},
-	},
-	tourSectionRefreshResend: {
-		Text: stringTourRefreshResend,
-		Navigation: []TourSectionNavigation{
-			{
-				Text:   "Next: " + stringTourTitleArrivingBusDetails,
-				Target: tourSectionArrivingBusDetails,
-			},
-		},
-	},
-	tourSectionArrivingBusDetails: {
-		Text: stringTourArrivingBusDetails,
-		Navigation: []TourSectionNavigation{
-			{
-				Text:   "Next: " + stringTourTitleFavourites,
-				Target: tourSectionFavourites,
-			},
-		},
-	},
-	tourSectionFavourites: {
-		Text: stringTourFavourites,
-		Navigation: []TourSectionNavigation{
-			{
-				Text:   "Next: " + stringTourTitleInlineQueries,
-				Target: tourSectionInlineQueries,
-			},
-		},
-	},
-	tourSectionInlineQueries: {
-		Text: stringTourInlineQueries,
-		Navigation: []TourSectionNavigation{
-			{
-				Text:   "Finish tour",
-				Target: tourSectionFinish,
-			},
-		},
-	},
-	tourSectionFinish: {
-		Text: stringTourFinish,
-	},
+func mustLoadTour(path string) map[string]TourSectionData {
+	var tour map[string]TourSectionData
+	f, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	err = yaml.NewDecoder(f).Decode(&tour)
+	if err != nil {
+		panic(err)
+	}
+	return tour
 }

@@ -300,11 +300,11 @@ func Test_inlineETAMessageReplyMarkupP(t *testing.T) {
 func Test_tourReplyMarkup(t *testing.T) {
 	t.Run("shows buttons when section has navigation", func(t *testing.T) {
 		section := TourSectionData{
-			Text: stringTourETAQueries,
+			Text: "Text",
 			Navigation: []TourSectionNavigation{
 				{
-					Text:   "Next: " + stringTourTitleFilteringETAQueries,
-					Target: tourSectionFilteringETAQueries,
+					Text:   "Button text",
+					Target: "button_target",
 				},
 			},
 		}
@@ -315,7 +315,7 @@ func Test_tourReplyMarkup(t *testing.T) {
 						Text: section.Navigation[0].Text,
 						CallbackData: CallbackData{
 							Type: callbackTour,
-							Name: string(section.Navigation[0].Target),
+							Name: section.Navigation[0].Target,
 						}.Encode(),
 					},
 				},
@@ -326,7 +326,7 @@ func Test_tourReplyMarkup(t *testing.T) {
 	})
 	t.Run("returns nil when section does not have navigation", func(t *testing.T) {
 		section := TourSectionData{
-			Text: stringTourFinish,
+			Text: "Text",
 		}
 		actual := tourReplyMarkup(section)
 		assert.Nil(t, actual)

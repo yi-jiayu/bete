@@ -12,4 +12,5 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/yi-jiayu/datamall/v3 v3.1.0
 	github.com/yi-jiayu/ted v0.0.0-20200323121430-34df995e5c15
+	gopkg.in/yaml.v2 v2.2.8
 )

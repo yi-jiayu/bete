@@ -515,17 +515,18 @@ func TestBete_handleTourCommand(t *testing.T) {
 
 	userID := randomID()
 	chatID := randomInt64ID()
+	section := tour[tourSectionStart]
 	req := ted.SendMessageRequest{
 		ChatID: chatID,
-		Text:   stringTourStart,
+		Text:   section.Text,
 		ReplyMarkup: ted.InlineKeyboardMarkup{
 			InlineKeyboard: [][]ted.InlineKeyboardButton{
 				{
 					{
-						Text: "Next: " + stringTourTitleETAQueries,
+						Text: section.Navigation[0].Text,
 						CallbackData: CallbackData{
 							Type: callbackTour,
-							Name: "eta_queries",
+							Name: section.Navigation[0].Target,
 						}.Encode(),
 					},
 				},

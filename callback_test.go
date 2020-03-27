@@ -823,7 +823,7 @@ func TestBete_favouritesCallback(t *testing.T) {
 }
 
 func TestBete_tourCallback(t *testing.T) {
-	section := tourSectionETAQueries
+	section := tourSectionStart
 	callbackQueryID := randomStringID()
 	chatID := randomInt64ID()
 
