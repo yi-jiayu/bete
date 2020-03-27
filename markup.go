@@ -233,3 +233,20 @@ func inlineETAMessageReplyMarkupP(stopID string, format Format) *ted.InlineKeybo
 		},
 	}
 }
+
+func tourReplyMarkup(section TourSectionData) ted.InlineKeyboardMarkup {
+	var rows [][]ted.InlineKeyboardButton
+	for _, nav := range section.Navigation {
+		button := ted.InlineKeyboardButton{
+			Text: nav.Text,
+			CallbackData: CallbackData{
+				Type: callbackTour,
+				Name: string(nav.Target),
+			}.Encode(),
+		}
+		rows = append(rows, []ted.InlineKeyboardButton{button})
+	}
+	return ted.InlineKeyboardMarkup{
+		InlineKeyboard: rows,
+	}
+}

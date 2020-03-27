@@ -296,3 +296,30 @@ func Test_inlineETAMessageReplyMarkupP(t *testing.T) {
 		assert.Equal(t, expected, actual)
 	})
 }
+
+func Test_tourReplyMarkup(t *testing.T) {
+	section := TourSectionData{
+		Text: stringTourETAQueries,
+		Navigation: []TourSectionNavigation{
+			{
+				Text:   "Next: " + stringTourTitleFilteringETAQueries,
+				Target: tourSectionFilteringETAQueries,
+			},
+		},
+	}
+	expected := ted.InlineKeyboardMarkup{
+		InlineKeyboard: [][]ted.InlineKeyboardButton{
+			{
+				{
+					Text: section.Navigation[0].Text,
+					CallbackData: CallbackData{
+						Type: callbackTour,
+						Name: string(section.Navigation[0].Target),
+					}.Encode(),
+				},
+			},
+		},
+	}
+	actual := tourReplyMarkup(section)
+	assert.Equal(t, expected, actual)
+}

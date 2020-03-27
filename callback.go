@@ -22,48 +22,6 @@ const (
 	callbackTour             = "tour"
 )
 
-// Tour sections
-const (
-	tourETAQueries          = "eta_queries"
-	tourFilteringETAQueries = "filtering_eta_queries"
-	tourRefreshResend       = "refresh_resend"
-	tourArrivingBusDetails  = "bus_details"
-	tourFavourites          = "favourites"
-	tourInlineQueries       = "inline_queries"
-)
-
-var tourSections = map[string]TourSection{
-	tourETAQueries: {
-		Title: stringTourTitleETAQueries,
-		Text:  stringTourETAQueries,
-		Next:  tourFilteringETAQueries,
-	},
-	tourFilteringETAQueries: {
-		Title: stringTourTitleFilteringETAQueries,
-		Text:  stringTourFilteringETAQueries,
-		Next:  tourRefreshResend,
-	},
-	tourRefreshResend: {
-		Title: stringTourTitleRefreshResend,
-		Text:  stringTourRefreshResend,
-		Next:  tourArrivingBusDetails,
-	},
-	tourArrivingBusDetails: {
-		Title: stringTourTitleArrivingBusDetails,
-		Text:  stringTourArrivingBusDetails,
-		Next:  tourFavourites,
-	},
-	tourFavourites: {
-		Title: stringTourTitleFavourites,
-		Text:  stringTourFavourites,
-		Next:  tourInlineQueries,
-	},
-	tourInlineQueries: {
-		Title: stringTourTitleInlineQueries,
-		Text:  stringTourInlineQueries,
-	},
-}
-
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	var data CallbackData
 	err := json.Unmarshal([]byte(q.Data), &data)
@@ -312,34 +270,16 @@ func (b Bete) favouritesCallback(ctx context.Context, q *ted.CallbackQuery) {
 }
 
 func (b Bete) tourCallback(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
-	section, ok := tourSections[data.Name]
-	if !ok {
-		return
-	}
-	sendMessage := ted.SendMessageRequest{
-		ChatID:    q.Message.Chat.ID,
-		Text:      section.Text,
-		ParseMode: "HTML",
-	}
-	if section.Next != "" {
-		next := tourSections[section.Next]
-		sendMessage.ReplyMarkup = ted.InlineKeyboardMarkup{
-			InlineKeyboard: [][]ted.InlineKeyboardButton{
-				{
-					{
-						Text: "Next: " + next.Title,
-						CallbackData: CallbackData{
-							Type: callbackTour,
-							Name: section.Next,
-						}.Encode(),
-					},
-				},
-			},
-		}
+	section := tour[data.Name]
+	reply := ted.SendMessageRequest{
+		ChatID:      q.Message.Chat.ID,
+		Text:        section.Text,
+		ParseMode:   "HTML",
+		ReplyMarkup: tourReplyMarkup(section),
 	}
 	answerCallback := ted.AnswerCallbackQueryRequest{
 		CallbackQueryID: q.ID,
 	}
-	b.send(ctx, sendMessage)
+	b.send(ctx, reply)
 	b.send(ctx, answerCallback)
 }

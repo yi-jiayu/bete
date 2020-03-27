@@ -138,22 +138,11 @@ func (b Bete) handleStartCommand(ctx context.Context, m *ted.Message) {
 }
 
 func (b Bete) handleTourCommand(ctx context.Context, m *ted.Message) {
+	start := tour[tourSectionStart]
 	reply := ted.SendMessageRequest{
-		ChatID: m.Chat.ID,
-		Text:   stringTourStart,
-		ReplyMarkup: ted.InlineKeyboardMarkup{
-			InlineKeyboard: [][]ted.InlineKeyboardButton{
-				{
-					{
-						Text: "Next: " + stringTourTitleETAQueries,
-						CallbackData: CallbackData{
-							Type: callbackTour,
-							Name: "eta_queries",
-						}.Encode(),
-					},
-				},
-			},
-		},
+		ChatID:      m.Chat.ID,
+		Text:        start.Text,
+		ReplyMarkup: tourReplyMarkup(start),
 	}
 	b.send(ctx, reply)
 }
