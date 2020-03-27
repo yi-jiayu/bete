@@ -298,28 +298,37 @@ func Test_inlineETAMessageReplyMarkupP(t *testing.T) {
 }
 
 func Test_tourReplyMarkup(t *testing.T) {
-	section := TourSectionData{
-		Text: stringTourETAQueries,
-		Navigation: []TourSectionNavigation{
-			{
-				Text:   "Next: " + stringTourTitleFilteringETAQueries,
-				Target: tourSectionFilteringETAQueries,
-			},
-		},
-	}
-	expected := ted.InlineKeyboardMarkup{
-		InlineKeyboard: [][]ted.InlineKeyboardButton{
-			{
+	t.Run("shows buttons when section has navigation", func(t *testing.T) {
+		section := TourSectionData{
+			Text: stringTourETAQueries,
+			Navigation: []TourSectionNavigation{
 				{
-					Text: section.Navigation[0].Text,
-					CallbackData: CallbackData{
-						Type: callbackTour,
-						Name: string(section.Navigation[0].Target),
-					}.Encode(),
+					Text:   "Next: " + stringTourTitleFilteringETAQueries,
+					Target: tourSectionFilteringETAQueries,
 				},
 			},
-		},
-	}
-	actual := tourReplyMarkup(section)
-	assert.Equal(t, expected, actual)
+		}
+		expected := ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text: section.Navigation[0].Text,
+						CallbackData: CallbackData{
+							Type: callbackTour,
+							Name: string(section.Navigation[0].Target),
+						}.Encode(),
+					},
+				},
+			},
+		}
+		actual := tourReplyMarkup(section)
+		assert.Equal(t, expected, actual)
+	})
+	t.Run("returns nil when section does not have navigation", func(t *testing.T) {
+		section := TourSectionData{
+			Text: stringTourFinish,
+		}
+		actual := tourReplyMarkup(section)
+		assert.Nil(t, actual)
+	})
 }

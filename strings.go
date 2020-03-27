@@ -85,4 +85,7 @@ If you frequently make certain ETA queries, you can add them as favourites for q
 	stringTourInlineQueries      = `<strong>Inline queries</strong>
 
 You can send ETA messages to any chat, including this one, using Bus Eta Bot's inline mode. Give it a try now by starting a message with @BusEtaBot followed by a space---you should see a list of bus stops appear. Selecting any of them will send an ETA message to the current chat.`
+	stringTourFinish = `You've reached the end of the tour! We hope that you learnt something new about Bus Eta Bot!
+
+If you'd like, you can use the /tour command again anytime to go through it again.`
 )

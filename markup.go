@@ -234,7 +234,10 @@ func inlineETAMessageReplyMarkupP(stopID string, format Format) *ted.InlineKeybo
 	}
 }
 
-func tourReplyMarkup(section TourSectionData) ted.InlineKeyboardMarkup {
+func tourReplyMarkup(section TourSectionData) ted.ReplyMarkup {
+	if len(section.Navigation) == 0 {
+		return nil
+	}
 	var rows [][]ted.InlineKeyboardButton
 	for _, nav := range section.Navigation {
 		button := ted.InlineKeyboardButton{

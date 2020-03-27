@@ -90,4 +90,7 @@ var tour = Tour{
 			},
 		},
 	},
+	tourSectionFinish: {
+		Text: stringTourFinish,
+	},
 }
