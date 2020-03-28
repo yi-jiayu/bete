@@ -16,6 +16,9 @@ blocks:
       secrets:
         - name: Push to private GitHub package repository
         - name: Sentry auth token
+      env_vars:
+        - name: SENTRY_ORG
+          value: yi-jiayu
 agent:
   machine:
     type: e1-standard-2
