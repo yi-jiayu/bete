@@ -16,7 +16,7 @@ blocks:
             - createdb -U postgres bete_test
             - GOBIN=$PWD/bin go get -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate
             - bin/migrate -path migrations -database "$DATABASE_URL" up
-            - go test ./...
+            - go test -cover -coverprofile=coverage.out -covermode=count ./...
       env_vars:
         - name: DATABASE_URL
           value: 'postgres://postgres@localhost/bete_test?sslmode=disable'
