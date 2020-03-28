@@ -1,0 +1,22 @@
+version: v1.0
+name: Build
+blocks:
+  - name: Build and push app image
+    task:
+      jobs:
+        - commands:
+            - checkout
+            - commit=$(git rev-parse --verify --short HEAD)
+            - echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --username yi-jiayu --password-stdin
+            - docker build -t docker.pkg.github.com/yi-jiayu/bete/bete:$commit .
+            - docker push docker.pkg.github.com/yi-jiayu/bete/bete:$commit
+            - curl -sL https://sentry.io/get-cli/ | bash
+            - sentry-cli releases new -p bete $commit
+            - sentry-cli releases set-commits --auto $commit
+      secrets:
+        - name: Push to private GitHub package repository
+        - name: Sentry auth token
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
