@@ -54,7 +54,7 @@ jobs:
             sentry-cli releases set-commits --auto $commit
     environment:
       SENTRY_ORG: jiayu-yi
-  deploy:
+  deploy_staging:
     docker:
       - image: "cimg/base:stable"
     steps:
@@ -63,7 +63,7 @@ jobs:
           version: "v3.0.0"
       - run:
           name: Create kubeconfig file
-          command: echo $KUBECONFIG_FILE_BASE64 | base64 --decode > $KUBECONFIG
+          command: echo $BETE_STAGING_DEPLOYER_KUBECONFIG_BASE64 | base64 --decode > $KUBECONFIG
       - run: echo "export commit=$(git rev-parse --verify --short HEAD)" >> $BASH_ENV
       - run:
           name: Helm upgrade
@@ -95,7 +95,7 @@ workflows:
       - build:
           requires:
             - test
-      - deploy:
+      - deploy_staging:
           requires:
             - build
   test:
