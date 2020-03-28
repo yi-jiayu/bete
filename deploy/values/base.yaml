@@ -1,9 +1,6 @@
 image:
   repository: docker.pkg.github.com/yi-jiayu/bete/bete
 
-imagePullSecrets:
-  - name: docker.pkg.github.com
-
 prometheus:
   enabled: true
 
