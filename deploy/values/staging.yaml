@@ -1,0 +1,11 @@
+environment: staging
+
+ingress:
+  hosts:
+    - host: bete-staging.orario.infra.jiayu.io
+      paths:
+        - /telegram/updates
+  tls:
+    - secretName: bete-tls
+      hosts:
+        - bete-staging.orario.infra.jiayu.io

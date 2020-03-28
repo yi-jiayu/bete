@@ -70,19 +70,18 @@ jobs:
           command: |
             helm upgrade --install --wait \
               bete deploy/charts/server \
-              -n bete \
-              -f deploy/values.yaml \
-              --set image.tag="$commit" \
-              --set environment="$ENVIRONMENT"
+              -n bete-staging \
+              -f deploy/values/base.yaml \
+              -f deploy/values/staging.yaml \
+              --set image.tag="$commit"
       - run:
           name: Create deploy in Sentry
           command: |
             curl -sL https://sentry.io/get-cli/ | bash
-            sentry-cli releases deploys "$commit" new -e "$ENVIRONMENT"
+            sentry-cli releases deploys "$commit" new -e staging
     environment:
       SENTRY_ORG: jiayu-yi
       KUBECONFIG: kubeconfig.yaml
-      ENVIRONMENT: staging
 
 workflows:
   version: 2
