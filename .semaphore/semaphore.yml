@@ -1,11 +1,11 @@
 version: v1.0
-name: Go
+name: Test
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: Test
+  - name: Run tests
     task:
       jobs:
         - name: go test
@@ -16,7 +16,12 @@ blocks:
             - createdb -U postgres bete_test
             - GOBIN=$PWD/bin go get -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate
             - bin/migrate -path migrations -database "$DATABASE_URL" up
-            - go test ./...
+            - go test -cover -coverprofile=coverage.out -covermode=count ./...
       env_vars:
         - name: DATABASE_URL
           value: 'postgres://postgres@localhost/bete_test?sslmode=disable'
+promotions:
+  - name: Proceed to build
+    pipeline_file: build.yml
+    auto_promote:
+      when: branch = 'master' AND result = 'passed'
