@@ -122,10 +122,9 @@ func (b Bete) handleETACommandWithoutArgs(ctx context.Context, m *ted.Message) {
 
 func (b Bete) handleAboutCommand(ctx context.Context, m *ted.Message) {
 	req := ted.SendMessageRequest{
-		ChatID:           m.Chat.ID,
-		Text:             fmt.Sprintf(stringAboutMessage, b.Version, b.Version),
-		ParseMode:        "HTML",
-		ReplyToMessageID: m.ID,
+		ChatID:    m.Chat.ID,
+		Text:      fmt.Sprintf(stringAboutMessage, b.Version, b.Version),
+		ParseMode: "HTML",
 	}
 	b.send(ctx, req)
 }
@@ -142,6 +141,14 @@ func (b Bete) handleStartCommand(ctx context.Context, m *ted.Message) {
 						CallbackData: CallbackData{
 							Type: callbackTour,
 							Name: tourSectionStart,
+						}.Encode(),
+					},
+				},
+				{
+					{
+						Text: "About Bus Eta Bot",
+						CallbackData: CallbackData{
+							Type: callbackAbout,
 						}.Encode(),
 					},
 				},

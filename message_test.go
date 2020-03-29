@@ -459,6 +459,7 @@ func TestBete_handleAboutCommand(t *testing.T) {
 
 			update := ted.Update{
 				Message: &ted.Message{
+					ID:   randomID(),
 					From: &ted.User{ID: userID},
 					Chat: ted.Chat{ID: chatID, Type: "private"},
 					Text: variant,
@@ -496,6 +497,14 @@ func TestBete_handleStartCommand(t *testing.T) {
 						CallbackData: CallbackData{
 							Type: callbackTour,
 							Name: tourSectionStart,
+						}.Encode(),
+					},
+				},
+				{
+					{
+						Text: "About Bus Eta Bot",
+						CallbackData: CallbackData{
+							Type: callbackAbout,
 						}.Encode(),
 					},
 				},

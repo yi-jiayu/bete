@@ -20,6 +20,7 @@ const (
 	callbackShowFavourites   = "show_favourites"
 	callbackHideFavourites   = "hide_favourites"
 	callbackTour             = "tour"
+	callbackAbout            = "about"
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -50,6 +51,8 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.favouritesCallback(ctx, q)
 	case callbackTour:
 		b.tourCallback(ctx, q, data)
+	case callbackAbout:
+		b.aboutCallback(ctx, q)
 	default:
 		captureMessage(ctx, "unrecogised callback")
 		return
@@ -286,5 +289,18 @@ func (b Bete) tourCallback(ctx context.Context, q *ted.CallbackQuery, data Callb
 		CallbackQueryID: q.ID,
 	}
 	b.send(ctx, reply)
+	b.send(ctx, answerCallback)
+}
+
+func (b Bete) aboutCallback(ctx context.Context, q *ted.CallbackQuery) {
+	aboutMessage := ted.SendMessageRequest{
+		ChatID:    q.Message.Chat.ID,
+		Text:      fmt.Sprintf(stringAboutMessage, b.Version, b.Version),
+		ParseMode: "HTML",
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: q.ID,
+	}
+	b.send(ctx, aboutMessage)
 	b.send(ctx, answerCallback)
 }

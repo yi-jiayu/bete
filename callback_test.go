@@ -857,3 +857,37 @@ func TestBete_tourCallback(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_aboutCallback(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	version := randomStringID()
+	callbackQueryID := randomStringID()
+	chatID := randomInt64ID()
+	about := ted.SendMessageRequest{
+		ChatID:    chatID,
+		Text:      fmt.Sprintf(stringAboutMessage, version, version),
+		ParseMode: "HTML",
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+	}
+
+	b.Version = version
+	b.Telegram.(*MockTelegram).EXPECT().Do(about).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID: callbackQueryID,
+			Message: &ted.Message{
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type: callbackAbout,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
