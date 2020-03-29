@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	commit      = "tip"
+	commit      = "master"
 	environment = os.Getenv("ENVIRONMENT")
 )
 

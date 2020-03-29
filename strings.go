@@ -39,4 +39,7 @@ To get started immediately, send me a 5-digit bus stop code like "02151".
 If you've got a little more time, use the button below to take a guided tour of Bus Eta Bot's features. 
 
 I hope that you will find Bus Eta Bot useful! For questions or feedback, feel free to reach out to @jiayu.`
+	stringAboutMessage = `Bus Eta Bot is an open-source project on GitHub: https://github.com/yi-jiayu/bete
+
+The currently deployed version of Bus Eta Bot is: <a href="https://github.com/yi-jiayu/bete/tree/%s">%s</a>`
 )

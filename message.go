@@ -123,7 +123,8 @@ func (b Bete) handleETACommandWithoutArgs(ctx context.Context, m *ted.Message) {
 func (b Bete) handleAboutCommand(ctx context.Context, m *ted.Message) {
 	req := ted.SendMessageRequest{
 		ChatID:           m.Chat.ID,
-		Text:             "Bus Eta Bot " + b.Version,
+		Text:             fmt.Sprintf(stringAboutMessage, b.Version, b.Version),
+		ParseMode:        "HTML",
 		ReplyToMessageID: m.ID,
 	}
 	b.send(ctx, req)

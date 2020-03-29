@@ -438,7 +438,7 @@ func TestBete_HandleReply_noMatch(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
-func TestBete_HandleCommand_About(t *testing.T) {
+func TestBete_handleAboutCommand(t *testing.T) {
 	variants := []string{"/about", "/version"}
 	for _, variant := range variants {
 		t.Run(variant, func(t *testing.T) {
@@ -449,8 +449,9 @@ func TestBete_HandleCommand_About(t *testing.T) {
 			userID := randomID()
 			chatID := randomInt64ID()
 			req := ted.SendMessageRequest{
-				ChatID: chatID,
-				Text:   "Bus Eta Bot " + version,
+				ChatID:    chatID,
+				Text:      fmt.Sprintf(stringAboutMessage, version, version),
+				ParseMode: "HTML",
 			}
 
 			b.Version = version
