@@ -35,6 +35,7 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args strin
 		b.handleInvalidCommand(ctx, m)
 		return
 	}
+	commandsTotal.WithLabelValues(cmd).Inc()
 }
 
 func (b Bete) handleETACommand(ctx context.Context, m *ted.Message, args string) {

@@ -20,4 +20,11 @@ var (
 		},
 		[]string{"type"},
 	)
+	commandsTotal = promauto.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "bete_commands_total",
+			Help: "The total number of commands received, partitioned by command.",
+		},
+		[]string{"command"},
+	)
 )
