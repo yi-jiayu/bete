@@ -6,10 +6,17 @@ import (
 )
 
 var (
-	telegramUpdates = promauto.NewCounterVec(
+	telegramUpdatesTotal = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "telegram_updates_total",
 			Help: "The total number of Telegram updates received, partitioned by type.",
+		},
+		[]string{"type"},
+	)
+	callbackQueriesTotal = promauto.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "bete_callback_queries_total",
+			Help: "The total number of callback queries received, partitioned by type.",
 		},
 		[]string{"type"},
 	)

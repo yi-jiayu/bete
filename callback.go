@@ -49,7 +49,10 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.favouritesCallback(ctx, q)
 	case callbackTour:
 		b.tourCallback(ctx, q, data)
+	default:
+		return
 	}
+	callbackQueriesTotal.WithLabelValues(data.Type).Inc()
 }
 
 func (b Bete) answerCallbackQueryError(ctx context.Context, q *ted.CallbackQuery, err error) {

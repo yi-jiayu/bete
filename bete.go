@@ -55,21 +55,21 @@ func (b Bete) HandleUpdate(ctx context.Context, u ted.Update) {
 	switch {
 	case u.Message != nil:
 		sentrySetUser(ctx, u.Message.From.ID)
-		telegramUpdates.WithLabelValues("message").Inc()
+		telegramUpdatesTotal.WithLabelValues("message").Inc()
 
 		b.HandleMessage(ctx, u.Message)
 	case u.CallbackQuery != nil:
 		sentrySetUser(ctx, u.CallbackQuery.From.ID)
-		telegramUpdates.WithLabelValues("callback_query").Inc()
+		telegramUpdatesTotal.WithLabelValues("callback_query").Inc()
 
 		b.HandleCallbackQuery(ctx, u.CallbackQuery)
 	case u.InlineQuery != nil:
-		telegramUpdates.WithLabelValues("inline_query").Inc()
+		telegramUpdatesTotal.WithLabelValues("inline_query").Inc()
 		sentrySetUser(ctx, u.InlineQuery.From.ID)
 
 		b.HandleInlineQuery(ctx, u.InlineQuery)
 	case u.ChosenInlineResult != nil:
-		telegramUpdates.WithLabelValues("chosen_inline_result").Inc()
+		telegramUpdatesTotal.WithLabelValues("chosen_inline_result").Inc()
 		sentrySetUser(ctx, u.ChosenInlineResult.From.ID)
 
 		b.HandleChosenInlineResult(ctx, u.ChosenInlineResult)
