@@ -11,3 +11,9 @@ func captureError(ctx context.Context, err error) {
 		hub.CaptureException(err)
 	}
 }
+
+func captureMessage(ctx context.Context, msg string) {
+	if hub := sentry.GetHubFromContext(ctx); hub != nil {
+		hub.CaptureMessage(msg)
+	}
+}

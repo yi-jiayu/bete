@@ -26,6 +26,7 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	var data CallbackData
 	err := json.Unmarshal([]byte(q.Data), &data)
 	if err != nil {
+		captureMessage(ctx, "unrecogised callback")
 		return
 	}
 	switch data.Type {
@@ -50,6 +51,7 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	case callbackTour:
 		b.tourCallback(ctx, q, data)
 	default:
+		captureMessage(ctx, "unrecogised callback")
 		return
 	}
 	callbackQueriesTotal.WithLabelValues(data.Type).Inc()
