@@ -14,7 +14,7 @@ blocks:
                 bete deploy/charts/server \
                 -n bete-staging \
                 -f deploy/values/base.yaml \
-                -f deploy/values/gcp/staging.yaml \
+                -f deploy/values/staging.yaml \
                 --set image.tag="$commit"
             - curl -sL https://sentry.io/get-cli/ | bash
             - sentry-cli releases deploys "$commit" new -e staging
