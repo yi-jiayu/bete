@@ -1,0 +1,29 @@
+version: v1.0
+name: Deploy to staging
+blocks:
+  - name: Deploy
+    task:
+      jobs:
+        - name: Helm upgrade
+          commands:
+            - checkout
+            - commit=$(git rev-parse --verify --short HEAD)
+            - 'curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash'
+            - helm upgrade --install --wait \
+            - '              bete deploy/charts/server \'
+            - '              -n bete-staging \'
+            - '              -f deploy/values/base.yaml \'
+            - '              -f deploy/values/gcp/staging.yaml \'
+            - '              --set image.tag="$commit"'
+            - 'curl -sL https://sentry.io/get-cli/ | bash'
+            - sentry-cli releases deploys "$commit" new -e staging
+      secrets:
+        - name: deployer-bete-staging-gke_infra-251203_asia-southeast1-a_orario
+        - name: Sentry auth token
+      env_vars:
+        - name: SENTRY_ORG
+          value: jiayu-yi
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
