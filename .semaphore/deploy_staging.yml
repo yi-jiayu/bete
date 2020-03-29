@@ -30,4 +30,4 @@ agent:
     os_image: ubuntu1804
 promotions:
   - name: Promote to production
-    pipeline_file: production.yml
+    pipeline_file: deploy_production.yml
