@@ -1,0 +1,11 @@
+environment: production
+
+ingress:
+  hosts:
+    - host: bete-production.orario.gcp.jiayu.io
+      paths:
+        - /telegram/updates
+  tls:
+    - secretName: bete-tls
+      hosts:
+        - bete-production.orario.gcp.jiayu.io

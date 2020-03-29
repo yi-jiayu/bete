@@ -1,5 +1,5 @@
 version: v1.0
-name: Deploy to staging
+name: Deploy to production
 blocks:
   - name: Deploy
     task:
@@ -12,14 +12,14 @@ blocks:
             - |
               helm upgrade --install --wait \
                 bete deploy/charts/server \
-                -n bete-staging \
+                -n bete-production \
                 -f deploy/values/base.yaml \
-                -f deploy/values/staging.yaml \
+                -f deploy/values/production.yaml \
                 --set image.tag="$commit"
             - curl -sL https://sentry.io/get-cli/ | bash
-            - sentry-cli releases deploys "$commit" new -e staging
+            - sentry-cli releases deploys "$commit" new -e production
       secrets:
-        - name: deployer-bete-staging-gke_infra-251203_asia-southeast1-a_orario
+        - name: deployer-bete-production-gke_infra-251203_asia-southeast1-a_orario
         - name: Sentry auth token
       env_vars:
         - name: SENTRY_ORG
@@ -28,6 +28,3 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-promotions:
-  - name: Promote to production
-    pipeline_file: production.yml
