@@ -1,6 +1,7 @@
 package bete
 
 const (
+	stringInvalidCommand                  = "Sorry, I didn't recognise that command."
 	stringETACommandPrompt                = "Send me the bus stop code you wish to see arrivals for, optionally followed by services to filter by. For example: \"96049 5 24\""
 	stringErrorSorry                      = "Oh no, Something went wrong! Sorry about that, we're looking into it."
 	stringAddFavouritePromptForName       = "Adding the query %q to your favourites with a custom name. Send me the name for this query."

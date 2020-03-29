@@ -30,8 +30,13 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args strin
 		b.handleETACommand(ctx, m, args)
 	case commandTour:
 		b.handleTourCommand(ctx, m)
+	default:
+		captureMessage(ctx, "invalid command")
+		b.handleInvalidCommand(ctx, m)
+		return
 	}
 }
+
 func (b Bete) handleETACommand(ctx context.Context, m *ted.Message, args string) {
 	if args == "" {
 		b.handleETACommandWithoutArgs(ctx, m)
@@ -130,4 +135,12 @@ func (b Bete) handleFavouritesCommand(ctx context.Context, m *ted.Message) {
 		}
 	}
 	b.send(ctx, req)
+}
+
+func (b Bete) handleInvalidCommand(ctx context.Context, m *ted.Message) {
+	reply := ted.SendMessageRequest{
+		ChatID: m.Chat.ID,
+		Text:   stringInvalidCommand,
+	}
+	b.send(ctx, reply)
 }

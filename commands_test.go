@@ -349,3 +349,34 @@ func TestBete_handleETACommand_withoutArgs(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_handleInvalidCommand(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	command := "/invalid"
+	userID := randomID()
+	chatID := randomInt64ID()
+	req := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   stringInvalidCommand,
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID, Type: "private"},
+			Text: command,
+			Entities: []ted.MessageEntity{
+				{
+					Type:   "bot_command",
+					Offset: 0,
+					Length: len(command),
+				},
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
