@@ -487,6 +487,19 @@ func TestBete_handleStartCommand(t *testing.T) {
 	req := ted.SendMessageRequest{
 		ChatID: chatID,
 		Text:   fmt.Sprintf(stringWelcomeMessage, firstName),
+		ReplyMarkup: ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text: "Take the tour!",
+						CallbackData: CallbackData{
+							Type: callbackTour,
+							Name: tourSectionStart,
+						}.Encode(),
+					},
+				},
+			},
+		},
 	}
 
 	b.Version = version

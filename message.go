@@ -133,6 +133,19 @@ func (b Bete) handleStartCommand(ctx context.Context, m *ted.Message) {
 	reply := ted.SendMessageRequest{
 		ChatID: m.Chat.ID,
 		Text:   fmt.Sprintf(stringWelcomeMessage, m.From.FirstName),
+		ReplyMarkup: ted.InlineKeyboardMarkup{
+			InlineKeyboard: [][]ted.InlineKeyboardButton{
+				{
+					{
+						Text: "Take the tour!",
+						CallbackData: CallbackData{
+							Type: callbackTour,
+							Name: tourSectionStart,
+						}.Encode(),
+					},
+				},
+			},
+		},
 	}
 	b.send(ctx, reply)
 }

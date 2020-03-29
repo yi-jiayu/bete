@@ -34,7 +34,9 @@ const (
 
 Bus Eta Bot tells you when your bus will arrive!
 
-To get started, send me a 5-digit bus stop code like "02151". For a tour of what else you can do with Bus Eta Bot, use the /tour command. 
+To get started immediately, send me a 5-digit bus stop code like "02151".
+
+If you've got a little more time, use the button below to take a guided tour of Bus Eta Bot's features. 
 
 I hope that you will find Bus Eta Bot useful! For questions or feedback, feel free to reach out to @jiayu.`
 )
