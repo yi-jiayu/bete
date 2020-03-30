@@ -44,3 +44,10 @@ I hope that you will find Bus Eta Bot useful! For questions or feedback, feel fr
 
 The currently deployed version of Bus Eta Bot is: <a href="https://github.com/yi-jiayu/bete/tree/%s">%s</a>`
 )
+
+var (
+	stringsTips = []string{
+		`🎉 Bus Eta Bot recently rolled out a new onboarding experience! Long-time users can send the /start command again to check it out!`,
+		`💡 Favourites have been given a makeover! You can now save favourites with custom names. Use the /favourites command now to try it out!`,
+	}
+)

@@ -35,6 +35,7 @@ var funcMap = map[string]interface{}{
 	"sortByArrival":   sortByArrival,
 	"sortByService":   sortByService,
 	"take":            take,
+	"tips":            tips,
 	"until":           minutesUntil,
 }
 
@@ -177,4 +178,8 @@ func FormatArrivals(arrivals ArrivalInfo, format Format) (string, error) {
 	default:
 		return formatArrivalsSummary(arrivals)
 	}
+}
+
+func tips(t time.Time) string {
+	return stringsTips[int(t.Unix())%len(stringsTips)]
 }
