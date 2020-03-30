@@ -10,17 +10,19 @@ import (
 
 var refTime = time.Unix(1584244383, 0)
 
+var factoryRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
 func randomID() int {
-	return rand.Int()
+	return factoryRand.Int()
 }
 
 func randomInt64ID() int64 {
-	return rand.Int63()
+	return factoryRand.Int63()
 }
 
 func randomStringID() string {
 	p := make([]byte, 6)
-	_, err := rand.Read(p)
+	_, err := factoryRand.Read(p)
 	if err != nil {
 		return "abcdef"
 	}
