@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -48,11 +50,14 @@ var (
 func newTelegramWebhookHandler(b bete.Bete) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var update ted.Update
-		err := json.NewDecoder(r.Body).Decode(&update)
+		var buf bytes.Buffer
+		tee := io.TeeReader(r.Body, &buf)
+		err := json.NewDecoder(tee).Decode(&update)
 		if err != nil {
 			log.Printf("error decoding update: %v", err)
 			return
 		}
+		log.Println(buf.String())
 		b.HandleUpdate(r.Context(), update)
 	}
 }
