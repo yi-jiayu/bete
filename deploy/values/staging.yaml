@@ -1,6 +1,9 @@
 environment: staging
 
 ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/whitelist-source-range: 149.154.160.0/20, 91.108.4.0/22
+
   hosts:
     - host: bete-staging.orario.gcp.jiayu.io
       paths:
