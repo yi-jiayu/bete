@@ -12,6 +12,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt-production"
+    nginx.ingress.kubernetes.io/whitelist-source-range: 149.154.160.0/20, 91.108.4.0/22
 
 envFromConfigMap: bete
 
