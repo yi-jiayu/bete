@@ -257,6 +257,53 @@ func TestBete_handleETACommand_withArgs(t *testing.T) {
 	b.HandleUpdate(context.Background(), update)
 }
 
+func TestBete_handleBusStopCodeCommand(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	stop := buildBusStop()
+	command := fmt.Sprintf("/%s", stop.ID)
+	query := Query{Stop: stop.ID}
+	arrivals := buildDataMallBusArrival()
+	userID := randomID()
+	messageID := randomID()
+	chatID := randomInt64ID()
+	text := must(formatArrivalsSummary(ArrivalInfo{
+		Stop:     stop,
+		Time:     refTime,
+		Services: arrivals.Services,
+		Filter:   query.Filter,
+	})).(string)
+	req := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(stop.ID, query.Filter, FormatSummary),
+	}
+
+	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
+	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			ID:   messageID,
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID, Type: "private"},
+			Text: command + " " + query.Canonical(),
+			Entities: []ted.MessageEntity{
+				{
+					Type:   "bot_command",
+					Offset: 0,
+					Length: len(command),
+				},
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
+
 func TestBete_handleETACommand_withInvalidArgs(t *testing.T) {
 	tests := []struct {
 		name         string

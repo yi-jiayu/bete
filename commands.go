@@ -3,6 +3,7 @@ package bete
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"github.com/yi-jiayu/ted"
 )
@@ -31,8 +32,13 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args strin
 	case commandTour:
 		b.handleTourCommand(ctx, m)
 	default:
-		captureMessage(ctx, "invalid command")
-		b.handleInvalidCommand(ctx, m)
+		if isBusStopCodeCommand(cmd) {
+			b.handleBusStopCodeCommand(ctx, m, cmd)
+			cmd = "code"
+		} else {
+			captureMessage(ctx, "invalid command")
+			b.handleInvalidCommand(ctx, m)
+		}
 		return
 	}
 	commandsTotal.WithLabelValues(cmd).Inc()
@@ -70,6 +76,29 @@ func (b Bete) handleETACommandWithoutArgs(ctx context.Context, m *ted.Message) {
 		ReplyMarkup: ted.ForceReply{},
 	}
 	b.send(ctx, reply)
+}
+
+func isBusStopCodeCommand(command string) bool {
+	match, err := regexp.MatchString(`\d{5}`, command)
+	if err != nil {
+		return false
+	}
+	return match
+}
+
+func (b Bete) handleBusStopCodeCommand(ctx context.Context, m *ted.Message, stopID string) {
+	text, err := b.etaMessageText(ctx, stopID, nil, FormatSummary)
+	if err != nil {
+		captureError(ctx, err)
+		return
+	}
+	req := ted.SendMessageRequest{
+		ChatID:      m.Chat.ID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(stopID, nil, FormatSummary),
+	}
+	b.send(ctx, req)
 }
 
 func (b Bete) handleAboutCommand(ctx context.Context, m *ted.Message) {
