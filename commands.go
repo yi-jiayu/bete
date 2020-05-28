@@ -32,14 +32,13 @@ func (b Bete) HandleCommand(ctx context.Context, m *ted.Message, cmd, args strin
 	case commandTour:
 		b.handleTourCommand(ctx, m)
 	default:
-		if isBusStopCodeCommand(cmd) {
-			b.handleBusStopCodeCommand(ctx, m, cmd)
-			cmd = "code"
-		} else {
+		if !isBusStopCodeCommand(cmd) {
 			captureMessage(ctx, "invalid command")
 			b.handleInvalidCommand(ctx, m)
+			return
 		}
-		return
+		b.handleBusStopCodeCommand(ctx, m, cmd)
+		cmd = "code"
 	}
 	commandsTotal.WithLabelValues(cmd).Inc()
 }
