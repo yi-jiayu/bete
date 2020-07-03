@@ -173,7 +173,7 @@ func TestSQLBusStopRepository_Search(t *testing.T) {
 			},
 		},
 		{
-			name:  "query without spaces",
+			name:  "query with spaces",
 			query: "lavender stn",
 			limit: 50,
 			expected: []BusStop{
