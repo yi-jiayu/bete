@@ -173,6 +173,19 @@ func TestSQLBusStopRepository_Search(t *testing.T) {
 			},
 		},
 		{
+			name:  "query without spaces",
+			query: "lavender stn",
+			limit: 50,
+			expected: []BusStop{
+				{
+					ID:          "01319",
+					Description: "Lavender Stn Exit A/ICA",
+					RoadName:    "Kallang Rd",
+					Location:    Location{Latitude: 1.307574, Longitude: 103.86326},
+				},
+			},
+		},
+		{
 			name:  "returns all matches with limit",
 			query: "lavender",
 			limit: 1,

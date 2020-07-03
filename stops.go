@@ -100,8 +100,8 @@ func (r SQLBusStopRepository) Search(query string, limit int) ([]BusStop, error)
 		rows, err = r.DB.Query(
 			`select id, road, description, location::text
 from stops
-where tokens @@ to_tsquery($1)
-order by ts_rank(tokens, to_tsquery($1)) desc
+where tokens @@ plainto_tsquery($1)
+order by ts_rank(tokens, plainto_tsquery($1)) desc
 limit $2;`,
 			query,
 			limit,
