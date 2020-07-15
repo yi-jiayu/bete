@@ -150,7 +150,7 @@ Upp Changi Rd East
 | 5    |  -1 |  10 |  36 |
 | 24   |   1 |   3 |   6 |
 </pre>
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>` + "\n\n" + tips(refTime),
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
 			name: "escapes dangerous HTML",
@@ -169,7 +169,7 @@ Upp Changi Rd East
 | 5    |  -1 |  10 |  36 |
 </pre>
 Filtered by services: 2, 5, &lt;strong&gt;24&lt;/strong&gt;
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>` + "\n\n" + tips(refTime),
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
 			name: "show only bus stop id when details not available",
@@ -187,7 +187,7 @@ Filtered by services: 2, 5, &lt;strong&gt;24&lt;/strong&gt;
 | 5    |  -1 |  10 |  36 |
 | 24   |   1 |   3 |   6 |
 </pre>
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>` + "\n\n" + tips(refTime),
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
 			name: "filters services and shows filtered services when filter provided",
@@ -209,7 +209,7 @@ Upp Changi Rd East
 | 24   |   1 |   3 |   6 |
 </pre>
 Filtered by services: 2, 24
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>` + "\n\n" + tips(refTime),
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 	}
 	for _, c := range cases {
@@ -250,7 +250,7 @@ Svc   Eta  Sea  Typ  Fea
 5      10  SDA   DD     
 5      36  LSD   BD  WAB
 </pre>
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>` + "\n\n" + tips(refTime),
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
 			name: "escapes dangerous HTML",
@@ -271,7 +271,7 @@ Svc   Eta  Sea  Typ  Fea
 5      36  LSD   BD  WAB
 </pre>
 Filtered by services: 2, 5, &lt;strong&gt;24&lt;/strong&gt;
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>` + "\n\n" + tips(refTime),
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
 			name: "show only bus stop id when details not available",
@@ -293,7 +293,7 @@ Svc   Eta  Sea  Typ  Fea
 5      10  SDA   DD     
 5      36  LSD   BD  WAB
 </pre>
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>` + "\n\n" + tips(refTime),
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 		{
 			name: "filters services and shows filtered services when filter provided",
@@ -317,7 +317,7 @@ Svc   Eta  Sea  Typ  Fea
 24      6  LSD   BD     
 </pre>
 Filtered by services: 2, 24
-<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>` + "\n\n" + tips(refTime),
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
 	}
 	for _, c := range cases {

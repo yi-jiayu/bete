@@ -15,9 +15,7 @@ const (
 {{- end }}
 </pre>
 {{ with .Filter }}Filtered by services: {{ join . ", " }}
-{{ end }}<em>Last updated on {{ .Time | inSGT }}</em>
-
-{{ with tips .Time }}{{ . }}{{ end }}`
+{{ end }}<em>Last updated on {{ .Time | inSGT }}</em>`
 	templateArrivalDetails = `{{ if .Stop.Description }}<strong>{{ .Stop.Description }} ({{ .Stop.ID }})</strong>
 {{ else }}<strong>{{ .Stop.ID }}</strong>
 {{ end }}{{ with .Stop.RoadName }}{{ . }}
@@ -33,7 +31,5 @@ Svc   Eta  Sea  Typ  Fea
 {{ end }}
 </pre>
 {{ with .Filter }}Filtered by services: {{ join . ", " }}
-{{ end }}<em>Last updated on {{ .Time | inSGT }}</em>
-
-{{ with tips .Time }}{{ . }}{{ end }}`
+{{ end }}<em>Last updated on {{ .Time | inSGT }}</em>`
 )
