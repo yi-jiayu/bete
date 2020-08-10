@@ -23,8 +23,3 @@ blocks:
           value: 'postgres://postgres@localhost/bete_test?sslmode=disable'
       secrets:
         - name: Bete Codecov token
-promotions:
-  - name: Proceed to build
-    pipeline_file: build.yml
-    auto_promote:
-      when: branch = 'master' AND result = 'passed'
