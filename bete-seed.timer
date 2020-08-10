@@ -1,0 +1,8 @@
+[Unit]
+Description=Run bete-seed daily at 1 am SGT
+
+[Timer]
+OnCalendar=*-*-* 17:00:00
+
+[Install]
+WantedBy=timers.target

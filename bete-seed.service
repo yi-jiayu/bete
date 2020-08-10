@@ -1,0 +1,6 @@
+[Unit]
+Description=Seed bus stops in bete database
+
+[Service]
+ExecStart=/var/bete/bin/seed
+EnvironmentFile=/etc/bete/environment

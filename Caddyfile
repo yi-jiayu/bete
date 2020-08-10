@@ -1,0 +1,8 @@
+{
+	email YOUR_EMAIL
+	admin off
+}
+
+BETE_HOST
+
+reverse_proxy /telegram/updates localhost:8080

@@ -1,0 +1,14 @@
+[Unit]
+Description=Bete server
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+User=bete
+ExecStart=/var/bete/bin/bete
+WorkingDirectory=/var/bete
+EnvironmentFile=/etc/bete/environment
+
+[Install]
+WantedBy=multi-user.target
