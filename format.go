@@ -150,6 +150,7 @@ type ArrivalInfo struct {
 	Time     time.Time
 	Services []datamall.Service
 	Filter   []string
+	ErrMsg   string
 }
 
 func formatArrivalsSummary(arrivals ArrivalInfo) (string, error) {

@@ -211,6 +211,26 @@ Upp Changi Rd East
 Filtered by services: 2, 24
 <em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
 		},
+		{
+			name: "with error message",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID:          "96049",
+					Description: "UPP CHANGI STN/SUTD",
+					RoadName:    "Upp Changi Rd East",
+				},
+				Time:   refTime,
+				Filter: []string{"2", "24"},
+				ErrMsg: "Error getting ETAs from LTA DataMall",
+			},
+			expected: `<strong>UPP CHANGI STN/SUTD (96049)</strong>
+Upp Changi Rd East
+<pre>
+Error getting ETAs from LTA DataMall
+</pre>
+Filtered by services: 2, 24
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -315,6 +335,26 @@ Svc   Eta  Sea  Typ  Fea
 24      1  SEA   SD     
 24      3  SDA   DD  WAB
 24      6  LSD   BD     
+</pre>
+Filtered by services: 2, 24
+<em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,
+		},
+		{
+			name: "displays error when present",
+			arrivals: ArrivalInfo{
+				Stop: BusStop{
+					ID:          "96049",
+					Description: "UPP CHANGI STN/SUTD",
+					RoadName:    "Upp Changi Rd East",
+				},
+				Time:   refTime,
+				Filter: []string{"2", "24"},
+				ErrMsg: "Error getting ETAs from LTA DataMall",
+			},
+			expected: `<strong>UPP CHANGI STN/SUTD (96049)</strong>
+Upp Changi Rd East
+<pre>
+Error getting ETAs from LTA DataMall
 </pre>
 Filtered by services: 2, 24
 <em>Last updated on Sun, 15 Mar 20 11:53 SGT</em>`,

@@ -2,6 +2,7 @@ package bete
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -89,9 +90,14 @@ func (b Bete) send(ctx context.Context, req ted.Request) {
 
 func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string, format Format) (string, error) {
 	t := b.Clock.Now()
+	var errMsg string
 	arrivals, err := b.DataMall.GetBusArrival(stopID, "")
 	if err != nil {
-		return "", errors.Wrap(err, "error getting bus arrivals")
+		captureError(ctx, err)
+		errMsg = "Error getting bus arrivals from LTA DataMall"
+		if datamallErr, ok := err.(*datamall.Error); ok {
+			errMsg += fmt.Sprintf(" (HTTP status %d)", datamallErr.StatusCode)
+		}
 	}
 	var stop BusStop
 	stop, err = b.BusStops.Find(stopID)
@@ -106,6 +112,7 @@ func (b Bete) etaMessageText(ctx context.Context, stopID string, filter []string
 		Time:     t,
 		Services: arrivals.Services,
 		Filter:   filter,
+		ErrMsg:   errMsg,
 	}
 	return FormatArrivals(info, format)
 }
