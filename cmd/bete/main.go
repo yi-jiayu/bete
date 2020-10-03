@@ -114,7 +114,7 @@ func main() {
 	}
 	streetViewStaticApiKey := os.Getenv("STREET_VIEW_STATIC_API_KEY")
 	if streetViewStaticApiKey == "" {
-		log.Fatal("STREET_VIEW_STATIC_API_KEY environment variable not set")
+		log.Println("warning: STREET_VIEW_STATIC_API_KEY environment variable not set")
 	}
 	b := bete.Bete{
 		Version:                commit,
