@@ -8,6 +8,10 @@ import (
 )
 
 func (b Bete) HandleMessage(ctx context.Context, m *ted.Message) {
+	if m.Location != nil {
+		b.HandleLocation(ctx, m)
+		return
+	}
 	if m.Text == "" {
 		// Ignore non-text messages.
 		return
@@ -155,4 +159,64 @@ func (b Bete) addFavouriteFinish(ctx context.Context, m *ted.Message, query stri
 		ReplyMarkup: showFavouritesReplyMarkup(favourites),
 	}
 	b.send(ctx, req)
+}
+
+func (b Bete) HandleLocation(ctx context.Context, m *ted.Message) {
+	chatID := m.Chat.ID
+	location := m.Location
+
+	nearby, err := b.BusStops.Nearby(location.Latitude, location.Longitude, float32(1), 5)
+
+	if err != nil {
+		captureError(ctx, err)
+		return
+	}
+
+	b.send(ctx, ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   stringLocationNearby,
+	})
+
+	for _, stop := range nearby {
+		req := ted.SendVenueRequest{
+			ChatID:    chatID,
+			Latitude:  stop.BusStop.Location.Latitude,
+			Longitude: stop.BusStop.Location.Longitude,
+			Title:     stop.BusStop.Description,
+			Address:   fmt.Sprintf("%.0f m away", stop.Distance),
+		}
+		b.send(ctx, req)
+	}
+
+	// 		for _, bs := range nearby {
+	// 			distance := bs.Distance
+
+	// 			req := ted.SendMessageRequest{
+	// 				ChatID:      chatID,
+	// 				Text:        stringShowFavouritesShowing,
+	// 				ReplyMarkup: ted.InlineKeyboardMarkup{
+	// 					InlineKeyboard: [][]ted.InlineKeyboardButton{
+	// 						{
+	// 							{
+	// 								Text: "Get etas",
+	// 								CallbackData: CallbackData{
+	// 									Type: "new_eta",
+	// 								}.Encode(),
+	// 							},
+	// 						},
+	// 					},
+	// 				},
+	// 			}
+
+	// 			b.send(ctx, req)
+	// 			// b.send(ctx, ted.AnswerCallbackQueryRequest{
+	// 			// 	CallbackQueryID: q.ID,
+	// 			// })
+	// 		}
+	// 	}
+
+	// 	b.send(ctx, ted.SendMessageRequest{
+	// 		ChatID: chatID,
+	// 		Text:   "Oops, I couldn't find any bus stops within 500 m of your location.",
+	// 	})
 }

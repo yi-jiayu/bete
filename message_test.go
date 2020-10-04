@@ -443,3 +443,68 @@ func Test_getFavouriteQuery(t *testing.T) {
 	assert.Equal(t, "96049 5 24", getFavouriteQuery(text))
 	assert.Equal(t, "", getFavouriteQuery("invalid"))
 }
+
+func TestBete_HandleReply_locationQuery(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	stops := []NearbyBusStop{
+		{
+			BusStop: BusStop{
+				ID:          "01339",
+				Description: "Bef Crawford Bridge",
+				RoadName:    "Crawford St",
+				Location:    Location{Latitude: 1.307746, Longitude: 103.864263},
+			},
+			Distance: 0.11356564947243729,
+		},
+		{
+			BusStop: BusStop{
+				ID:          "07371",
+				Description: "Aft Kallang Rd",
+				RoadName:    "Lavender St",
+				Location:    Location{Latitude: 1.309508, Longitude: 103.863501},
+			},
+			Distance: 0.21676780485189698,
+		},
+	}
+	var lat, lon float32 = 1.307574, 103.863256
+
+	// sendLocation???
+	req := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   stringLocationNearby,
+	}
+
+	venues := make([]ted.Request, len(stops))
+
+	for i := range stops {
+		venues[i] = ted.SendVenueRequest{
+			ChatID:    chatID,
+			Latitude:  stops[i].BusStop.Location.Latitude,
+			Longitude: stops[i].BusStop.Location.Longitude,
+			Title:     stops[i].BusStop.Description,
+			Address:   fmt.Sprintf("%.0f m away", stops[i].Distance),
+		}
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(venues[0]).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(venues[1]).Return(ted.Response{}, nil)
+
+	b.BusStops.(*MockBusStopRepository).EXPECT().Nearby(lat, lon, float32(1), 5).Return(stops, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			Location: &ted.Location{
+				Latitude:  lat,
+				Longitude: lon,
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
