@@ -472,7 +472,6 @@ func TestBete_HandleReply_locationQuery(t *testing.T) {
 	}
 	var lat, lon float32 = 1.307574, 103.863256
 
-	// sendLocation???
 	req := ted.SendMessageRequest{
 		ChatID: chatID,
 		Text:   stringLocationNearby,
@@ -486,7 +485,20 @@ func TestBete_HandleReply_locationQuery(t *testing.T) {
 			Latitude:  stops[i].BusStop.Location.Latitude,
 			Longitude: stops[i].BusStop.Location.Longitude,
 			Title:     stops[i].BusStop.Description,
-			Address:   fmt.Sprintf("%.0f m away", stops[i].Distance),
+			Address:   fmt.Sprintf("%.0f m away", stops[i].Distance*1000),
+			ReplyMarkup: ted.InlineKeyboardMarkup{
+				InlineKeyboard: [][]ted.InlineKeyboardButton{
+					{
+						{
+							Text: "Get ETAs",
+							CallbackData: CallbackData{
+								Type:   callbackNearbyETA,
+								StopID: stops[i].BusStop.ID,
+							}.Encode(),
+						},
+					},
+				},
+			},
 		}
 	}
 

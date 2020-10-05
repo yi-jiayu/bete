@@ -183,37 +183,23 @@ func (b Bete) HandleLocation(ctx context.Context, m *ted.Message) {
 			Latitude:  stop.BusStop.Location.Latitude,
 			Longitude: stop.BusStop.Location.Longitude,
 			Title:     stop.BusStop.Description,
-			Address:   fmt.Sprintf("%.0f m away", stop.Distance),
+			Address:   fmt.Sprintf("%.0f m away", stop.Distance*1000),
+			ReplyMarkup: ted.InlineKeyboardMarkup{
+				InlineKeyboard: [][]ted.InlineKeyboardButton{
+					{
+						{
+							Text: "Get ETAs",
+							CallbackData: CallbackData{
+								Type:   callbackNearbyETA,
+								StopID: stop.BusStop.ID,
+							}.Encode(),
+						},
+					},
+				},
+			},
 		}
 		b.send(ctx, req)
 	}
-
-	// 		for _, bs := range nearby {
-	// 			distance := bs.Distance
-
-	// 			req := ted.SendMessageRequest{
-	// 				ChatID:      chatID,
-	// 				Text:        stringShowFavouritesShowing,
-	// 				ReplyMarkup: ted.InlineKeyboardMarkup{
-	// 					InlineKeyboard: [][]ted.InlineKeyboardButton{
-	// 						{
-	// 							{
-	// 								Text: "Get etas",
-	// 								CallbackData: CallbackData{
-	// 									Type: "new_eta",
-	// 								}.Encode(),
-	// 							},
-	// 						},
-	// 					},
-	// 				},
-	// 			}
-
-	// 			b.send(ctx, req)
-	// 			// b.send(ctx, ted.AnswerCallbackQueryRequest{
-	// 			// 	CallbackQueryID: q.ID,
-	// 			// })
-	// 		}
-	// 	}
 
 	// 	b.send(ctx, ted.SendMessageRequest{
 	// 		ChatID: chatID,
