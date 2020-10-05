@@ -520,3 +520,33 @@ func TestBete_HandleReply_locationQuery(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_HandleReply_noLocationFound(t *testing.T) {
+	b, finish := newMockBete(t)
+	defer finish()
+
+	userID := randomID()
+	chatID := randomInt64ID()
+	stops := []NearbyBusStop{}
+	var lat, lon float32 = 1.307574, 103.863256
+
+	req := ted.SendMessageRequest{
+		ChatID: chatID,
+		Text:   stringNoLocationsNearby,
+	}
+
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Nearby(lat, lon, float32(1), 5).Return(stops, nil)
+
+	update := ted.Update{
+		Message: &ted.Message{
+			From: &ted.User{ID: userID},
+			Chat: ted.Chat{ID: chatID},
+			Location: &ted.Location{
+				Latitude:  lat,
+				Longitude: lon,
+			},
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}

@@ -172,37 +172,41 @@ func (b Bete) HandleLocation(ctx context.Context, m *ted.Message) {
 		return
 	}
 
-	b.send(ctx, ted.SendMessageRequest{
-		ChatID: chatID,
-		Text:   stringLocationNearby,
-	})
+	if len(nearby) > 0 {
 
-	for _, stop := range nearby {
-		req := ted.SendVenueRequest{
-			ChatID:    chatID,
-			Latitude:  stop.BusStop.Location.Latitude,
-			Longitude: stop.BusStop.Location.Longitude,
-			Title:     stop.BusStop.Description,
-			Address:   fmt.Sprintf("%.0f m away", stop.Distance*1000),
-			ReplyMarkup: ted.InlineKeyboardMarkup{
-				InlineKeyboard: [][]ted.InlineKeyboardButton{
-					{
+		b.send(ctx, ted.SendMessageRequest{
+			ChatID: chatID,
+			Text:   stringLocationNearby,
+		})
+
+		for _, stop := range nearby {
+			req := ted.SendVenueRequest{
+				ChatID:    chatID,
+				Latitude:  stop.BusStop.Location.Latitude,
+				Longitude: stop.BusStop.Location.Longitude,
+				Title:     stop.BusStop.Description,
+				Address:   fmt.Sprintf("%.0f m away", stop.Distance*1000),
+				ReplyMarkup: ted.InlineKeyboardMarkup{
+					InlineKeyboard: [][]ted.InlineKeyboardButton{
 						{
-							Text: "Get ETAs",
-							CallbackData: CallbackData{
-								Type:   callbackNearbyETA,
-								StopID: stop.BusStop.ID,
-							}.Encode(),
+							{
+								Text: "Get ETAs",
+								CallbackData: CallbackData{
+									Type:   callbackNearbyETA,
+									StopID: stop.BusStop.ID,
+								}.Encode(),
+							},
 						},
 					},
 				},
-			},
+			}
+			b.send(ctx, req)
 		}
-		b.send(ctx, req)
+	} else {
+		b.send(ctx, ted.SendMessageRequest{
+			ChatID: chatID,
+			Text:   stringNoLocationsNearby,
+		})
 	}
 
-	// 	b.send(ctx, ted.SendMessageRequest{
-	// 		ChatID: chatID,
-	// 		Text:   "Oops, I couldn't find any bus stops within 500 m of your location.",
-	// 	})
 }
