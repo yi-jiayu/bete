@@ -44,7 +44,7 @@ I hope that you will find Bus Eta Bot useful! For questions or feedback, feel fr
 
 The currently deployed version of Bus Eta Bot is: <a href="https://github.com/yi-jiayu/bete/tree/%s">%s</a>`
 	stringLocationNearby    = "Here are some bus stops near your location:"
-	stringNoLocationsNearby = "Oops, I couldn't find any bus stops within 500 m of your location."
+	stringNoLocationsNearby = "Oops, I couldn't find any bus stops within 1 km of your location."
 )
 
 var (
