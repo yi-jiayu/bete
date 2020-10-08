@@ -921,7 +921,6 @@ func TestBete_nearbyETAsCallback(t *testing.T) {
 	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
 	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
 	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
-
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
 

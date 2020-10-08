@@ -471,14 +471,11 @@ func TestBete_HandleReply_locationQuery(t *testing.T) {
 		},
 	}
 	var lat, lon float32 = 1.307574, 103.863256
-
 	req := ted.SendMessageRequest{
 		ChatID: chatID,
 		Text:   stringLocationNearby,
 	}
-
 	venues := make([]ted.Request, len(stops))
-
 	for i := range stops {
 		venues[i] = ted.SendVenueRequest{
 			ChatID:    chatID,
@@ -505,7 +502,6 @@ func TestBete_HandleReply_locationQuery(t *testing.T) {
 	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(venues[0]).Return(ted.Response{}, nil)
 	b.Telegram.(*MockTelegram).EXPECT().Do(venues[1]).Return(ted.Response{}, nil)
-
 	b.BusStops.(*MockBusStopRepository).EXPECT().Nearby(lat, lon, float32(1), 5).Return(stops, nil)
 
 	update := ted.Update{
@@ -527,9 +523,8 @@ func TestBete_HandleReply_noLocationFound(t *testing.T) {
 
 	userID := randomID()
 	chatID := randomInt64ID()
-	stops := []NearbyBusStop{}
+	var stops []NearbyBusStop
 	var lat, lon float32 = 1.307574, 103.863256
-
 	req := ted.SendMessageRequest{
 		ChatID: chatID,
 		Text:   stringNoLocationsNearby,
