@@ -11,6 +11,6 @@ require (
 	github.com/prometheus/client_golang v1.5.0
 	github.com/stretchr/testify v1.5.1
 	github.com/yi-jiayu/datamall/v3 v3.1.0
-	github.com/yi-jiayu/ted v0.0.0-20201002164415-510e239bdc7e
+	github.com/yi-jiayu/ted v0.0.0-20201006030430-0f1689986aa6
 	gopkg.in/yaml.v2 v2.2.8
 )
