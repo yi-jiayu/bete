@@ -21,6 +21,7 @@ const (
 	callbackHideFavourites   = "hide_favourites"
 	callbackTour             = "tour"
 	callbackAbout            = "about"
+	callbackNearbyETA        = "nearby_eta"
 )
 
 func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
@@ -53,6 +54,8 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 		b.tourCallback(ctx, q, data)
 	case callbackAbout:
 		b.aboutCallback(ctx, q)
+	case callbackNearbyETA:
+		b.resendETAs(ctx, q, data)
 	default:
 		captureMessage(ctx, "unrecogised callback")
 		return

@@ -891,3 +891,50 @@ func TestBete_aboutCallback(t *testing.T) {
 	}
 	b.HandleUpdate(context.Background(), update)
 }
+
+func TestBete_nearbyETAsCallback(t *testing.T) {
+	callbackQueryID := randomStringID()
+	chatID := randomInt64ID()
+	arrivals := buildDataMallBusArrival()
+	stop := buildBusStop()
+
+	b, finish := newMockBete(t)
+	defer finish()
+
+	text := must(formatArrivalsSummary(ArrivalInfo{
+		Stop:     stop,
+		Time:     refTime,
+		Services: arrivals.Services,
+		Filter:   nil,
+	})).(string)
+	req := ted.SendMessageRequest{
+		ChatID:      chatID,
+		Text:        text,
+		ParseMode:   "HTML",
+		ReplyMarkup: etaMessageReplyMarkup(stop.ID, nil, FormatSummary),
+	}
+	answerCallback := ted.AnswerCallbackQueryRequest{
+		CallbackQueryID: callbackQueryID,
+		Text:            stringResendETAsSent,
+	}
+
+	b.Clock.(*MockClock).EXPECT().Now().Return(refTime)
+	b.BusStops.(*MockBusStopRepository).EXPECT().Find(stop.ID).Return(stop, nil)
+	b.DataMall.(*MockDataMall).EXPECT().GetBusArrival(stop.ID, "").Return(arrivals, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+	b.Telegram.(*MockTelegram).EXPECT().Do(answerCallback).Return(ted.Response{}, nil)
+
+	update := ted.Update{
+		CallbackQuery: &ted.CallbackQuery{
+			ID: callbackQueryID,
+			Message: &ted.Message{
+				Chat: ted.Chat{ID: chatID},
+			},
+			Data: CallbackData{
+				Type:   callbackNearbyETA,
+				StopID: stop.ID,
+			}.Encode(),
+		},
+	}
+	b.HandleUpdate(context.Background(), update)
+}
