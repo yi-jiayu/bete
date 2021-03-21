@@ -17,7 +17,7 @@ func TestBete_HandleTextMessage(t *testing.T) {
 	stop := buildBusStop()
 	filter := []string{"5", "24"}
 	arrivals := buildDataMallBusArrival()
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	text := must(formatArrivalsSummary(ArrivalInfo{
 		Stop:     stop,
@@ -53,6 +53,7 @@ func TestBete_HandleTextMessage_InvalidQuery(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
+	userID := randomInt64ID()
 	text := "Hello, World"
 	chatID := randomInt64ID()
 
@@ -60,7 +61,7 @@ func TestBete_HandleTextMessage_InvalidQuery(t *testing.T) {
 
 	update := ted.Update{
 		Message: &ted.Message{
-			From: &ted.User{ID: randomID()},
+			From: &ted.User{ID: userID},
 			Chat: ted.Chat{ID: chatID},
 			Text: text,
 		},
@@ -73,6 +74,7 @@ func TestBete_HandleTextMessage_LongQuery(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
+	userID := randomInt64ID()
 	query := "81111 155 134 135 135A 137 154 155 24 28 43 43e 70 70A 70M 76"
 	chatID := randomInt64ID()
 	reply := ted.SendMessageRequest{
@@ -85,7 +87,7 @@ func TestBete_HandleTextMessage_LongQuery(t *testing.T) {
 
 	update := ted.Update{
 		Message: &ted.Message{
-			From: &ted.User{ID: randomID()},
+			From: &ted.User{ID: userID},
 			Chat: ted.Chat{ID: chatID},
 			Text: query,
 		},
@@ -100,7 +102,7 @@ func TestBete_HandleTextMessage_Favourite(t *testing.T) {
 	stop := buildBusStop()
 	filter := []string{"5", "24"}
 	arrivals := buildDataMallBusArrival()
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageText := "SUTD"
 	replyText := must(formatArrivalsSummary(ArrivalInfo{
@@ -136,7 +138,7 @@ func TestBete_addFavouriteSuggestName(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	stop := buildBusStop()
 	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
@@ -166,7 +168,7 @@ func TestBete_addFavouriteSuggestName_BusStopNotFound(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	stop := buildBusStop()
 	query := Query{Stop: "96049", Filter: []string{"5", "24"}}
@@ -196,7 +198,7 @@ func TestBete_addFavouriteFinish(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	query := "96049 5 24"
 	favourites := []string{"Home", "SUTD"}
@@ -228,7 +230,7 @@ func TestBete_addFavouriteFinish_PutError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	query := "96049 5 24"
 	name := "SUTD"
@@ -257,7 +259,7 @@ func TestBete_addFavouriteFinish_ListError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	query := "96049 5 24"
 	name := "SUTD"
@@ -287,7 +289,7 @@ func TestBete_HandleReply_AddFavourite_HandleInvalidQuery(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageText := `Invalid Query: !@#$%^&*"`
 	reportError := ted.SendMessageRequest{
@@ -323,7 +325,7 @@ func TestBete_HandleReply_etaCommandArgs(t *testing.T) {
 	stop := buildBusStop()
 	query := Query{Stop: stop.ID, Filter: []string{"5", "24"}}
 	arrivals := buildDataMallBusArrival()
-	userID := randomID()
+	userID := randomInt64ID()
 	messageID := randomID()
 	chatID := randomInt64ID()
 	text := must(formatArrivalsSummary(ArrivalInfo{
@@ -386,7 +388,7 @@ func TestBete_HandleReply_etaCommandArgsInvalid(t *testing.T) {
 			b, finish := newMockBete(t)
 			defer finish()
 
-			userID := randomID()
+			userID := randomInt64ID()
 			messageID := randomID()
 			chatID := randomInt64ID()
 			req := ted.SendMessageRequest{
@@ -416,7 +418,7 @@ func TestBete_HandleReply_noMatch(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	req := ted.SendMessageRequest{
 		ChatID: chatID,
@@ -448,7 +450,7 @@ func TestBete_HandleReply_locationQuery(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	stops := []NearbyBusStop{
 		{
@@ -521,7 +523,7 @@ func TestBete_HandleReply_noLocationFound(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	var stops []NearbyBusStop
 	var lat, lon float32 = 1.307574, 103.863256

@@ -1,6 +1,5 @@
 cmd/bete/bete
-bin/mockgen
-bin/migrate
+bin/
 
 # Created by .ignore support plugin (hsz.mobi)
 ### JetBrains template

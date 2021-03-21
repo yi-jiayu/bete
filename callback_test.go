@@ -248,7 +248,7 @@ func TestBete_saveFavouriteCallback_WithName(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -296,7 +296,7 @@ func TestBete_saveFavouriteCallback_WithName_PutError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -332,7 +332,7 @@ func TestBete_saveFavouriteCallback_WithName_ListError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -369,7 +369,7 @@ func TestBete_saveFavouriteCallback_WithoutName(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -412,7 +412,7 @@ func TestBete_deleteFavouritesCallback_ListError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -445,7 +445,7 @@ func TestBete_deleteFavouritesCallback_NoFavourites(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -483,7 +483,7 @@ func TestBete_deleteFavouritesCallback(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -522,7 +522,7 @@ func TestBete_deleteFavouriteCallback(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -568,7 +568,7 @@ func TestBete_deleteFavouriteCallback_DeleteError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -603,7 +603,7 @@ func TestBete_deleteFavouriteCallback_ListError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -639,7 +639,7 @@ func TestBete_showFavouritesCallback_ListError(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -672,7 +672,7 @@ func TestBete_showFavouritesCallback_NoFavourites(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -719,7 +719,7 @@ func TestBete_showFavouritesCallback(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -757,7 +757,7 @@ func TestBete_hideFavouritesCallback(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	callbackQueryID := randomStringID()
@@ -789,7 +789,7 @@ func TestBete_favouritesCallback(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	callbackQueryID := randomStringID()
 	messageID := randomID()
 	chatID := randomInt64ID()

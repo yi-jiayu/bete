@@ -16,7 +16,7 @@ func TestBete_handleAboutCommand(t *testing.T) {
 			defer finish()
 
 			version := randomStringID()
-			userID := randomID()
+			userID := randomInt64ID()
 			chatID := randomInt64ID()
 			req := ted.SendMessageRequest{
 				ChatID:    chatID,
@@ -54,7 +54,7 @@ func TestBete_handleStartCommand(t *testing.T) {
 	firstName := "Bete"
 	command := "/start"
 	version := randomStringID()
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	req := ted.SendMessageRequest{
 		ChatID: chatID,
@@ -106,7 +106,7 @@ func TestBete_handleTourCommand(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	section := tour[tourSectionStart]
 	req := ted.SendMessageRequest{
@@ -150,7 +150,7 @@ func TestBete_handleFavouritesCommand(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	req := ted.SendMessageRequest{
 		ChatID:      chatID,
@@ -181,7 +181,7 @@ func TestBete_handleFavouritesCommand_nonPrivateChat(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	messageID := randomID()
 	req := ted.SendMessageRequest{
@@ -218,7 +218,7 @@ func TestBete_handleETACommand_withArgs(t *testing.T) {
 	stop := buildBusStop()
 	query := Query{Stop: stop.ID, Filter: []string{"5", "24"}}
 	arrivals := buildDataMallBusArrival()
-	userID := randomID()
+	userID := randomInt64ID()
 	messageID := randomID()
 	chatID := randomInt64ID()
 	text := must(formatArrivalsSummary(ArrivalInfo{
@@ -265,7 +265,7 @@ func TestBete_handleBusStopCodeCommand(t *testing.T) {
 	command := fmt.Sprintf("/%s", stop.ID)
 	query := Query{Stop: stop.ID}
 	arrivals := buildDataMallBusArrival()
-	userID := randomID()
+	userID := randomInt64ID()
 	messageID := randomID()
 	chatID := randomInt64ID()
 	text := must(formatArrivalsSummary(ArrivalInfo{
@@ -332,7 +332,7 @@ func TestBete_handleETACommand_withInvalidArgs(t *testing.T) {
 			defer finish()
 
 			command := "/eta"
-			userID := randomID()
+			userID := randomInt64ID()
 			messageID := randomID()
 			chatID := randomInt64ID()
 			req := ted.SendMessageRequest{
@@ -367,7 +367,7 @@ func TestBete_handleETACommand_withoutArgs(t *testing.T) {
 	defer finish()
 
 	command := "/eta"
-	userID := randomID()
+	userID := randomInt64ID()
 	messageID := randomID()
 	chatID := randomInt64ID()
 	req := ted.SendMessageRequest{
@@ -402,7 +402,7 @@ func TestBete_handleInvalidCommand(t *testing.T) {
 	defer finish()
 
 	command := "/invalid"
-	userID := randomID()
+	userID := randomInt64ID()
 	chatID := randomInt64ID()
 	req := ted.SendMessageRequest{
 		ChatID: chatID,

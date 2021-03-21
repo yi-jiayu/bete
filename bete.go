@@ -42,11 +42,11 @@ type Bete struct {
 	Telegram   Telegram
 }
 
-func sentrySetUser(ctx context.Context, id int) {
+func sentrySetUser(ctx context.Context, id int64) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
 			scope.SetUser(sentry.User{
-				ID: strconv.Itoa(id),
+				ID: strconv.FormatInt(id, 10),
 			})
 		})
 	}

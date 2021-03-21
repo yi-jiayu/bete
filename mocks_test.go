@@ -5,37 +5,38 @@
 package bete
 
 import (
-	gomock "github.com/golang/mock/gomock"
-	datamall "github.com/yi-jiayu/datamall/v3"
-	ted "github.com/yi-jiayu/ted"
 	reflect "reflect"
 	time "time"
+
+	gomock "github.com/golang/mock/gomock"
+	v3 "github.com/yi-jiayu/datamall/v3"
+	ted "github.com/yi-jiayu/ted"
 )
 
-// MockClock is a mock of Clock interface
+// MockClock is a mock of Clock interface.
 type MockClock struct {
 	ctrl     *gomock.Controller
 	recorder *MockClockMockRecorder
 }
 
-// MockClockMockRecorder is the mock recorder for MockClock
+// MockClockMockRecorder is the mock recorder for MockClock.
 type MockClockMockRecorder struct {
 	mock *MockClock
 }
 
-// NewMockClock creates a new mock instance
+// NewMockClock creates a new mock instance.
 func NewMockClock(ctrl *gomock.Controller) *MockClock {
 	mock := &MockClock{ctrl: ctrl}
 	mock.recorder = &MockClockMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockClock) EXPECT() *MockClockMockRecorder {
 	return m.recorder
 }
 
-// Now mocks base method
+// Now mocks base method.
 func (m *MockClock) Now() time.Time {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Now")
@@ -43,74 +44,74 @@ func (m *MockClock) Now() time.Time {
 	return ret0
 }
 
-// Now indicates an expected call of Now
+// Now indicates an expected call of Now.
 func (mr *MockClockMockRecorder) Now() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Now", reflect.TypeOf((*MockClock)(nil).Now))
 }
 
-// MockDataMall is a mock of DataMall interface
+// MockDataMall is a mock of DataMall interface.
 type MockDataMall struct {
 	ctrl     *gomock.Controller
 	recorder *MockDataMallMockRecorder
 }
 
-// MockDataMallMockRecorder is the mock recorder for MockDataMall
+// MockDataMallMockRecorder is the mock recorder for MockDataMall.
 type MockDataMallMockRecorder struct {
 	mock *MockDataMall
 }
 
-// NewMockDataMall creates a new mock instance
+// NewMockDataMall creates a new mock instance.
 func NewMockDataMall(ctrl *gomock.Controller) *MockDataMall {
 	mock := &MockDataMall{ctrl: ctrl}
 	mock.recorder = &MockDataMallMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockDataMall) EXPECT() *MockDataMallMockRecorder {
 	return m.recorder
 }
 
-// GetBusArrival mocks base method
-func (m *MockDataMall) GetBusArrival(arg0, arg1 string) (datamall.BusArrival, error) {
+// GetBusArrival mocks base method.
+func (m *MockDataMall) GetBusArrival(arg0, arg1 string) (v3.BusArrival, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBusArrival", arg0, arg1)
-	ret0, _ := ret[0].(datamall.BusArrival)
+	ret0, _ := ret[0].(v3.BusArrival)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetBusArrival indicates an expected call of GetBusArrival
+// GetBusArrival indicates an expected call of GetBusArrival.
 func (mr *MockDataMallMockRecorder) GetBusArrival(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBusArrival", reflect.TypeOf((*MockDataMall)(nil).GetBusArrival), arg0, arg1)
 }
 
-// MockTelegram is a mock of Telegram interface
+// MockTelegram is a mock of Telegram interface.
 type MockTelegram struct {
 	ctrl     *gomock.Controller
 	recorder *MockTelegramMockRecorder
 }
 
-// MockTelegramMockRecorder is the mock recorder for MockTelegram
+// MockTelegramMockRecorder is the mock recorder for MockTelegram.
 type MockTelegramMockRecorder struct {
 	mock *MockTelegram
 }
 
-// NewMockTelegram creates a new mock instance
+// NewMockTelegram creates a new mock instance.
 func NewMockTelegram(ctrl *gomock.Controller) *MockTelegram {
 	mock := &MockTelegram{ctrl: ctrl}
 	mock.recorder = &MockTelegramMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockTelegram) EXPECT() *MockTelegramMockRecorder {
 	return m.recorder
 }
 
-// Do mocks base method
+// Do mocks base method.
 func (m *MockTelegram) Do(arg0 ted.Request) (ted.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Do", arg0)
@@ -119,13 +120,13 @@ func (m *MockTelegram) Do(arg0 ted.Request) (ted.Response, error) {
 	return ret0, ret1
 }
 
-// Do indicates an expected call of Do
+// Do indicates an expected call of Do.
 func (mr *MockTelegramMockRecorder) Do(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockTelegram)(nil).Do), arg0)
 }
 
-// DoMulti mocks base method
+// DoMulti mocks base method.
 func (m *MockTelegram) DoMulti(arg0 ...ted.Request) ([]ted.Response, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
@@ -138,36 +139,36 @@ func (m *MockTelegram) DoMulti(arg0 ...ted.Request) ([]ted.Response, error) {
 	return ret0, ret1
 }
 
-// DoMulti indicates an expected call of DoMulti
+// DoMulti indicates an expected call of DoMulti.
 func (mr *MockTelegramMockRecorder) DoMulti(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DoMulti", reflect.TypeOf((*MockTelegram)(nil).DoMulti), arg0...)
 }
 
-// MockBusStopRepository is a mock of BusStopRepository interface
+// MockBusStopRepository is a mock of BusStopRepository interface.
 type MockBusStopRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockBusStopRepositoryMockRecorder
 }
 
-// MockBusStopRepositoryMockRecorder is the mock recorder for MockBusStopRepository
+// MockBusStopRepositoryMockRecorder is the mock recorder for MockBusStopRepository.
 type MockBusStopRepositoryMockRecorder struct {
 	mock *MockBusStopRepository
 }
 
-// NewMockBusStopRepository creates a new mock instance
+// NewMockBusStopRepository creates a new mock instance.
 func NewMockBusStopRepository(ctrl *gomock.Controller) *MockBusStopRepository {
 	mock := &MockBusStopRepository{ctrl: ctrl}
 	mock.recorder = &MockBusStopRepositoryMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockBusStopRepository) EXPECT() *MockBusStopRepositoryMockRecorder {
 	return m.recorder
 }
 
-// Find mocks base method
+// Find mocks base method.
 func (m *MockBusStopRepository) Find(arg0 string) (BusStop, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Find", arg0)
@@ -176,13 +177,13 @@ func (m *MockBusStopRepository) Find(arg0 string) (BusStop, error) {
 	return ret0, ret1
 }
 
-// Find indicates an expected call of Find
+// Find indicates an expected call of Find.
 func (mr *MockBusStopRepositoryMockRecorder) Find(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockBusStopRepository)(nil).Find), arg0)
 }
 
-// Nearby mocks base method
+// Nearby mocks base method.
 func (m *MockBusStopRepository) Nearby(arg0, arg1, arg2 float32, arg3 int) ([]NearbyBusStop, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Nearby", arg0, arg1, arg2, arg3)
@@ -191,13 +192,13 @@ func (m *MockBusStopRepository) Nearby(arg0, arg1, arg2 float32, arg3 int) ([]Ne
 	return ret0, ret1
 }
 
-// Nearby indicates an expected call of Nearby
+// Nearby indicates an expected call of Nearby.
 func (mr *MockBusStopRepositoryMockRecorder) Nearby(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Nearby", reflect.TypeOf((*MockBusStopRepository)(nil).Nearby), arg0, arg1, arg2, arg3)
 }
 
-// Search mocks base method
+// Search mocks base method.
 func (m *MockBusStopRepository) Search(arg0 string, arg1 int) ([]BusStop, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", arg0, arg1)
@@ -206,65 +207,65 @@ func (m *MockBusStopRepository) Search(arg0 string, arg1 int) ([]BusStop, error)
 	return ret0, ret1
 }
 
-// Search indicates an expected call of Search
+// Search indicates an expected call of Search.
 func (mr *MockBusStopRepositoryMockRecorder) Search(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockBusStopRepository)(nil).Search), arg0, arg1)
 }
 
-// MockFavouriteRepository is a mock of FavouriteRepository interface
+// MockFavouriteRepository is a mock of FavouriteRepository interface.
 type MockFavouriteRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockFavouriteRepositoryMockRecorder
 }
 
-// MockFavouriteRepositoryMockRecorder is the mock recorder for MockFavouriteRepository
+// MockFavouriteRepositoryMockRecorder is the mock recorder for MockFavouriteRepository.
 type MockFavouriteRepositoryMockRecorder struct {
 	mock *MockFavouriteRepository
 }
 
-// NewMockFavouriteRepository creates a new mock instance
+// NewMockFavouriteRepository creates a new mock instance.
 func NewMockFavouriteRepository(ctrl *gomock.Controller) *MockFavouriteRepository {
 	mock := &MockFavouriteRepository{ctrl: ctrl}
 	mock.recorder = &MockFavouriteRepositoryMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockFavouriteRepository) EXPECT() *MockFavouriteRepositoryMockRecorder {
 	return m.recorder
 }
 
-// Delete mocks base method
-func (m *MockFavouriteRepository) Delete(arg0 int, arg1 string) error {
+// Delete mocks base method.
+func (m *MockFavouriteRepository) Delete(arg0 int64, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Delete indicates an expected call of Delete
+// Delete indicates an expected call of Delete.
 func (mr *MockFavouriteRepositoryMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockFavouriteRepository)(nil).Delete), arg0, arg1)
 }
 
-// Find mocks base method
-func (m *MockFavouriteRepository) Find(arg0 int, arg1 string) string {
+// Find mocks base method.
+func (m *MockFavouriteRepository) Find(arg0 int64, arg1 string) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Find", arg0, arg1)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// Find indicates an expected call of Find
+// Find indicates an expected call of Find.
 func (mr *MockFavouriteRepositoryMockRecorder) Find(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockFavouriteRepository)(nil).Find), arg0, arg1)
 }
 
-// List mocks base method
-func (m *MockFavouriteRepository) List(arg0 int) ([]string, error) {
+// List mocks base method.
+func (m *MockFavouriteRepository) List(arg0 int64) ([]string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0)
 	ret0, _ := ret[0].([]string)
@@ -272,21 +273,21 @@ func (m *MockFavouriteRepository) List(arg0 int) ([]string, error) {
 	return ret0, ret1
 }
 
-// List indicates an expected call of List
+// List indicates an expected call of List.
 func (mr *MockFavouriteRepositoryMockRecorder) List(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockFavouriteRepository)(nil).List), arg0)
 }
 
-// Put mocks base method
-func (m *MockFavouriteRepository) Put(arg0 int, arg1, arg2 string) error {
+// Put mocks base method.
+func (m *MockFavouriteRepository) Put(arg0 int64, arg1, arg2 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Put", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Put indicates an expected call of Put
+// Put indicates an expected call of Put.
 func (mr *MockFavouriteRepositoryMockRecorder) Put(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockFavouriteRepository)(nil).Put), arg0, arg1, arg2)

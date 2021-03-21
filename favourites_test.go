@@ -10,7 +10,7 @@ func TestSQLFavouriteRepository_Find(t *testing.T) {
 	tx := getDatabaseTx()
 	defer tx.Rollback()
 
-	userID := 123
+	userID := randomInt64ID()
 	name := "SUTD"
 	query := "96049 5 24"
 	_, err := tx.Exec(`insert into favourites (user_id, name, query) values ($1, $2, $3)`, userID, name, query)
@@ -27,7 +27,7 @@ func TestSQLFavouriteRepository_Put(t *testing.T) {
 	tx := getDatabaseTx()
 	defer tx.Rollback()
 
-	userID := 123
+	userID := randomInt64ID()
 	name := "SUTD"
 	query := "96049 5 24"
 
@@ -43,7 +43,7 @@ func TestSQLFavouriteRepository_List(t *testing.T) {
 	tx := getDatabaseTx()
 	defer tx.Rollback()
 
-	userID := 123
+	userID := randomInt64ID()
 	names := []string{"SUTD", "Paya Lebar MRT"}
 	_, err := tx.Exec(
 		`insert into favourites (user_id, name, query)
@@ -68,7 +68,7 @@ func TestSQLFavouriteRepository_Delete(t *testing.T) {
 	tx := getDatabaseTx()
 	defer tx.Rollback()
 
-	userID := 123
+	userID := randomInt64ID()
 	name := "SUTD"
 	query := "96049 5 24"
 	_, err := tx.Exec(`insert into favourites (user_id, name, query) values ($1, $2, $3)`, userID, name, query)
