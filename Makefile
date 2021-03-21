@@ -1,7 +1,8 @@
 .PHONY: build start webhook
 
 build:
-	cd cmd/bete && go build -o ../../bin/bete
+	cd cmd/bete
+	go build -o ../../bin/bete -ldflags "-X main.commit=$(shell git rev-parse --short --verify HEAD)"
 
 start: build
 	bin/bete	
