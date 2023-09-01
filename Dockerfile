@@ -1,11 +1,11 @@
-FROM golang:1.14-buster as build
+FROM golang:1.21-bookworm as build
 
 COPY . /go/src/bete
 WORKDIR /go/src/bete
 
 RUN bin/build.sh
 
-FROM gcr.io/distroless/base-debian10
+FROM debian:bookworm-slim
 
 COPY --from=build /go/src/bete/dist /bete
 
