@@ -1,4 +1,4 @@
-FROM golang:1.21-bookworm as build
+FROM golang:1.23-bookworm as build
 
 COPY . /go/src/bete
 WORKDIR /go/src/bete
