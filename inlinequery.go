@@ -70,8 +70,16 @@ func (b Bete) nearbyBusStopsResults(lat, lon float32) ([]ted.InlineQueryResult, 
 }
 
 func (b Bete) HandleInlineQuery(ctx context.Context, q *ted.InlineQuery) {
-	var results []ted.InlineQueryResult
 	var err error
+	activity := InlineQueryActivity{
+		Query: q.Query,
+	}
+	err = b.UserActivity.Record(ctx, q.From.ID, activity)
+	if err != nil {
+		captureError(ctx, err)
+	}
+
+	var results []ted.InlineQueryResult
 	if q.Location != nil && q.Query == "" {
 		results, err = b.nearbyBusStopsResults(q.Location.Latitude, q.Location.Longitude)
 	} else {
@@ -89,6 +97,14 @@ func (b Bete) HandleInlineQuery(ctx context.Context, q *ted.InlineQuery) {
 }
 
 func (b Bete) HandleChosenInlineResult(ctx context.Context, r *ted.ChosenInlineResult) {
+	activity := InlineQueryResultSelectedActivity{
+		ResultID: r.ID,
+	}
+	err := b.UserActivity.Record(ctx, r.From.ID, activity)
+	if err != nil {
+		captureError(ctx, err)
+	}
+
 	stopID := r.ID
 	text, err := b.etaMessageText(ctx, stopID, nil, FormatSummary)
 	if err != nil {

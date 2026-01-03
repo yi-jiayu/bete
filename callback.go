@@ -28,7 +28,7 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	var data CallbackData
 	err := json.Unmarshal([]byte(q.Data), &data)
 	if err != nil {
-		captureMessage(ctx, "unrecogised callback")
+		captureMessage(ctx, "unrecognised callback")
 		return
 	}
 	switch data.Type {
@@ -57,7 +57,7 @@ func (b Bete) HandleCallbackQuery(ctx context.Context, q *ted.CallbackQuery) {
 	case callbackNearbyETA:
 		b.resendETAs(ctx, q, data)
 	default:
-		captureMessage(ctx, "unrecogised callback")
+		captureMessage(ctx, "unrecognised callback")
 		return
 	}
 	callbackQueriesTotal.WithLabelValues(data.Type).Inc()
@@ -73,6 +73,17 @@ func (b Bete) answerCallbackQueryError(ctx context.Context, q *ted.CallbackQuery
 }
 
 func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
+	activity := EtaRefreshActivity{
+		StopID:          data.StopID,
+		Filter:          data.Filter,
+		Format:          string(data.Format),
+		IsInlineMessage: q.InlineMessageID != "",
+	}
+	err := b.UserActivity.Record(ctx, q.From.ID, activity)
+	if err != nil {
+		captureError(ctx, err)
+	}
+
 	text, err := b.etaMessageText(ctx, data.StopID, data.Filter, data.Format)
 	if err != nil {
 		captureError(ctx, err)
@@ -99,6 +110,16 @@ func (b Bete) updateETAs(ctx context.Context, q *ted.CallbackQuery, data Callbac
 }
 
 func (b Bete) resendETAs(ctx context.Context, q *ted.CallbackQuery, data CallbackData) {
+	activity := EtaResendActivity{
+		StopID: data.StopID,
+		Filter: data.Filter,
+		Format: string(data.Format),
+	}
+	err := b.UserActivity.Record(ctx, q.From.ID, activity)
+	if err != nil {
+		captureError(ctx, err)
+	}
+
 	text, err := b.etaMessageText(ctx, data.StopID, data.Filter, data.Format)
 	if err != nil {
 		captureError(ctx, err)

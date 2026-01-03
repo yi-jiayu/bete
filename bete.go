@@ -35,11 +35,12 @@ type Bete struct {
 	Version                string
 	StreetViewStaticAPIKey string
 
-	Clock      Clock
-	BusStops   BusStopRepository
-	Favourites FavouriteRepository
-	DataMall   DataMall
-	Telegram   Telegram
+	Clock        Clock
+	BusStops     BusStopRepository
+	Favourites   FavouriteRepository
+	UserActivity *UserActivityRepository
+	DataMall     DataMall
+	Telegram     Telegram
 }
 
 func sentrySetUser(ctx context.Context, id int64) {

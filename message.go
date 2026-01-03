@@ -41,6 +41,14 @@ func (b Bete) HandleTextMessage(ctx context.Context, m *ted.Message) {
 			return
 		}
 	}
+	activity := EtaRequestMessageActivity{
+		StopID: query.Stop,
+		Filter: query.Filter,
+	}
+	err := b.UserActivity.Record(ctx, m.From.ID, activity)
+	if err != nil {
+		captureError(ctx, err)
+	}
 	text, err := b.etaMessageText(ctx, query.Stop, query.Filter, FormatSummary)
 	if err != nil {
 		captureError(ctx, err)
@@ -164,6 +172,12 @@ func (b Bete) addFavouriteFinish(ctx context.Context, m *ted.Message, query stri
 func (b Bete) HandleLocation(ctx context.Context, m *ted.Message) {
 	chatID := m.Chat.ID
 	location := m.Location
+
+	activity := LocationQueryActivity{}
+	err := b.UserActivity.Record(ctx, m.From.ID, activity)
+	if err != nil {
+		captureError(ctx, err)
+	}
 
 	nearby, err := b.BusStops.Nearby(location.Latitude, location.Longitude, float32(1), 5)
 

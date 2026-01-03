@@ -122,6 +122,7 @@ func main() {
 		Clock:                  bete.RealClock{},
 		BusStops:               bete.SQLBusStopRepository{DB: db},
 		Favourites:             bete.SQLFavouriteRepository{DB: db},
+		UserActivity:           &bete.UserActivityRepository{DB: db},
 		DataMall:               dm,
 		Telegram:               bot,
 	}
