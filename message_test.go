@@ -414,18 +414,14 @@ func TestBete_HandleReply_etaCommandArgsInvalid(t *testing.T) {
 	}
 }
 
-func TestBete_HandleReply_noMatch(t *testing.T) {
+func TestBete_HandleReply_noMatch_fallsThrough(t *testing.T) {
 	b, finish := newMockBete(t)
 	defer finish()
 
 	userID := randomInt64ID()
 	chatID := randomInt64ID()
-	req := ted.SendMessageRequest{
-		ChatID: chatID,
-		Text:   "Sorry, I forgot what we were talking about.",
-	}
 
-	b.Telegram.(*MockTelegram).EXPECT().Do(req).Return(ted.Response{}, nil)
+	b.Favourites.(*MockFavouriteRepository).EXPECT().Find(userID, "anything").Return("")
 
 	update := ted.Update{
 		Message: &ted.Message{

@@ -104,10 +104,7 @@ func (b Bete) HandleReply(ctx context.Context, m *ted.Message) {
 	} else if m.ReplyToMessage.Text == stringETACommandPrompt {
 		b.handleETACommand(ctx, m, m.Text)
 	} else {
-		b.send(ctx, ted.SendMessageRequest{
-			ChatID: m.Chat.ID,
-			Text:   "Sorry, I forgot what we were talking about.",
-		})
+		b.HandleTextMessage(ctx, m)
 	}
 }
 
